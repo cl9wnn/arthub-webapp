@@ -1,10 +1,22 @@
-using System.Net;
+﻿using System.Net;
+using System.Text;
 
-namespace ArtHub;
+namespace ArtHub.Controllers;
 
-public static class StaticFileHandler
+
+public class StaticFileController
 {
-    public static async Task ShowStatic(HttpListenerContext context, CancellationToken token)
+    [Route("/", "GET")]
+    public async Task ShowIndexAsync(HttpListenerContext context, CancellationToken cancellationToken)
+    {
+        const string path = "index.html";
+        await ShowResourceFile(path, context, cancellationToken);
+    }
+    
+    [Route("/style.css", "GET")]
+    [Route("/favicon.ico", "GET")]
+    [Route("/script.js", "GET")]
+    public  async Task ShowStaticFileAsync(HttpListenerContext context, CancellationToken token)
     {
         if (context.Request.Url?.LocalPath == null)
         {
@@ -22,12 +34,7 @@ public static class StaticFileHandler
         }
         await ShowResourceFile(path,context, token);
     }
-
-    public static async Task ShowIndex(HttpListenerContext context, CancellationToken token)
-    {
-        const string path = "index.html";
-        await ShowResourceFile(path, context, token);
-    }
+    
     private static async Task ShowResourceFile(string path, HttpListenerContext context, CancellationToken token)
     {
         context.Response.StatusCode = 200;

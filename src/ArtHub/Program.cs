@@ -2,29 +2,19 @@
 using ArtHub;
 
 var httpListener = new HttpListener();
+var routeHandler = new RouteHandler();
 httpListener.Prefixes.Add("http://localhost:5050/");
 httpListener.Start();
 
 while (httpListener.IsListening)
 {
     var context = await httpListener.GetContextAsync();
-    var request = context.Request;
-    var response = context.Response;
-    var ctx = new CancellationTokenSource();
 
     _ = Task.Run(async () =>
     {
-        switch (request.Url?.LocalPath)
-        {
-            case "/" when request.HttpMethod == "GET":
-                await StaticFileHandler.ShowIndex(context, ctx.Token);
-                break;
-            default:
-                await StaticFileHandler.ShowStatic(context, ctx.Token);
-                break;
-        }
-        response.OutputStream.Close();
-        response.Close();
+        await routeHandler.HandleRequest(context);
+        context.Response.OutputStream.Close();
+        context.Response.Close();
     });
 }
 httpListener.Stop();
