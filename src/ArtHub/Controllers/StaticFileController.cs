@@ -1,8 +1,5 @@
 ﻿using System.Net;
-using System.Text;
-
 namespace ArtHub.Controllers;
-
 
 public class StaticFileController
 {
