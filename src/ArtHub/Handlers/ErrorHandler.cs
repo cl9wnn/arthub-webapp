@@ -5,11 +5,10 @@ namespace ArtHub;
 
 public static class ErrorHandler
 {
-    public static async Task Show404(HttpListenerContext context, CancellationToken cancellationToken)
+    public static async Task ShowError(int code, string message, HttpListenerContext context, CancellationToken token)
     {
-        context.Response.StatusCode = 404;
+        context.Response.StatusCode = code;
         context.Response.ContentType = "text/html; charset=utf-8"; 
-        const string message = "Такая страница не найдена!";
-        await context.Response.OutputStream.WriteAsync(Encoding.UTF8.GetBytes(message), cancellationToken);
+        await context.Response.OutputStream.WriteAsync(Encoding.UTF8.GetBytes(message), token);
     }
 }

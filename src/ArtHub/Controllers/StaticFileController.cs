@@ -17,7 +17,7 @@ public class StaticFileController
     {
         if (context.Request.Url?.LocalPath == null)
         {
-            await ErrorHandler.Show404(context, token);
+            await ErrorHandler.ShowError(404, "Такой страницы нет!", context, token);
             return; 
         }
     
@@ -26,7 +26,7 @@ public class StaticFileController
 
         if (!File.Exists(filePath))
         {
-            await ErrorHandler.Show404(context,token);
+            await ErrorHandler.ShowError(404, "Такой страницы нет!", context,token);
             return;
         }
         await ShowResourceFile(path,context, token);

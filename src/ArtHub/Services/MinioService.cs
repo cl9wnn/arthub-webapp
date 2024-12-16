@@ -1,24 +1,20 @@
 ﻿using Minio;
 using Minio.DataModel.Args;
-namespace ArtHub;
+namespace ArtHub.Services;
 
 public class MinioService
 {
-    private readonly IMinioClient _minioClient;
+    //TODO: сделать конфиг и брать ключи оттуда
     private const string BucketName = "image-bucket";
     private const string Endpoint = "localhost:9000";
     private const string AccessKey = "minioadmin";
     private const string SecretKey = "minioadmin";
-    
-    //TODO: сделать конфиг и брать ключи оттуда
-    public MinioService()
-    {
-        _minioClient = new MinioClient()
-            .WithEndpoint(Endpoint)
-            .WithCredentials(AccessKey, SecretKey)
-            .Build();
-    }
-    
+
+    private readonly IMinioClient _minioClient = new MinioClient()
+        .WithEndpoint(Endpoint)
+        .WithCredentials(AccessKey, SecretKey)
+        .Build();
+
     private async Task EnsureBucketExistsAsync()
     {
         var found = await _minioClient.BucketExistsAsync(new BucketExistsArgs().WithBucket(BucketName));
