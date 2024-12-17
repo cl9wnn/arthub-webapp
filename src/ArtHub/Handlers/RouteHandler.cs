@@ -77,7 +77,7 @@ public class RouteHandler
         
         if (path == null || !_routes.TryGetValue((path, method), out var action))
         {
-            await ErrorHandler.ShowError(404,"Такой страницы нет!" , context, ctx.Token);
+            await WebHelper.ShowError(404,"Такой страницы нет!" , context, ctx.Token);
             return;
         }
         
