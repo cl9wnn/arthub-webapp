@@ -26,6 +26,9 @@ public class RouteHandler
 
         var authController = new AuthController(authService);
         _dependencies[typeof(AuthController)] = authController;
+        
+        var testController = new TestController(authService);
+        _dependencies[typeof(TestController)] = testController;
     }
     private void RegisterRoutes()
     {

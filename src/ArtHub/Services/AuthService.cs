@@ -1,4 +1,6 @@
-﻿using System.Security.Authentication;
+﻿using System.Net;
+using System.Security.Authentication;
+using System.Text;
 using ArtHub.Entities;
 using ArtHub.Models;
 
@@ -41,5 +43,24 @@ public class AuthService(DbContext dbContext)
         {
             Token = JwtService.GenerateJwtToken(user)
         };
+    }
+
+    public async Task<User> AuthorizeUserAsync(HttpListenerContext context, CancellationToken cancellationToken)
+    {
+        var auth = context.Request.Headers["Authorization"];
+        
+        if (auth == null)
+        {
+           throw new AuthenticationException("Missing authorization header.");
+        }
+        var token = auth.Split()[1];
+        var tokenValidationResult = JwtService.ValidateJwtToken(token);
+        
+        if (tokenValidationResult.isSuccess)
+        {
+            return tokenValidationResult.user;
+        }
+        
+        throw new AuthenticationException("Invalid token.");
     }
 }
