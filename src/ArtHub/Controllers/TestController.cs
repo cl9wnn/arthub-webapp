@@ -1,17 +1,19 @@
 ﻿using System.Net;
 using System.Security.Authentication;
+using ArtHub.Attributes;
 using ArtHub.Services;
 
 namespace ArtHub.Controllers;
 
 public class TestController(AuthService authService)
 {
+    [Authorize("user")]
     [Route("/test", "GET")]
     public async Task TestAuth(HttpListenerContext context, CancellationToken token)
     {
         try
         {
-            var auth = await authService.AuthorizeUserAsync(context, token);
+            await WebHelper.WriteJsonAsync("OK", context, token);
         }
         catch (AuthenticationException ex)
         {

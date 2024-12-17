@@ -1,5 +1,7 @@
 ﻿using System.Net;
 using System.Reflection;
+using System.Security.Authentication;
+using ArtHub.Attributes;
 using ArtHub.Controllers;
 using ArtHub.Services;
 
@@ -50,7 +52,6 @@ public class RouteHandler
             }
         }
     }
-    
     private object CreateControllerInstance(Type controllerType)
     {
         var constructor = controllerType.GetConstructors().FirstOrDefault();
@@ -77,14 +78,35 @@ public class RouteHandler
         var path = context.Request.Url?.LocalPath;
         var method = context.Request.HttpMethod;
         var ctx = new CancellationTokenSource();
-        
+
         if (path == null || !_routes.TryGetValue((path, method), out var action))
         {
-            await WebHelper.ShowError(404,"Такой страницы нет!" , context, ctx.Token);
+            await WebHelper.ShowError(404, "Page not found", context, ctx.Token);
             return;
         }
-        
+
         var controller = _controllers[action.DeclaringType!];
+
+        var authorizeAttribute = action.GetCustomAttribute<AuthorizeAttribute>() ??
+                                 action.DeclaringType?.GetCustomAttribute<AuthorizeAttribute>();
+
+        if (authorizeAttribute != null)
+        {
+                var authService = (AuthService)_dependencies[typeof(AuthService)]!;
+                var user = await authService.AuthorizeUserAsync(context, ctx.Token);
+
+                if (user == null)
+                {
+                    await WebHelper.ShowError(401,"Not authorized", context, ctx.Token);
+                    return;
+                }
+                if (!authorizeAttribute.Role.Contains(user.Role!))
+                {
+                    await WebHelper.ShowError(403, "Forbidden: Insufficient permissions", context, ctx.Token);
+                    return;
+                }
+        }
+        
         await (Task)action.Invoke(controller, new object[] { context, ctx.Token })!;
     }
 }

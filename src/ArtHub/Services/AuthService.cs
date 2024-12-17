@@ -45,22 +45,17 @@ public class AuthService(DbContext dbContext)
         };
     }
 
-    public async Task<User> AuthorizeUserAsync(HttpListenerContext context, CancellationToken cancellationToken)
+    public async Task<User?> AuthorizeUserAsync(HttpListenerContext context, CancellationToken cancellationToken)
     {
         var auth = context.Request.Headers["Authorization"];
         
         if (auth == null)
         {
-           throw new AuthenticationException("Missing authorization header.");
+            return null;
         }
-        var token = auth.Split()[1];
+        var token = auth!.Split()[1];
         var tokenValidationResult = JwtService.ValidateJwtToken(token);
         
-        if (tokenValidationResult.isSuccess)
-        {
-            return tokenValidationResult.user;
-        }
-        
-        throw new AuthenticationException("Invalid token.");
+        return tokenValidationResult.isSuccess ? tokenValidationResult.user : null;
     }
 }
