@@ -8,54 +8,57 @@ namespace ArtHub.Services;
 
 public class AuthService(DbContext dbContext)
 {
-    public async Task<User> RegisterUserAsync(User user, CancellationToken cancellationToken)
+    public async Task<Result<User>> RegisterUserAsync(User user, CancellationToken cancellationToken)
     {
         if (await dbContext.GetUserAsync(user.Login, cancellationToken) != null)
-            throw new InvalidOperationException($"User with login {user.Login} already exists."); 
+            return Result<User>.Failure(409,$"User with login {user.Login} already exists.")!; 
         
         var validator = new UserValidator();
         var validationResult = await  validator.ValidateAsync(user, cancellationToken);
 
         if (!validationResult.IsValid)
-            throw new AuthenticationException("Invalid login or password.");
+            return Result<User>.Failure(401, validationResult.ToString())!;
 
         user!.Password = MyPasswordHasher.HashPassword(user.Password);
         
-        return await dbContext.CreateUserAsync(user.Login!, user.Password, cancellationToken);
+        var createdUser = await dbContext.CreateUserAsync(user.Login!, user.Password, cancellationToken);
+        return Result<User>.Success(createdUser);
     }
 
-    public async Task<AuthResult> LoginUserAsync(UserLoginModel userModel, CancellationToken cancellationToken)
+    public async Task<Result<AuthResult>> LoginUserAsync(UserLoginModel userModel, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(userModel.Login) || string.IsNullOrWhiteSpace(userModel.Password))
-            throw new ArgumentException("Login or Password cannot be null or empty");
+            return Result<AuthResult>.Failure(400,"Login or Password cannot be null or empty")!;
         
         var user = await dbContext.GetUserAsync(userModel.Login, cancellationToken);
         
         if (user == null)
-            throw new KeyNotFoundException($"User with login '{userModel.Login}' was not found.");;
+          return Result<AuthResult>.Failure(404, $"User with login '{userModel.Login}' was not found.")!;
                 
         var validationResult = MyPasswordHasher.ValidatePassword(user!.Password!, userModel!.Password!);
 
         if (!validationResult)
-            throw new AuthenticationException("Invalid password.");
-
-        return new AuthResult
+            return Result<AuthResult>.Failure(401,"Invalid password.")!;
+        
+        var authResult =  new AuthResult
         {
             Token = JwtService.GenerateJwtToken(user)
         };
+        
+        return Result<AuthResult>.Success(authResult);
     }
 
-    public async Task<User?> AuthorizeUserAsync(HttpListenerContext context, CancellationToken cancellationToken)
+    public Task<User?> AuthorizeUserAsync(HttpListenerContext context, CancellationToken cancellationToken)
     {
-        var auth = context.Request.Headers["Authorization"];
+        var authHeader = context.Request.Headers["Authorization"];
         
-        if (auth == null)
+        if (authHeader == null)
         {
-            return null;
+            return Task.FromResult<User?>(null);
         }
-        var token = auth!.Split()[1];
+        var token = authHeader!.Split()[1];
         var tokenValidationResult = JwtService.ValidateJwtToken(token);
         
-        return tokenValidationResult.isSuccess ? tokenValidationResult.user : null;
+        return Task.FromResult(tokenValidationResult.isSuccess ? tokenValidationResult.user : null);
     }
 }

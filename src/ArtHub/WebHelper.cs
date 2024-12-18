@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Text;
 using System.Text.Json;
-using ArtHub.Entities;
 
 namespace ArtHub;
 
@@ -37,7 +36,7 @@ public static class WebHelper
     {
         context.Response.StatusCode = code;
         context.Response.ContentType = "text/html; charset=utf-8"; 
-        await context.Response.OutputStream.WriteAsync(Encoding.UTF8.GetBytes(message), token);
+        await context.Response.OutputStream.WriteAsync(Encoding.UTF8.GetBytes(message!), token);
     }
     public static async Task ShowResourceFile(string path, HttpListenerContext context, CancellationToken token)
     {

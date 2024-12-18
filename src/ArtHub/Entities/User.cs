@@ -2,8 +2,8 @@
 
 public class User
 {
-    public long UserId { get; set; }
-    public string? Login { get; set; }
+    public long UserId { get; init; }
+    public string? Login { get; init; }
     public string? Password { get; set; }
-    public string? Role { get; set; }
+    public string? Role { get; init; }
 }
