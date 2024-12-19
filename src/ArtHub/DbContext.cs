@@ -6,7 +6,7 @@ namespace ArtHub;
 public class DbContext
 {
     //TODO: убрать в переменные окружения
-    private const string _connectionString = "Host=localhost;Port=5555;Username=postgres;Password=1029384756u;Database=apod";
+    private const string _connectionString = "Host=localhost;Port=5555;Username=postgres;Password=1029384756u;Database=arthub";
     private readonly NpgsqlConnection _dbConnection = new(_connectionString);
     
     public async Task<User> CreateUserAsync(string login, string password, CancellationToken cancellationToken = default)

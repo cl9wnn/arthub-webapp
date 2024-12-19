@@ -25,7 +25,7 @@ public static class JwtService
         var token = new JwtSecurityToken(
             issuer: "http://localhost:5050",
             audience: "http://localhost:5050",
-            expires: DateTime.Now.AddMinutes(60),
+            expires: DateTime.Now.AddMinutes(1),
             claims: claims,
             signingCredentials: credentials
         );
@@ -41,6 +41,7 @@ public static class JwtService
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
+            ClockSkew = TimeSpan.Zero,
             ValidIssuer = "http://localhost:5050",
             ValidAudience = "http://localhost:5050",
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey!))

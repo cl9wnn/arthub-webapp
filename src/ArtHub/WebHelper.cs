@@ -35,8 +35,17 @@ public static class WebHelper
     public static async Task ShowError(int code, string message, HttpListenerContext context, CancellationToken token)
     {
         context.Response.StatusCode = code;
-        context.Response.ContentType = "text/html; charset=utf-8"; 
-        await context.Response.OutputStream.WriteAsync(Encoding.UTF8.GetBytes(message!), token);
+        context.Response.ContentType = "application/json"; 
+        
+        var responseBody = JsonSerializer.Serialize(message,
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                
+            }
+        );
+        var bytes = Encoding.UTF8.GetBytes(responseBody);
+        await context.Response.OutputStream.WriteAsync(bytes, token);
     }
     public static async Task ShowResourceFile(string path, HttpListenerContext context, CancellationToken token)
     {
@@ -45,7 +54,7 @@ public static class WebHelper
         {
             "html" => "text/html",
             "css" => "text/css",
-            "js" => "text/js",
+            "js" => "text/javascript",
             "svg" => "image/svg+xml",
             "ico" => "image/x-icon",
             _ => "application/octet-stream"

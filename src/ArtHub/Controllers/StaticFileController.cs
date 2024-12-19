@@ -13,6 +13,7 @@ public class StaticFileController
     [Route("/style.css", "GET")]
     [Route("/favicon.ico", "GET")]
     [Route("/script.js", "GET")]
+    [Route("/auth.js", "GET")]
     public  async Task ShowStaticFileAsync(HttpListenerContext context, CancellationToken token)
     {
         if (context.Request.Url?.LocalPath == null)
