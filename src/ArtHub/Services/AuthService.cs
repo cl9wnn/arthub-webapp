@@ -8,21 +8,26 @@ namespace ArtHub.Services;
 
 public class AuthService(DbContext dbContext)
 {
-    public async Task<Result<User>> RegisterUserAsync(User user, CancellationToken cancellationToken)
+    public async Task<Result<AuthResult>> RegisterUserAsync(User user, CancellationToken cancellationToken)
     {
         if (await dbContext.GetUserAsync(user.Login, cancellationToken) != null)
-            return Result<User>.Failure(409,$"User with login {user.Login} already exists.")!; 
+            return Result<AuthResult>.Failure(409,$"User with login {user.Login} already exists.")!; 
         
         var validator = new UserValidator();
         var validationResult = await  validator.ValidateAsync(user, cancellationToken);
 
         if (!validationResult.IsValid)
-            return Result<User>.Failure(401, validationResult.ToString())!;
+            return Result<AuthResult>.Failure(401, validationResult.ToString())!;
 
         user!.Password = MyPasswordHasher.HashPassword(user.Password);
         
         var createdUser = await dbContext.CreateUserAsync(user.Login!, user.Password, cancellationToken);
-        return Result<User>.Success(createdUser);
+        
+        var authResult =  new AuthResult
+        {
+            Token = JwtService.GenerateJwtToken(createdUser)
+        };
+        return Result<AuthResult>.Success(authResult);
     }
 
     public async Task<Result<AuthResult>> LoginUserAsync(UserLoginModel userModel, CancellationToken cancellationToken)

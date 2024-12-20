@@ -34,7 +34,7 @@ header h1 {
     font-weight: bold;
 }
 
-.btn {
+.btnText {
     padding: 8px 17px;
     border: none;
     border-radius: 5px;
@@ -49,37 +49,47 @@ header h1 {
     gap: 14px;
 }
 
-.sign-up {
+#signup {
     background-color: #007BFF;
     color: #fff;
 }
 
-.sign-up:hover {
+#signup:hover {
     background-color: #0056b3;
 }
 
-.sign-in {
+#signin {
     background-color: #28A745;
     color: #fff;
 }
 
-.sign-in:hover {
+#signin:hover {
     background-color: #1e7e34;
 }
 
-.market {
+.btnImg {
     width: 40px; 
     height: 40px; 
     border: none;
-    background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Ic_shopping_cart_48px.svg/1200px-Ic_shopping_cart_48px.svg.png");
     background-size: contain; 
     background-repeat: no-repeat;
     background-position: center; 
     cursor: pointer;
     background-color: transparent;
 }
+#market{
+    background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Ic_shopping_cart_48px.svg/1200px-Ic_shopping_cart_48px.svg.png");
+}
 
-.market:hover{
+#market:hover{
+    background-color: #313131;
+}
+
+#account{
+    background-image: url("https://tyumenczevskij-r22.gosweb.gosuslugi.ru/netcat_files/8/110/img_243887_13.png");
+    display: none; 
+}
+#account:hover{
     background-color: #313131;
 }
 

@@ -1,95 +1,66 @@
-﻿export const someVariable = 'Hello'
+﻿document.addEventListener('DOMContentLoaded', () => {
+    const setupButton = (id, createFormMethod, path, buttonText) => {
+        document.getElementById(id).addEventListener('click', (event) => {
+            event.preventDefault();
+            showForm(createFormMethod, path, buttonText);
+        });
+    };
 
-document.getElementById('signup').addEventListener('click', (event) => {
-    event.preventDefault();
-    showForm(createRegistrationForm,"/auth/signup", "Sign up");
+    setupButton('signup', createRegistrationForm, '/auth/signup', 'Sign up');
+    setupButton('signin', createLoginForm, '/auth/signin', 'Sign in');
 });
 
-document.getElementById('signin').addEventListener('click', (event) => {
-    event.preventDefault();
-    showForm(createLoginForm,"/auth/signin", "Sign in");
-});
+export const tokenStorage = {
+    save: (token) => localStorage.setItem('jwtToken', token),
+    get: () => localStorage.getItem('jwtToken'),
+    remove: () => localStorage.removeItem('jwtToken')
+};
 
-function saveToken(token) {
-    localStorage.setItem('jwtToken', token);
-}
-
-export function getToken() {
-    return localStorage.getItem('jwtToken');
-}
-
-function removeToken() {
-    localStorage.removeItem('jwtToken');
-}
-
-function createOverlay() {
-    const overlay = document.createElement('div');
-    overlay.className = "overlay";
-    return overlay;
-}
-
-function createPopup() {
-    const popup = document.createElement('div');
-    popup.className = "popup";
-
-    const closeButton = document.createElement('button');
-    closeButton.textContent = "×";
-    closeButton.className = "close-button";
-    closeButton.addEventListener('click', () => {
-        document.body.removeChild(document.querySelector('.overlay'));
+const createElement = (tag, options = {}) => {
+    const element = document.createElement(tag);
+    Object.entries(options).forEach(([key, value]) => {
+        if (key === 'className') element.className = value;
+        else if (key === 'textContent') element.textContent = value;
+        else if (key.startsWith('on')) element.addEventListener(key.slice(2).toLowerCase(), value);
+        else element[key] = value;
     });
+    return element;
+};
 
+const createOverlay = () => createElement('div', { className: 'overlay' });
+
+const createPopup = (onClose) => {
+    const popup = createElement('div', { className: 'popup' });
+    const closeButton = createElement('button', {
+        textContent: '×',
+        className: 'close-button',
+        onClick: () => {
+            document.body.removeChild(document.querySelector('.overlay'));
+            if (onClose) onClose();
+        }
+    });
     popup.appendChild(closeButton);
     return popup;
-}
+};
 
-function showForm(createFormMethod, path, bttnText) {
+const showForm = (createFormMethod, path, buttonText) => {
     const overlay = createOverlay();
-    const popup = createPopup();
+    const popup = createPopup(() => document.body.removeChild(overlay));
 
-    const form = createFormMethod(
-        () => document.body.removeChild(overlay),
-        path,
-        bttnText
-    );
+    const form = createFormMethod(() => document.body.removeChild(overlay), path, buttonText);
     popup.appendChild(form);
-
     overlay.appendChild(popup);
+
     document.body.appendChild(overlay);
-}
-function createInputField(type, name, placeholder) {
-    const input = document.createElement('input');
-    input.type = type;
-    input.name = name;
-    input.placeholder = placeholder;
-    input.required = true;
-    input.className = "input-field";
-    return input;
-}
+};
 
-function createErrorField() {
-    const errorField = document.createElement('span');
-    errorField.className = 'error-message';
-    errorField.textContent = '';
-    return errorField;
-}
+const createInputField = (type, name, placeholder) =>
+    createElement('input', { type, name, placeholder, required: true, className: 'input-field' });
 
-function createRegistrationForm(onClose, path) {
-    return createForm(path, 'Зарегистрироваться', async (data, path) => {
-        await handleSubmitSignUp(data, path);
-        onClose();
-    }, true);
-}
+const createErrorField = () => createElement('span', { className: 'error-message' });
 
-function createLoginForm(onClose, path) {
-    return createForm(path, 'Войти', async (data, path) => {
-        await handleSubmitSignIn(data, path);
-        onClose();
-    });
-}
-
-function createForm(path, bttnText, onSubmitHandler, validate = false) {
-    const form = document.createElement('form');
+const createForm = (path, buttonText, onSubmitHandler, validate = false) => {
+    const form = createElement('form');
 
     const nameField = createInputField('text', 'login', 'Введите логин');
     const passwordField = createInputField('password', 'password', 'Введите пароль');
@@ -97,16 +68,13 @@ function createForm(path, bttnText, onSubmitHandler, validate = false) {
     const nameError = createErrorField();
     const passwordError = createErrorField();
 
-    const submitButton = document.createElement('button');
-    submitButton.type = "submit";
-    submitButton.textContent = bttnText;
-    submitButton.className = "submit-button";
+    const submitButton = createElement('button', {
+        type: 'submit',
+        textContent: buttonText,
+        className: 'submit-button'
+    });
 
-    form.appendChild(nameField);
-    form.appendChild(nameError);
-    form.appendChild(passwordField);
-    form.appendChild(passwordError);
-    form.appendChild(submitButton);
+    [nameField, nameError, passwordField, passwordError, submitButton].forEach(el => form.appendChild(el));
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -114,85 +82,69 @@ function createForm(path, bttnText, onSubmitHandler, validate = false) {
         nameError.textContent = '';
         passwordError.textContent = '';
 
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
+        const formData = Object.fromEntries(new FormData(form).entries());
 
         if (validate) {
-            const errors = validateFields(data);
-
+            const errors = validateFields(formData);
             if (Object.keys(errors).length > 0) {
-                if (errors.login) {
-                    nameError.textContent = errors.login;
-                }
-
-                if (errors.password) {
-                    passwordError.textContent = errors.password;
-                }
+                nameError.textContent = errors.login || '';
+                passwordError.textContent = errors.password || '';
                 return;
             }
         }
-        await onSubmitHandler(data, path);
+        await onSubmitHandler(formData, path);
     });
 
     return form;
-}
+};
 
-
-function validateFields(data) {
+const validateFields = (data) => {
     const errors = {};
 
-    const loginRegex = /^[a-zA-Z0-9_]{5,20}$/;
-    if (!data.login || !loginRegex.test(data.login)) {
+    if (!/^[a-zA-Z0-9_]{5,20}$/.test(data.login)) {
         errors.login = "Логин должен быть от 5 до 20 символов и содержать только латинские буквы, цифры и символы подчеркивания.";
     }
 
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
-    if (!data.password || !passwordRegex.test(data.password)) {
+    if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/.test(data.password)) {
         errors.password = "Пароль должен быть от 8 до 20 символов, содержать минимум одну букву, одну цифру и один специальный символ.";
     }
 
     return errors;
-}
-async function handleSubmitSignUp(data, path) {
+};
+
+const createRegistrationForm = (onClose, path) =>
+    createForm(path, 'Зарегистрироваться', async (data) => {
+        await handleSubmit('/auth/signup', data);
+        onClose();
+    }, true);
+
+const createLoginForm = (onClose, path) =>
+    createForm(path, 'Войти', async (data) => {
+        await handleSubmit('/auth/signin', data);
+        onClose();
+    });
+
+const handleSubmit = async (path, data) => {
     try {
         const response = await fetch(path, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
         });
 
         if (!response.ok) {
-            const result = await response.json();
-            throw new Error(result);
+            throw new Error((await response.json()) || 'Ошибка при выполнении запроса');
         }
+
+        const { token } = await response.json();
+        tokenStorage.save(token);
+
+        document.getElementById('account').style.display = 'block';
+        document.getElementById('signup').style.display = 'none';
+        document.getElementById('signin').style.display = 'none';
 
         alert('Успешно!');
     } catch (error) {
-        alert(error.message || 'Произошла ошибка');
+        alert(error.message);
     }
-}
-
-async function handleSubmitSignIn(data, path) {
-    try {
-        const response = await fetch(path, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        });
-
-        if (!response.ok) {
-            const result = await response.json();
-            throw new Error(result);
-        }
-
-        const responseData = await response.json();
-        saveToken(responseData.token);
-        alert("Успешно!")
-    } catch (error) {
-        alert(error.message || 'Произошла ошибка');
-    }
-}
+};
