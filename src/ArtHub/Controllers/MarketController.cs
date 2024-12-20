@@ -5,19 +5,13 @@ using ArtHub.Services;
 
 namespace ArtHub.Controllers;
 
-public class MarketController
+public class MarketController: BaseController
 {
     [Authorize("user")]
     [Route("/market", "GET")]
-    public async Task LoadMarket(HttpListenerContext context, CancellationToken token)
+    public IActionResult ShowMarketPage(HttpListenerContext context, CancellationToken cancellationToken)
     {
-        try
-        {
-            await WebHelper.WriteJsonAsync("OK", context, token);
-        }
-        catch (AuthenticationException ex)
-        {
-            await WebHelper.ShowError(401, ex.Message, context, token);
-        }
+        const string path = "public/MarketPage/index.html";
+        return new JsonResult<string>(path);
     }
 }

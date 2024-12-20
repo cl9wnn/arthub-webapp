@@ -1,26 +1,23 @@
 ﻿using System.Net;
 namespace ArtHub.Controllers;
 
-public class StaticFileController
+public class StaticFileController: BaseController
 {
-    
     [Route("/static/*", "GET")]
-    public  async Task ShowStaticFileAsync(HttpListenerContext context, CancellationToken token)
+    public IActionResult ShowStaticFileAsync(HttpListenerContext context, CancellationToken token)
     {
         if (context.Request.Url?.LocalPath == null)
         {
-            await WebHelper.ShowError(404, "Такой страницы нет!", context, token);
-            return; 
+            return new ErrorResult(404, "Такой страницы нет!");
         }
         
-        var path = context.Request.Url.LocalPath["/static".Length..];
+        var path = context.Request.Url!.LocalPath["/static".Length..];
         var filePath = $"public/{path}";
 
         if (!File.Exists(filePath))
         {
-            await WebHelper.ShowError(404, "Такой страницы нет!", context,token);
-            return;
-        }
-        await WebHelper.ShowResourceFile(path, context, token);
+            return new ErrorResult(404, "Такой страницы нет!");
+        } 
+        return new ResourceResult(filePath);
     }
 }

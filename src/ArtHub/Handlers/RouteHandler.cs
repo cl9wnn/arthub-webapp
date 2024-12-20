@@ -33,12 +33,13 @@ public class RouteHandler
     {
         var controllerTypes = Assembly.GetExecutingAssembly()
             .GetTypes()
-            .Where(t => t.IsClass && t.GetMethods().Any(m => m.GetCustomAttributes<RouteAttribute>().Any()));
+            .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(BaseController)));
         
         foreach (var controllerType in controllerTypes)
         {
             var controllerInstance = CreateControllerInstance(controllerType);
             _controllers[controllerType] = controllerInstance;
+            
             foreach (var method in controllerType.GetMethods())
             {
                 var attributes = method.GetCustomAttributes<RouteAttribute>();
@@ -57,11 +58,11 @@ public class RouteHandler
             throw new InvalidOperationException($"Controller {controllerType.Name} has no public constructor.");
 
         var parameters = constructor.GetParameters();
-        var resolvedParameters = parameters.Select<ParameterInfo, object>(p =>
+        var resolvedParameters = parameters.Select(p =>
         {
             if (_dependencies.TryGetValue(p.ParameterType, out var dependency))
             {
-                return dependency;
+                return dependency!;
             }
 
             throw new InvalidOperationException($"Cannot resolve dependency: {p.ParameterType.Name}");
@@ -115,7 +116,17 @@ public class RouteHandler
                 }
         }
         
-        await (Task)action.Invoke(controller, new object[] { context, ctx.Token })!;
+        var result = action.Invoke(controller, new object[] { context, ctx.Token });
+
+        if (result is Task<IActionResult> asyncResult)
+        {
+            var actionResult = await asyncResult;
+            await actionResult.ExecuteAsync(context, ctx.Token);
+        }
+        else if (result is IActionResult syncResult)
+        {
+            await syncResult.ExecuteAsync(context, ctx.Token);
+        }
     }
     
     

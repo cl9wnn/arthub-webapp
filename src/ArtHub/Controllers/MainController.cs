@@ -2,12 +2,12 @@
 
 namespace ArtHub.Controllers;
 
-public class MainController
+public class MainController: BaseController
 {
     [Route("/", "GET")]
-    public async Task ShowIndexAsync(HttpListenerContext context, CancellationToken cancellationToken)
+    public IActionResult ShowIndexAsync(HttpListenerContext context, CancellationToken cancellationToken)
     {
-        const string path = "MainPage/index.html";
-        await WebHelper.ShowResourceFile(path, context, cancellationToken);
+        const string path = "public/MainPage/index.html";
+        return new ResourceResult(path);
     }
 }

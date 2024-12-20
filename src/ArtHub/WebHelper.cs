@@ -17,21 +17,6 @@ public static class WebHelper
                 PropertyNameCaseInsensitive = true
             });
     }
-    public static async Task WriteJsonAsync<T>(T data, HttpListenerContext context, CancellationToken cancellationToken)
-    {
-        context.Response.StatusCode = 200;
-        context.Response.ContentType = "application/json";
-
-        var responseBody = JsonSerializer.Serialize(data,
-            new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                
-            }
-        );
-        var bytes = Encoding.UTF8.GetBytes(responseBody);
-        await context.Response.OutputStream.WriteAsync(bytes, cancellationToken);
-    }
     public static async Task ShowError(int code, string message, HttpListenerContext context, CancellationToken token)
     {
         context.Response.StatusCode = code;
@@ -46,21 +31,5 @@ public static class WebHelper
         );
         var bytes = Encoding.UTF8.GetBytes(responseBody);
         await context.Response.OutputStream.WriteAsync(bytes, token);
-    }
-    public static async Task ShowResourceFile(string path, HttpListenerContext context, CancellationToken token)
-    {
-        context.Response.StatusCode = 200;
-        context.Response.ContentType = path!.Split('.').Last() switch
-        {
-            "html" => "text/html",
-            "css" => "text/css",
-            "js" => "text/javascript",
-            "svg" => "image/svg+xml",
-            "ico" => "image/x-icon",
-            _ => "application/octet-stream"
-        };
-        var filePath = $"public/{path}";
-        var file = await File.ReadAllBytesAsync(filePath, token);
-        await context.Response.OutputStream.WriteAsync(file, token);
     }
  }

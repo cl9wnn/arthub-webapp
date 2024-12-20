@@ -2,12 +2,12 @@
 
 namespace ArtHub.Controllers;
 
-public class AccountController
+public class AccountController: BaseController
 {
     [Route("/account", "GET")]
-    public async Task ShowIndexAsync(HttpListenerContext context, CancellationToken cancellationToken)
+    public IActionResult ShowAccountAsync(HttpListenerContext context, CancellationToken cancellationToken)
     {
-        const string path = "AccountPage/index.html";
-        await WebHelper.ShowResourceFile(path, context, cancellationToken);
+        const string path = "public/AccountPage/index.html";
+        return new ResourceResult(path);
     }
 }
