@@ -10,6 +10,12 @@
     setupButton('signin', createLoginForm, '/auth/signin', 'Sign in');
 });
 
+
+const button = document.getElementById('accountBtn');
+button.addEventListener('click', () => {
+    window.location.href = '/account';
+});
+
 export const tokenStorage = {
     save: (token) => localStorage.setItem('jwtToken', token),
     get: () => localStorage.getItem('jwtToken'),
@@ -139,9 +145,9 @@ const handleSubmit = async (path, data) => {
         const { token } = await response.json();
         tokenStorage.save(token);
 
-        document.getElementById('account').style.display = 'block';
-        document.getElementById('signup').style.display = 'none';
-        document.getElementById('signin').style.display = 'none';
+        document.getElementById('accountBtn').style.display = 'block';
+        document.getElementById('signupBtn').style.display = 'none';
+        document.getElementById('signinBtn').style.display = 'none';
 
         alert('Успешно!');
     } catch (error) {

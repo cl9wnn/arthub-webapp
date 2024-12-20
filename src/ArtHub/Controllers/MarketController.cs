@@ -5,11 +5,11 @@ using ArtHub.Services;
 
 namespace ArtHub.Controllers;
 
-public class TestController(AuthService authService)
+public class MarketController
 {
     [Authorize("user")]
-    [Route("/test", "GET")]
-    public async Task TestAuth(HttpListenerContext context, CancellationToken token)
+    [Route("/market", "GET")]
+    public async Task LoadMarket(HttpListenerContext context, CancellationToken token)
     {
         try
         {

@@ -4,15 +4,15 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleVisibility(tokenStorage.get());
 });
 
-document.getElementById('market').addEventListener('click', async (event) => {
+document.getElementById('marketBtn').addEventListener('click', async (event) => {
     event.preventDefault();
     await handleMarketRequest();
 });
 
 function toggleVisibility(token) {
-    const accountSection = document.getElementById("account");
-    const signupSection = document.getElementById("signup");
-    const signinSection = document.getElementById("signin");
+    const accountSection = document.getElementById("accountBtn");
+    const signupSection = document.getElementById("signupBtn");
+    const signinSection = document.getElementById("signinBtn");
 
     if (token) {
         accountSection.style.display = "block";
@@ -31,7 +31,7 @@ async function handleMarketRequest() {
         alert('Успешно!');
         console.log('Response:', result);
     } catch (error) {
-        document.getElementById("signin").style.display = "block";
+        document.getElementById("signinBtn").style.display = "block";
         alert(error.message || 'Произошла ошибка');
     }
 }
@@ -43,7 +43,7 @@ async function fetchMarketData() {
         throw new Error('Токен отсутствует. Пожалуйста, войдите в систему.');
     }
 
-    const response = await fetch('/test', {
+    const response = await fetch('/market', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
