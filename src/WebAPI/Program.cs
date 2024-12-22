@@ -1,16 +1,20 @@
 ﻿using System.Net;
+using Microsoft.Extensions.DependencyInjection;
 using MyFramework;
+using Persistence;
+using WebAPI.Services;
 
 var httpListener = new HttpListener();
 
-var diContainer = new DiContainer();
-//diContainer.Register<DbContext>(() => new DbContext());
-//diContainer.Register<AuthService>(() => new AuthService(diContainer.Resolve<DbContext>()));
-//diContainer.Register<AuthController>(() => new AuthController(diContainer.Resolve<AuthService>()));
-
-var routeHandler = new RouteHandler(diContainer);
 httpListener.Prefixes.Add("http://localhost:5050/");
 httpListener.Start();
+
+var serviceProvider = new ServiceCollection()
+    .AddSingleton<DbContext>()
+    .AddSingleton<AuthService>()
+    .BuildServiceProvider();
+
+var routeHandler = new RouteHandler(serviceProvider);
 
 while (httpListener.IsListening)
 {

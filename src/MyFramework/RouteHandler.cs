@@ -7,27 +7,24 @@ namespace MyFramework;
 public class RouteHandler
 {
     private readonly List<(string Path, string Method, MethodInfo Action)> _routes = new();
-    private readonly Dictionary<Type, object?> _controllers = new();
-    private readonly DiContainer _diContainer;
-    
-    public RouteHandler(DiContainer diContainer)
+    private readonly IServiceProvider _serviceProvider;
+
+    public RouteHandler(IServiceProvider serviceProvider)
     {
-        _diContainer = diContainer;
+        _serviceProvider = serviceProvider;
         RegisterRoutes();
     }
 
     private void RegisterRoutes()
     {
         var assembly = Assembly.Load("WebAPI");
+
         var controllerTypes = assembly
             .GetTypes()
             .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(BaseController)));
-        
+
         foreach (var controllerType in controllerTypes)
         {
-            var controllerInstance = _diContainer.Resolve(controllerType);
-            _controllers[controllerType] = controllerInstance;
-            
             foreach (var method in controllerType.GetMethods())
             {
                 var attributes = method.GetCustomAttributes<RouteAttribute>();
@@ -50,24 +47,19 @@ public class RouteHandler
             await WebHelper.ShowError(404, "Page not found", context, ctx.Token);
             return;
         }
-      
+
         var route = _routes.FirstOrDefault(r =>
             r.Method.Equals(method) &&
             MatchRoute(path, r.Path));
-        
+
         if (route == default)
         {
             await WebHelper.ShowError(404, "Page not found", context, ctx.Token);
             return;
         }
 
-        var action = route.Action;
-        var controller = _controllers[route.Action.DeclaringType!];
-        
-        var authorizeAttribute = action.GetCustomAttribute<AuthorizeAttribute>() ??
-                                 action.DeclaringType?.GetCustomAttribute<AuthorizeAttribute>();
-        
-        var result = action.Invoke(controller, new object[] { context, ctx.Token });
+        var controller = CreateControllerInstance(route.Action.DeclaringType!);
+        var result = route.Action.Invoke(controller, new object[] { context, ctx.Token });
 
         if (result is Task<IActionResult> asyncResult)
         {
@@ -78,6 +70,21 @@ public class RouteHandler
         {
             await syncResult.ExecuteAsync(context, ctx.Token);
         }
+    }
+    
+    private object? CreateControllerInstance(Type controllerType)
+    {
+        var constructor = controllerType.GetConstructors().FirstOrDefault();
+
+        if (constructor == null)
+        {
+            throw new InvalidOperationException($"No public constructors found for {controllerType.Name}");
+        }
+
+        var parameters = constructor.GetParameters();
+        var args = parameters.Select(p => _serviceProvider.GetService(p.ParameterType)).ToArray();
+
+        return Activator.CreateInstance(controllerType, args);
     }
     
     private static bool MatchRoute(string path, string template)
