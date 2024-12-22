@@ -1,6 +1,8 @@
-﻿namespace Persistence.Entities;
+﻿using MyFramework.Contracts;
 
-public class User
+namespace Persistence.Entities;
+
+public class User: IAuthEntity
 {
     public long UserId { get; init; }
     public string? Login { get; init; }

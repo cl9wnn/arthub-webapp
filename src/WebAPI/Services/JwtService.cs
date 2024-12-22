@@ -47,7 +47,6 @@ public static class JwtService
         };
         try
         {
-          
             var claimsPrincipal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
             var userId = claimsPrincipal.Claims.FirstOrDefault(x => x.Type == "Sub")?.Value;
             var role = claimsPrincipal.Claims.FirstOrDefault(x => x.Type == "Role")?.Value;

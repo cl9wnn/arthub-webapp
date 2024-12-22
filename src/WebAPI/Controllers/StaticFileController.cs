@@ -5,10 +5,10 @@ using MyFramework.Contracts;
 
 namespace WebAPI.Controllers;
 
-public class StaticFileController: BaseController
+public class StaticFileController: MyBaseController
 {
-    [Route("/static/*", "GET")]
-    public IActionResult ShowStaticFileAsync(HttpListenerContext context, CancellationToken token)
+    [HttpGet("/static/*")]
+    public IMyActionResult ShowStaticFileAsync(HttpListenerContext context, CancellationToken token)
     {
         if (context.Request.Url?.LocalPath == null)
         {

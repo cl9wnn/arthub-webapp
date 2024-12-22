@@ -5,7 +5,7 @@ using MyFramework.Contracts;
 
 namespace MyFramework;
 
-public class ErrorResult(int statusCode, string message): IActionResult
+public class ErrorResult(int statusCode, string message): IMyActionResult
 {
     public async Task ExecuteAsync(HttpListenerContext context, CancellationToken cancellationToken)
     {

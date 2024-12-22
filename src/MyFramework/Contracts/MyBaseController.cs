@@ -1,5 +1,5 @@
 ﻿namespace MyFramework.Contracts;
 
-public abstract class BaseController
+public abstract class MyBaseController
 {
 }

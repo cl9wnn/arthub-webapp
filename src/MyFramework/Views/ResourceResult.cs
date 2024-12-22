@@ -3,7 +3,7 @@ using MyFramework.Contracts;
 
 namespace MyFramework;
 
-public class ResourceResult(string path): IActionResult
+public class ResourceResult(string path): IMyActionResult
 {
     public async Task ExecuteAsync(HttpListenerContext context, CancellationToken cancellationToken)
     {

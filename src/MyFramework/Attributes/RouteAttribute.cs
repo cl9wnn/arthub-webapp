@@ -1,14 +1,8 @@
 ﻿namespace MyFramework.Attributes;
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-public class RouteAttribute: Attribute
+public class RouteAttribute(string path, string method) : Attribute
 {
-    public string Path { get; }
-    public string Method { get; }
-
-    public RouteAttribute(string path, string method)
-    {
-        Path = path;
-        Method = method.ToUpper();
-    }
+    public string Path { get; } = path;
+    public string Method { get; } = method.ToUpper();
 }

@@ -5,10 +5,10 @@ using MyFramework.Contracts;
 
 namespace WebAPI.Controllers;
 
-public class AccountController: BaseController
+public class AccountController: MyBaseController
 {
-    [Route("/account", "GET")]
-    public IActionResult ShowAccountAsync(HttpListenerContext context, CancellationToken cancellationToken)
+    [HttpGet("/account")]
+    public IMyActionResult ShowAccountAsync(HttpListenerContext context, CancellationToken cancellationToken)
     {
         const string path = "public/AccountPage/index.html";
         return new ResourceResult(path);

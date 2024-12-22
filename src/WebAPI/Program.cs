@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using MyFramework;
 using Persistence;
@@ -9,12 +10,13 @@ var httpListener = new HttpListener();
 httpListener.Prefixes.Add("http://localhost:5050/");
 httpListener.Start();
 
-var serviceProvider = new ServiceCollection()
-    .AddSingleton<DbContext>()
-    .AddSingleton<AuthService>()
-    .BuildServiceProvider();
+var serviceProvider = new MyServiceCollection();
+serviceProvider.AddSingleton<DbContext>();
+serviceProvider.AddSingleton<AccountService>();
 
-var routeHandler = new RouteHandler(serviceProvider);
+var authService = new AuthorizationService(); 
+
+var routeHandler = new RouteHandler(serviceProvider, authService);
 
 while (httpListener.IsListening)
 {

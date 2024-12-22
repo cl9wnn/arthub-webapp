@@ -8,27 +8,27 @@ using WebAPI.Services;
 
 namespace WebAPI.Controllers;
 
-public class AuthController(AuthService authService) : BaseController
+public class AuthController(AccountService accountService) : MyBaseController
 {
     
-    [Route("/auth/signup", "POST")]
-    public async Task<IActionResult> Register(HttpListenerContext context, CancellationToken cancellationToken)
+    [HttpPost("/auth/signup")]
+    public async Task<IMyActionResult> Register(HttpListenerContext context, CancellationToken cancellationToken)
     {
         var userModel = await WebHelper.ReadBodyAsync<User>(context, cancellationToken);
 
-        var result = await authService.RegisterUserAsync(userModel!, cancellationToken);
+        var result = await accountService.RegisterUserAsync(userModel!, cancellationToken);
 
         return result.IsSuccess
             ? new JsonResult<AuthToken>(result!.Data)
             : new ErrorResult(result.StatusCode, result.ErrorMessage!);
     }
 
-    [Route("/auth/signin", "POST")]
-    public async Task<IActionResult> Login(HttpListenerContext context, CancellationToken cancellationToken)
+    [HttpPost("/auth/signin")]
+    public async Task<IMyActionResult> Login(HttpListenerContext context, CancellationToken cancellationToken)
     {
         var userModel = await WebHelper.ReadBodyAsync<UserLoginModel>(context, cancellationToken);
 
-        var result = await authService.LoginUserAsync(userModel!, cancellationToken);
+        var result = await accountService.LoginUserAsync(userModel!, cancellationToken);
 
         return result.IsSuccess
             ? new JsonResult<AuthToken>(result!.Data)

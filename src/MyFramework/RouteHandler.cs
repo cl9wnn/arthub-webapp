@@ -2,30 +2,31 @@
 using System.Reflection;
 using MyFramework.Attributes;
 using MyFramework.Contracts;
+
 namespace MyFramework;
 
 public class RouteHandler
 {
-    private readonly List<(string Path, string Method, MethodInfo Action)> _routes = new();
-    private readonly IServiceProvider _serviceProvider;
-
-    public RouteHandler(IServiceProvider serviceProvider)
+    private readonly List<(string Path, string Method, MethodInfo Action)> _routes = [];
+    private readonly IMyServiceProvider _serviceProvider;
+    private readonly IAuthService _authService;
+    
+    public RouteHandler(IMyServiceProvider serviceProvider, IAuthService authService)
     {
         _serviceProvider = serviceProvider;
+        _authService = authService;
         RegisterRoutes();
     }
 
     private void RegisterRoutes()
     {
-        var assembly = Assembly.Load("WebAPI");
-
-        var controllerTypes = assembly
+        var controllerTypes = Assembly.Load("WebAPI")
             .GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(BaseController)));
+            .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(MyBaseController)));
 
         foreach (var controllerType in controllerTypes)
         {
-            foreach (var method in controllerType.GetMethods())
+            foreach (var method in controllerType.GetMethods((BindingFlags.Public | BindingFlags.Instance)))
             {
                 var attributes = method.GetCustomAttributes<RouteAttribute>();
                 foreach (var attribute in attributes)
@@ -60,13 +61,31 @@ public class RouteHandler
 
         var controller = CreateControllerInstance(route.Action.DeclaringType!);
         var result = route.Action.Invoke(controller, new object[] { context, ctx.Token });
+        
+        var authorizeAttribute = route.Action.GetCustomAttribute<AuthorizeAttribute>() ??
+                                 route.Action.DeclaringType?.GetCustomAttribute<AuthorizeAttribute>();
+        
+        if (authorizeAttribute != null)
+        {
+            var user = await _authService.AuthorizeUserAsync(context, ctx.Token)!;
+            if (user == null)
+            {
+                await WebHelper.ShowError(401,"Not authorized", context, ctx.Token);
+                return;
+            }
+            if (!authorizeAttribute.Role.Contains(user.Role!))
+            {
+                await WebHelper.ShowError(403, "Forbidden: Insufficient permissions", context, ctx.Token);
+                return;
+            }
+        }
 
-        if (result is Task<IActionResult> asyncResult)
+        if (result is Task<IMyActionResult> asyncResult)
         {
             var actionResult = await asyncResult;
             await actionResult.ExecuteAsync(context, ctx.Token);
         }
-        else if (result is IActionResult syncResult)
+        else if (result is IMyActionResult syncResult)
         {
             await syncResult.ExecuteAsync(context, ctx.Token);
         }
@@ -77,9 +96,7 @@ public class RouteHandler
         var constructor = controllerType.GetConstructors().FirstOrDefault();
 
         if (constructor == null)
-        {
             throw new InvalidOperationException($"No public constructors found for {controllerType.Name}");
-        }
 
         var parameters = constructor.GetParameters();
         var args = parameters.Select(p => _serviceProvider.GetService(p.ParameterType)).ToArray();
@@ -91,7 +108,7 @@ public class RouteHandler
     {
         if (template.EndsWith("/*"))
         {
-            var basePath = template.Substring(0, template.Length - 2);
+            var basePath = template[..^2];
             return path.StartsWith(basePath);
         }
 

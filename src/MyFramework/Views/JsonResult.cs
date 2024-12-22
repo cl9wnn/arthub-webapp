@@ -5,7 +5,7 @@ using MyFramework.Contracts;
 
 namespace MyFramework;
 
-public class JsonResult<T>(T data): IActionResult
+public class JsonResult<T>(T data): IMyActionResult
 {
     public async Task ExecuteAsync(HttpListenerContext context, CancellationToken cancellationToken)
     {

@@ -5,11 +5,11 @@ using MyFramework.Contracts;
 
 namespace WebAPI.Controllers;
 
-public class MarketController: BaseController
+public class MarketController: MyBaseController
 {
     [Authorize("user")]
-    [Route("/market", "GET")]
-    public IActionResult ShowMarketPage(HttpListenerContext context, CancellationToken cancellationToken)
+    [HttpGet("/market")]
+    public IMyActionResult ShowMarketPage(HttpListenerContext context, CancellationToken cancellationToken)
     {
         const string path = "public/MarketPage/index.html";
         return new JsonResult<string>(path);

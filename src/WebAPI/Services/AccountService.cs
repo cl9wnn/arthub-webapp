@@ -1,11 +1,10 @@
-﻿using System.Net;
-using Persistence;
+﻿using Persistence;
 using Persistence.Entities;
 using WebAPI.Models;
 
 namespace WebAPI.Services;
 
-public class AuthService(DbContext dbContext)
+public class AccountService(DbContext dbContext)
 {
     public async Task<Result<AuthToken>> RegisterUserAsync(User user, CancellationToken cancellationToken)
     {
@@ -37,7 +36,7 @@ public class AuthService(DbContext dbContext)
         var user = await dbContext.GetUserAsync(userModel.Login, cancellationToken);
         
         if (user == null)
-          return Result<AuthToken>.Failure(404, $"User with login '{userModel.Login}' was not found.")!;
+            return Result<AuthToken>.Failure(404, $"User with login '{userModel.Login}' was not found.")!;
                 
         var validationResult = MyPasswordHasher.ValidatePassword(user!.Password!, userModel!.Password!);
 
@@ -50,19 +49,5 @@ public class AuthService(DbContext dbContext)
         };
         
         return Result<AuthToken>.Success(authResult);
-    }
-
-    public Task<User?> AuthorizeUserAsync(HttpListenerContext context, CancellationToken cancellationToken)
-    {
-        var authHeader = context.Request.Headers["Authorization"];
-        
-        if (authHeader == null)
-        {
-            return null;
-        }
-        var token = authHeader!.Split()[1];
-        var tokenValidationResult = JwtService.ValidateJwtToken(token);
-        
-        return Task.FromResult(tokenValidationResult.isSuccess ? tokenValidationResult.user : null);
     }
 }

@@ -31,19 +31,4 @@ public static class WebHelper
         var bytes = Encoding.UTF8.GetBytes(responseBody);
         await context.Response.OutputStream.WriteAsync(bytes, token);
     }
-    
-    public static async Task WriteJsonAsync<T>(T data, HttpListenerContext context, CancellationToken cancellationToken)
-    {
-        context.Response.StatusCode = 200;
-        context.Response.ContentType = "application/json";
-        var responseBody = JsonSerializer.Serialize(data,
-            new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                
-            }
-        );
-        var bytes = Encoding.UTF8.GetBytes(responseBody);
-        await context.Response.OutputStream.WriteAsync(bytes, cancellationToken);
-    }
  }
