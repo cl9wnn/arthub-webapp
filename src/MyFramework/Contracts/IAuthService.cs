@@ -1,6 +1,6 @@
 ﻿using System.Net;
-using MyFramework.Contracts;
-namespace MyFramework;
+
+namespace MyFramework.Contracts;
 
 public interface IAuthService
 {

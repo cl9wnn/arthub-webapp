@@ -13,7 +13,7 @@
 
 const button = document.getElementById('accountBtn');
 button.addEventListener('click', () => {
-    window.location.href = '/account';
+    window.location.href = '/account-settings';
 });
 
 export const tokenStorage = {

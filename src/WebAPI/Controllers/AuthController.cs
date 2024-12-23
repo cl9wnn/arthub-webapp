@@ -19,7 +19,7 @@ public class AuthController(AccountService accountService) : MyBaseController
         var result = await accountService.RegisterUserAsync(userModel!, cancellationToken);
 
         return result.IsSuccess
-            ? new JsonResult<AuthToken>(result!.Data)
+            ? new JsonResult<JwtTokenModel>(result!.Data)
             : new ErrorResult(result.StatusCode, result.ErrorMessage!);
     }
 
@@ -31,7 +31,7 @@ public class AuthController(AccountService accountService) : MyBaseController
         var result = await accountService.LoginUserAsync(userModel!, cancellationToken);
 
         return result.IsSuccess
-            ? new JsonResult<AuthToken>(result!.Data)
+            ? new JsonResult<JwtTokenModel>(result!.Data)
             : new ErrorResult(result.StatusCode, result.ErrorMessage!);
     }
 }

@@ -1,0 +1,122 @@
+﻿body {
+    background-color: #1a1a1a;
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+h2 {
+    font-size: 16px;
+    color: #888;
+    margin-bottom: 20px;
+}
+
+.form-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.form-section {
+    background-color: #2a2a2a;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    color: #aaa;
+    margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group select {
+    width: calc(100% - 20px); /* Учитываем отступы */
+    padding: 10px;
+    font-size: 14px;
+    background-color: #333;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #fff;
+}
+
+.avatar-section {
+    text-align: center;
+}
+
+.avatar {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 15px;
+    background-color: #333;
+    border: 2px dashed #555;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #aaa;
+}
+
+.upload-btn {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    background-color: #444;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.checkbox-group {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.checkbox-group input {
+    margin-right: 10px;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.buttons button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.back {
+    background-color: #444;
+    color: #fff;
+}
+
+.next {
+    background-color: #007bff;
+    color: #fff;
+}

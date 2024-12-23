@@ -8,7 +8,7 @@ namespace WebAPI.Controllers;
 public class StaticFileController: MyBaseController
 {
     [HttpGet("/static/*")]
-    public IMyActionResult ShowStaticFileAsync(HttpListenerContext context, CancellationToken token)
+    public IMyActionResult ShowStaticFileAsync(HttpListenerContext context, CancellationToken cancellationToken)
     {
         if (context.Request.Url?.LocalPath == null)
         {

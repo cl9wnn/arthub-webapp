@@ -26,5 +26,9 @@
 	  <ProjectReference Include="..\MyFramework\MyFramework.csproj" />
 	  <ProjectReference Include="..\Persistence\Persistence.csproj" />
 	</ItemGroup>
+	
+	<ItemGroup>
+	  <Folder Include="public\ProfilePage\" />
+	</ItemGroup>
 
 </Project>

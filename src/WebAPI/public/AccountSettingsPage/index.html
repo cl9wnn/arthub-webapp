@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="/static/AccountSettingsPage/style.css">
+</head>
+<body>
+<div class="container">
+    <h1>Personal Profile</h1>
+    <h2>STEP 1</h2>
+    <div class="form-container">
+        <div class="form-section">
+            <div class="form-group">
+                <label for="headline">Headline - One line about you *</label>
+                <input type="text" id="headline" placeholder="e.g. Freelance artist">
+            </div>
+            <div class="form-group">
+                <label for="city">City *</label>
+                <input type="text" id="city" value="Helsinki">
+            </div>
+            <div class="form-group">
+                <label for="country">Country *</label>
+                <select id="country">
+                    <option value="finland">Finland</option>
+                    <option value="usa">USA</option>
+                    <option value="germany">Germany</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="timezone">Timezone *</label>
+                <select id="timezone">
+                    <option value="gmt+2">(GMT+02:00) Helsinki</option>
+                    <option value="gmt+1">(GMT+01:00) Berlin</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="language">Language *</label>
+                <select id="language">
+                    <option value="english">English</option>
+                    <option value="finnish">Finnish</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-section avatar-section">
+            <div class="avatar" id="avatarPreview">Avatar</div>
+            <input type="file" id="avatarInput" style="display: none;">
+            <button class="upload-btn" id="uploadBtn">Upload New Avatar</button>
+            <div class="checkbox-group">
+                <input type="checkbox" id="subscribe">
+                <label for="subscribe">Subscribe to ArtStation Newsletter - packed with news and art</label>
+            </div>
+        </div>
+    </div>
+    <div class="buttons">
+        <button class="back">Back</button>
+        <button class="next" id="nextBtn">Next</button>
+    </div>
+</div>
+<script src="/static/AccountSettingsPage/script.js"></script>
+</body>
+</html>

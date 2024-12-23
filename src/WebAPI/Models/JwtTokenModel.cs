@@ -1,6 +1,6 @@
 ﻿namespace WebAPI.Models;
 
-public class AuthToken
+public class JwtTokenModel
 {
     public string? Token { get; set; }
 }

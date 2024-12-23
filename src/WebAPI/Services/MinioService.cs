@@ -2,13 +2,13 @@
 using Minio.DataModel.Args;
 namespace WebAPI.Services;
 
-public class MinioService
+public class MinioService: IS3Storage<string>
 {
     //TODO: сделать конфиг и брать ключи оттуда
     private const string BucketName = "image-bucket";
     private const string Endpoint = "localhost:9000";
-    private const string AccessKey = "minioadmin";
-    private const string SecretKey = "minioadmin";
+    private const string AccessKey = "cl9wn";
+    private const string SecretKey = "1029384756u";
 
     private readonly IMinioClient _minioClient = new MinioClient()
         .WithEndpoint(Endpoint)
@@ -23,25 +23,50 @@ public class MinioService
             await _minioClient.MakeBucketAsync(new MakeBucketArgs().WithBucket(BucketName));
         }
     }
-    
-    public async Task<string> UploadFileAsync(string filePath, string objectName)
+
+    public async Task<string> UploadFileAsync(byte[] fileBytes, string objectName, string contentType)
     {
         try
         {
             await EnsureBucketExistsAsync();
 
+            using var stream = new MemoryStream(fileBytes);
             await _minioClient.PutObjectAsync(new PutObjectArgs()
                 .WithBucket(BucketName)
                 .WithObject(objectName)
-                .WithFileName(filePath)
-                .WithContentType("image/jpeg"));
+                .WithStreamData(stream)
+                .WithObjectSize(fileBytes.Length)
+                .WithContentType(contentType));
 
-            string objectUrl = $"{Endpoint}/{BucketName}/{objectName}";
+            var objectUrl = $"{Endpoint}/{BucketName}/{objectName}";
             return objectUrl;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Ошибка при загрузке файла: {ex.Message}");
+            throw;
+        }
+    }
+    
+    public async Task<byte[]> GetFileAsync(string objectName)
+    {
+        try
+        {
+            using var memoryStream = new MemoryStream();
+        
+            await _minioClient.GetObjectAsync(new GetObjectArgs()
+                .WithBucket(BucketName)
+                .WithObject(objectName)
+                .WithCallbackStream(async (stream) =>
+                {
+                    await stream.CopyToAsync(memoryStream);
+                }));
+        
+            return memoryStream.ToArray();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка при получении файла: {ex.Message}");
             throw;
         }
     }

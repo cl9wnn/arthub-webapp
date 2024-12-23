@@ -1,8 +1,7 @@
 ﻿using System.Net;
-using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
 using MyFramework;
 using Persistence;
+using WebAPI;
 using WebAPI.Services;
 
 var httpListener = new HttpListener();
@@ -11,8 +10,10 @@ httpListener.Prefixes.Add("http://localhost:5050/");
 httpListener.Start();
 
 var serviceProvider = new MyServiceCollection();
+
 serviceProvider.AddSingleton<DbContext>();
 serviceProvider.AddSingleton<AccountService>();
+serviceProvider.AddSingleton<IS3Storage<string>,MinioService>();
 
 var authService = new AuthorizationService(); 
 
