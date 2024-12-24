@@ -13,12 +13,13 @@ public class AuthorizationService: IAuthService //TODO: переделать!
 
         if (authHeader == null)
         {
-            return null;
+            return Task.FromResult<IAuthEntity?>(null);
+
         }
 
         var token = authHeader.Split()[1];
         var tokenValidationResult = JwtService.ValidateJwtToken(token);
 
-        return Task.FromResult<IAuthEntity?>(!tokenValidationResult.isSuccess ? null : tokenValidationResult.user);
+        return Task.FromResult<IAuthEntity?>(!tokenValidationResult.isSuccess ? null : tokenValidationResult.user)!;
     }
 }

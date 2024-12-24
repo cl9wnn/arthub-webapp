@@ -60,14 +60,13 @@ public class RouteHandler
         }
 
         var controller = CreateControllerInstance(route.Action.DeclaringType!);
-        var result = route.Action.Invoke(controller, new object[] { context, ctx.Token });
         
         var authorizeAttribute = route.Action.GetCustomAttribute<AuthorizeAttribute>() ??
                                  route.Action.DeclaringType?.GetCustomAttribute<AuthorizeAttribute>();
         
         if (authorizeAttribute != null)
         {
-            var user = await _authService.AuthorizeUserAsync(context, ctx.Token)!;
+            var user = await _authService.AuthorizeUserAsync(context, ctx.Token);
             if (user == null)
             {
                 await WebHelper.ShowError(401,"Not authorized", context, ctx.Token);
@@ -79,7 +78,9 @@ public class RouteHandler
                 return;
             }
         }
-
+        
+        var result = route.Action.Invoke(controller, new object[] { context, ctx.Token });
+        
         if (result is Task<IMyActionResult> asyncResult)
         {
             var actionResult = await asyncResult;

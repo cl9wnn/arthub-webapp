@@ -1,22 +1,4 @@
-﻿document.addEventListener('DOMContentLoaded', () => {
-    const setupButton = (id, createFormMethod, path, buttonText) => {
-        document.getElementById(id).addEventListener('click', (event) => {
-            event.preventDefault();
-            showForm(createFormMethod, path, buttonText);
-        });
-    };
-
-    setupButton('signupBtn', createRegistrationForm, '/auth/signup', 'Sign up');
-    setupButton('signinBtn', createLoginForm, '/auth/signin', 'Sign in');
-});
-
-
-const button = document.getElementById('accountBtn');
-button.addEventListener('click', () => {
-    window.location.href = '/account-settings';
-});
-
-export const tokenStorage = {
+﻿export const tokenStorage = {
     save: (token) => localStorage.setItem('jwtToken', token),
     get: () => localStorage.getItem('jwtToken'),
     remove: () => localStorage.removeItem('jwtToken')
@@ -35,6 +17,7 @@ const createElement = (tag, options = {}) => {
 
 const createOverlay = () => createElement('div', { className: 'overlay' });
 
+
 const createPopup = (onClose) => {
     const popup = createElement('div', { className: 'popup' });
     const closeButton = createElement('button', {
@@ -49,7 +32,7 @@ const createPopup = (onClose) => {
     return popup;
 };
 
-const showForm = (createFormMethod, path, buttonText) => {
+export const showForm = (createFormMethod, path, buttonText) => {
     const overlay = createOverlay();
     const popup = createPopup(() => document.body.removeChild(overlay));
 
@@ -118,13 +101,13 @@ const validateFields = (data) => {
     return errors;
 };
 
-const createRegistrationForm = (onClose, path) =>
+export const createRegistrationForm = (onClose, path) =>
     createForm(path, 'Зарегистрироваться', async (data) => {
         await handleSubmit('/auth/signup', data);
         onClose();
     }, true);
 
-const createLoginForm = (onClose, path) =>
+export const createLoginForm = (onClose, path) =>
     createForm(path, 'Войти', async (data) => {
         await handleSubmit('/auth/signin', data);
         onClose();
@@ -144,13 +127,10 @@ const handleSubmit = async (path, data) => {
 
         const { token } = await response.json();
         tokenStorage.save(token);
-
-        document.getElementById('accountBtn').style.display = 'block';
-        document.getElementById('signupBtn').style.display = 'none';
-        document.getElementById('signinBtn').style.display = 'none';
-
+        
         alert('Успешно!');
-    } catch (error) {
+    } 
+    catch (error) {
         alert(error.message);
     }
 };

@@ -1,5 +1,9 @@
+import { tokenStorage } from '../Auth/auth.js';
+import { showForm, createLoginForm } from '../Auth/auth.js';
+
 const uploadBtn = document.getElementById('uploadBtn');
 const avatarInput = document.getElementById('avatarInput');
+avatarInput.setAttribute('accept', 'image/jpeg, image/png, image/gif, image/webp');
 const avatarPreview = document.getElementById('avatarPreview');
 const nextBtn = document.getElementById('nextBtn');
 
@@ -10,18 +14,10 @@ uploadBtn.addEventListener('click', () => {
 });
 
 
-// Обработка выбора файла
 avatarInput.addEventListener('change', (event) => {
     const file = event.target.files[0];
 
     if (file) {
-        const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        if (!validImageTypes.includes(file.type)) {
-            avatarPreview.textContent = 'Ошибка: Выберите файл изображения!';
-            avatarPreview.style.backgroundImage = '';
-            return;
-        }
-
         avatarFile = file;
 
         const reader = new FileReader();
@@ -35,8 +31,9 @@ avatarInput.addEventListener('change', (event) => {
     }
 });
 
-// Обработка отправки файла
 nextBtn.addEventListener('click', async () => {
+    const token = tokenStorage.get();
+
     if (!avatarFile) {
         alert('Please select an avatar before proceeding.');
         return;
@@ -44,6 +41,7 @@ nextBtn.addEventListener('click', async () => {
 
     const reader = new FileReader();
     reader.onload = async function (e) {
+        
         const base64String = e.target.result.split(',')[1];
         const payload = JSON.stringify({
             contentType: avatarFile.type,
@@ -54,19 +52,21 @@ nextBtn.addEventListener('click', async () => {
             const response = await fetch('/api/save-avatar', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: payload
             });
 
+            const data = await response.json();
+
             if (response.ok) {
-                alert('Avatar uploaded successfully!');
+                window.location.href = '/account';
             } else {
-                alert('Failed to upload avatar. Please try again.');
+                showForm(createLoginForm, '/auth/signin', 'Sign In');
             }
         } catch (error) {
-            console.error('Error uploading avatar:', error);
-            alert('An error occurred while uploading the avatar.');
+            alert(error.message);
         }
     };
 

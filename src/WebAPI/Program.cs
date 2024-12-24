@@ -14,6 +14,7 @@ var serviceProvider = new MyServiceCollection();
 serviceProvider.AddSingleton<DbContext>();
 serviceProvider.AddSingleton<AccountService>();
 serviceProvider.AddSingleton<IS3Storage<string>,MinioService>();
+serviceProvider.AddSingleton<AccSettingsService>();
 
 var authService = new AuthorizationService(); 
 
