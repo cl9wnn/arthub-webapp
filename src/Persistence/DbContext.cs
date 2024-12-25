@@ -54,7 +54,7 @@ public class DbContext
             {
                 return new User
                 {
-                    UserId = reader.GetInt64("user_id"),
+                    UserId = reader.GetInt32("user_id"),
                     Login = reader.GetString("login"),
                     Password = reader.GetString("password"),
                     Role = reader.GetString("role")
@@ -68,6 +68,4 @@ public class DbContext
 
         return null;
     }
-    
-
 }

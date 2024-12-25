@@ -1,10 +1,13 @@
 ﻿using System.Net;
 using MyFramework;
+using MyORM;
+using Npgsql;
 using Persistence;
+using Persistence.Entities;
 using WebAPI;
 using WebAPI.Services;
 
-var httpListener = new HttpListener();
+var httpListener = new HttpListener();     
 
 httpListener.Prefixes.Add("http://localhost:5050/");
 httpListener.Start();

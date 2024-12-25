@@ -23,6 +23,7 @@
 	</ItemGroup>
 	
 	<ItemGroup>
+	  <ProjectReference Include="..\..\MyORM\MyORM.csproj" />
 	  <ProjectReference Include="..\MyFramework\MyFramework.csproj" />
 	  <ProjectReference Include="..\Persistence\Persistence.csproj" />
 	</ItemGroup>
