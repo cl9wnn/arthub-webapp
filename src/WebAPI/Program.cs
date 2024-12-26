@@ -4,6 +4,7 @@ using MyORM;
 using Npgsql;
 using Persistence;
 using Persistence.Entities;
+using Persistence.Repositories;
 using WebAPI;
 using WebAPI.Services;
 
@@ -13,7 +14,8 @@ httpListener.Start();
 
 var serviceProvider = new MyServiceCollection();
 
-serviceProvider.AddSingleton<DbContext>();
+serviceProvider.AddSingleton<QueryMapper>();
+serviceProvider.AddSingleton<UserRepository>();
 serviceProvider.AddSingleton<AccountService>();
 serviceProvider.AddSingleton<IS3Storage<string>,MinioService>();
 serviceProvider.AddSingleton<AccSettingsService>();

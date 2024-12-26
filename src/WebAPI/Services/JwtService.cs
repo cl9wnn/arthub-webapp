@@ -9,7 +9,7 @@ public static class JwtService
 {
       private const string? SecretKey = "15tkwagt2h6k8m3vs9z9qf21qkgbheho155mbs";
 
-    public static string GenerateJwtToken(User user)
+    public static string GenerateJwtToken(User? user)
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey!));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
