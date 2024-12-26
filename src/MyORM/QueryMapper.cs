@@ -16,7 +16,8 @@ public class QueryMapper
 
     private static readonly ConcurrentDictionary<Type, Delegate> MapperFuncs = new();
     
-    public  async Task<List<T>> QueryAsync<T>(FormattableString sql, CancellationToken token)
+    
+    public  async Task<List<T>> QueryAsync<T>(FormattableString sql, CancellationToken token = default)
     {
         await _connection.OpenAsync(token);
         
@@ -53,10 +54,12 @@ public class QueryMapper
 
     private static Expression BuildReadColumnExpression(Expression reader, PropertyInfo prop)
     {
+        var columnName = prop.GetCustomAttribute<ColumnNameAttribute>()?.Name ?? prop.Name;
+        
         if (prop.PropertyType == typeof(string))
-            return Expression.Call(null, GetStringMethod, reader, Expression.Constant(prop.Name));
+            return Expression.Call(null, GetStringMethod, reader, Expression.Constant(columnName));
         else if (prop.PropertyType == typeof(int) || (prop.PropertyType == typeof(long)))
-            return Expression.Call(null, GetIntMethod, reader, Expression.Constant(prop.Name));
+            return Expression.Call(null, GetIntMethod, reader, Expression.Constant(columnName));
         throw new InvalidOperationException();
     }
 

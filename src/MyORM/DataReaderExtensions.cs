@@ -21,7 +21,7 @@ public static class DataReaderExtensions
             
     public static string? GetStringOrDefault(this IDataReader reader, string columnName)
     {
-        if (reader.TryGetOrdinal(columnName, out int order))
+        if (reader.TryGetOrdinal(columnName, out int order) && !reader.IsDBNull(order))
         {
             return reader.GetString(order);
         }
@@ -30,10 +30,10 @@ public static class DataReaderExtensions
     
     public static int GetIntOrDefault(this IDataReader reader, string columnName)
     {
-        if (reader.TryGetOrdinal(columnName, out int order))
+        if (reader.TryGetOrdinal(columnName, out int order) && !reader.IsDBNull(order))
         {
             return reader.GetInt32(order);
         }
-        return default;
+        return -1;
     }
 }

@@ -11,7 +11,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\MyFramework\MyFramework.csproj" />
+        <ProjectReference Include="..\MyORM\MyORM.csproj" />
+        <ProjectReference Include="..\MyFramework\MyFramework.csproj" />
     </ItemGroup>
 
 </Project>
