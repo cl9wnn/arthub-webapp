@@ -43,8 +43,7 @@ public class MinioService: IS3Storage<string>
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Ошибка при загрузке файла: {ex.Message}");
-            throw;
+            return null;
         }
     }
     

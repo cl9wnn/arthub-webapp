@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Reflection;
+using System.Reflection.Metadata;
 using MyFramework.Attributes;
 using MyFramework.Contracts;
 
@@ -77,6 +78,8 @@ public class RouteHandler
                 await WebHelper.ShowError(403, "Forbidden: Insufficient permissions", context, ctx.Token);
                 return;
             }
+            
+            context.SetItem("userId", user.UserId);
         }
         
         var result = route.Action.Invoke(controller, new object[] { context, ctx.Token });

@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Persistence.Entities;
+using WebAPI.Models;
 
 namespace WebAPI;
 

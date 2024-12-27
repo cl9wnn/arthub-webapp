@@ -20,7 +20,7 @@ public class AccountService(UserRepository userRepository)
 
         user!.Password = MyPasswordHasher.HashPassword(user.Password);
         
-        var createdUser = await userRepository.CreateUserAsync(user.Login!, user.Password, cancellationToken);
+        var createdUser = await userRepository.CreateUserAsync(user, cancellationToken);
         
         var authResult =  new JwtTokenModel
         {
@@ -29,17 +29,17 @@ public class AccountService(UserRepository userRepository)
         return Result<JwtTokenModel>.Success(authResult);
     }
 
-    public async Task<Result<JwtTokenModel>> LoginUserAsync(UserLoginModel userModel, CancellationToken cancellationToken)
+    public async Task<Result<JwtTokenModel>> LoginUserAsync(LoginModel model, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(userModel.Login) || string.IsNullOrWhiteSpace(userModel.Password))
+        if (string.IsNullOrWhiteSpace(model.Login) || string.IsNullOrWhiteSpace(model.Password))
             return Result<JwtTokenModel>.Failure(400,"Login or Password cannot be null or empty")!;
         
-        var user = await userRepository.GetUserAsync(userModel.Login, cancellationToken);
+        var user = await userRepository.GetUserAsync(model.Login, cancellationToken);
         
         if (user == null)
-            return Result<JwtTokenModel>.Failure(404, $"User with login '{userModel.Login}' was not found.")!;
+            return Result<JwtTokenModel>.Failure(404, $"User with login '{model.Login}' was not found.")!;
                 
-        var validationResult = MyPasswordHasher.ValidatePassword(user!.Password!, userModel!.Password!);
+        var validationResult = MyPasswordHasher.ValidatePassword(user!.Password!, model!.Password!);
 
         if (!validationResult)
             return Result<JwtTokenModel>.Failure(401,"Invalid password.")!;

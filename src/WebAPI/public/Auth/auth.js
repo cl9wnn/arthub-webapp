@@ -4,7 +4,7 @@
     remove: () => localStorage.removeItem('jwtToken')
 };
 
-const createElement = (tag, options = {}) => {
+export const createElement = (tag, options = {}) => {
     const element = document.createElement(tag);
     Object.entries(options).forEach(([key, value]) => {
         if (key === 'className') element.className = value;
@@ -17,13 +17,13 @@ const createElement = (tag, options = {}) => {
 
 const createOverlay = () => createElement('div', { className: 'overlay' });
 
-
 const createPopup = (onClose) => {
     const popup = createElement('div', { className: 'popup' });
     const closeButton = createElement('button', {
         textContent: '×',
         className: 'close-button',
         onClick: () => {
+            window.location.href = '/';
             document.body.removeChild(document.querySelector('.overlay'));
             if (onClose) onClose();
         }
@@ -46,72 +46,31 @@ export const showForm = (createFormMethod, path, buttonText) => {
 const createInputField = (type, name, placeholder) =>
     createElement('input', { type, name, placeholder, required: true, className: 'input-field' });
 
-const createErrorField = () => createElement('span', { className: 'error-message' });
 
-const createForm = (path, buttonText, onSubmitHandler, validate = false) => {
+export const createLoginForm = (onClose, path) => {
     const form = createElement('form');
 
     const nameField = createInputField('text', 'login', 'Введите логин');
     const passwordField = createInputField('password', 'password', 'Введите пароль');
-
-    const nameError = createErrorField();
-    const passwordError = createErrorField();
-
+    
     const submitButton = createElement('button', {
         type: 'submit',
-        textContent: buttonText,
+        textContent: 'Войти',
         className: 'submit-button'
     });
 
-    [nameField, nameError, passwordField, passwordError, submitButton].forEach(el => form.appendChild(el));
+    [nameField, passwordField, submitButton].forEach(el => form.appendChild(el));
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
-
-        nameError.textContent = '';
-        passwordError.textContent = '';
-
+        
         const formData = Object.fromEntries(new FormData(form).entries());
-
-        if (validate) {
-            const errors = validateFields(formData);
-            if (Object.keys(errors).length > 0) {
-                nameError.textContent = errors.login || '';
-                passwordError.textContent = errors.password || '';
-                return;
-            }
-        }
-        await onSubmitHandler(formData, path);
+        await handleSubmit('/auth/signin', formData);
+        onClose();
     });
 
     return form;
 };
-
-const validateFields = (data) => {
-    const errors = {};
-
-    if (!/^[a-zA-Z0-9_]{5,20}$/.test(data.login)) {
-        errors.login = "Логин должен быть от 5 до 20 символов и содержать только латинские буквы, цифры и символы подчеркивания.";
-    }
-
-    if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/.test(data.password)) {
-        errors.password = "Пароль должен быть от 8 до 20 символов, содержать минимум одну букву, одну цифру и один специальный символ.";
-    }
-
-    return errors;
-};
-
-export const createRegistrationForm = (onClose, path) =>
-    createForm(path, 'Зарегистрироваться', async (data) => {
-        await handleSubmit('/auth/signup', data);
-        onClose();
-    }, true);
-
-export const createLoginForm = (onClose, path) =>
-    createForm(path, 'Войти', async (data) => {
-        await handleSubmit('/auth/signin', data);
-        onClose();
-    });
 
 const handleSubmit = async (path, data) => {
     try {
@@ -127,9 +86,8 @@ const handleSubmit = async (path, data) => {
 
         const { token } = await response.json();
         tokenStorage.save(token);
-        
         alert('Успешно!');
-    } 
+    }
     catch (error) {
         alert(error.message);
     }

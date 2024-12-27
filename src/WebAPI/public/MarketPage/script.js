@@ -9,7 +9,7 @@ testBtn.addEventListener('click', async () => {
     
         try {
             const response = await fetch('/api/buy', {
-                method: 'POST',
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
@@ -19,7 +19,7 @@ testBtn.addEventListener('click', async () => {
             const data = await response.json();
 
             if (response.ok) {
-                alert(data);
+                console.log(data);
             } else {
                 showForm(createLoginForm, '/auth/signin', 'Sign In');
             }

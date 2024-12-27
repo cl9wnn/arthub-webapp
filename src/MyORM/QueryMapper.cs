@@ -68,7 +68,7 @@ public class QueryMapper
             await _connection.CloseAsync();
         }
     }
-    public async Task<T?> ExecuteAndReturnAsync<T>(FormattableString sql, CancellationToken token)  where T : new()
+    public async Task<T?> ExecuteAndReturnAsync<T>(FormattableString sql, CancellationToken token) 
     {
         await _connection.OpenAsync(token);
 
@@ -86,8 +86,15 @@ public class QueryMapper
 
             if (await reader.ReadAsync(token))
             {
-                var func = (Func<IDataReader, T>)MapperFuncs.GetOrAdd(typeof(T), x => Build<T>());
-                return func(reader);
+                if (typeof(T).IsPrimitive || typeof(T) == typeof(string) || typeof(T).IsValueType)
+                {
+                    return (T)Convert.ChangeType(reader.GetValue(0), typeof(T));
+                }
+                else
+                {
+                    var func = (Func<IDataReader, T>)MapperFuncs.GetOrAdd(typeof(T), x => Build<T>());
+                    return func(reader);
+                }
             }
 
             return default;

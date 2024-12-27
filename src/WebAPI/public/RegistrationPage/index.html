@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="/static/RegistrationPage/style.css">
+    <link rel="stylesheet" href="/static/Auth/auth.css">
+</head>
+<body>
+<div class="container">
+    <h1>Personal Profile</h1>
+    <h2>Registration</h2>
+    <div class="form-container">
+        <div class="form-section">
+            <!-- Логин -->
+            <div class="form-group">
+                <label for="login">Login *</label>
+                <input type="text" id="login" name="login" placeholder="Enter your account login" required>
+                <span class="error-message" id="login-error"></span>
+            </div>
+
+            <!-- Пароль -->
+            <div class="form-group">
+                <label for="password">Password *</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                <span class="error-message" id="password-error"></span>
+            </div>
+
+            <!-- Имя профиля -->
+            <div class="form-group">
+                <label for="profile-name">Profile Name *</label>
+                <input type="text" id="profile-name" name="profile-name" placeholder="Enter your profile name" required>
+                <span class="error-message" id="profile-name-error"></span>
+            </div>
+
+            <!-- Настоящее имя -->
+            <div class="form-group">
+                <label for="real-name">Real Name *</label>
+                <input type="text" id="real-name" name="real-name" placeholder="Enter your real name" required>
+                <span class="error-message" id="real-name-error"></span>
+            </div>
+
+            <!-- Кнопка отправки -->
+            <button type="button" id="submit-button">Submit</button>
+        </div>
+
+        <div class="form-section avatar-section">
+            <div class="avatar" id="avatarPreview">Avatar</div>
+            <input type="file" id="avatarInput" style="display: none;">
+            <button class="upload-btn" id="uploadBtn">Upload New Avatar</button>
+        </div>
+        
+    </div>
+    <div class="buttons">
+        <button class="back">Back</button>
+        <button class="next" id="nextBtn">Next</button>
+    </div>
+</div>
+<script  type="module" src="/static/RegistrationPage/script.js"></script>
+</body>
+</html>

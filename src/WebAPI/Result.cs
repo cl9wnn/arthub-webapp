@@ -9,5 +9,5 @@ public class Result<T>(bool isSuccess, T data, string? errorMessage, int statusC
     
     public static Result<T> Success(T data) => new (true, data, null, 200);
     public static Result<T?> Failure(int statusCode, string error) =>
-        new Result<T?>(false, default, error, statusCode);
+        new (false, default, error, statusCode);
 }

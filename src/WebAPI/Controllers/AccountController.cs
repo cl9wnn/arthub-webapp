@@ -2,13 +2,17 @@
 using MyFramework;
 using MyFramework.Attributes;
 using MyFramework.Contracts;
+using MyORM;
+using Persistence.Entities;
+using Persistence.Repositories;
 using WebAPI.Models;
 using WebAPI.Services;
 
 namespace WebAPI.Controllers;
 
-public class AccountController(AccSettingsService accSettingsService): MyBaseController
+public class AccountController(AvatarService avatarService): MyBaseController
 {
+    
     [HttpGet("/account")]
     public IMyActionResult ShowAccountPageAsync(HttpListenerContext context, CancellationToken cancellationToken)
     {
@@ -20,23 +24,23 @@ public class AccountController(AccSettingsService accSettingsService): MyBaseCon
     [HttpGet("/account-settings")]
     public IMyActionResult ShowSettingsPageAsync(HttpListenerContext context, CancellationToken cancellationToken)
     {
-        const string path = "public/AccountSettingsPage/index.html";
+        const string path = "public/RegistrationPage/index.html";
         return new ResourceResult(path);
     }
-
+    
+    
     
     [Authorize("user")]
-    [HttpPost("/api/save-avatar")]
-    public async Task<IMyActionResult> SaveAvatarAsync(HttpListenerContext context, CancellationToken cancellationToken)
+    [HttpGet("/api/get-account")]
+    public async Task<IMyActionResult> GetAccountInfoAsync(HttpListenerContext context, CancellationToken cancellationToken)
     {
-        var file = await WebHelper.ReadBodyAsync<FileModel>(context, cancellationToken);
-        
-        var result = await accSettingsService.SaveAvatarAsync(file!, cancellationToken);
+        if (!context.TryGetItem<int>("userId", out var userId))
+            return new ErrorResult(400, "Not authorized");
 
+        var result = await avatarService.GetAccountDataAsync(userId, cancellationToken);
+        
         return result.IsSuccess
-            ? new JsonResult<string>("success!")
+            ? new JsonResult<UserProfileModel>(result.Data)
             : new ErrorResult(result.StatusCode, result.ErrorMessage!);
     }
-    
-    
 }

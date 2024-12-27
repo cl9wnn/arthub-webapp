@@ -1,5 +1,5 @@
 import { tokenStorage } from '../Auth/auth.js';
-import { showForm, createLoginForm, createRegistrationForm } from '../Auth/auth.js';
+import { showForm, createLoginForm } from '../Auth/auth.js';
 
 const accountSection = document.getElementById("accountBtn");
 const signupSection = document.getElementById("signupBtn");
@@ -14,12 +14,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    setupButton('signupBtn', createRegistrationForm, '/auth/signup', 'Sign up');
     setupButton('signinBtn', createLoginForm, '/auth/signin', 'Sign in');
-
     toggleVisibility(tokenStorage.get());
 });
 
+document.getElementById('signupBtn').addEventListener('click', async (event) => {
+    event.preventDefault();
+    window.location.href = '/account-settings';
+});
 
 document.getElementById('marketBtn').addEventListener('click', async (event) => {
     event.preventDefault();
@@ -28,7 +30,7 @@ document.getElementById('marketBtn').addEventListener('click', async (event) => 
 
 document.getElementById('accountBtn').addEventListener('click', async (event) => {
     event.preventDefault();
-    window.location.href = '/account-settings';
+    window.location.href = '/account';
 });
 
 function toggleVisibility(token) {

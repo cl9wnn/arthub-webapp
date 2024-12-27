@@ -18,7 +18,7 @@ serviceProvider.AddSingleton<QueryMapper>();
 serviceProvider.AddSingleton<UserRepository>();
 serviceProvider.AddSingleton<AccountService>();
 serviceProvider.AddSingleton<IS3Storage<string>,MinioService>();
-serviceProvider.AddSingleton<AccSettingsService>();
+serviceProvider.AddSingleton<AvatarService>();
 
 var authService = new AuthorizationService(); 
 
