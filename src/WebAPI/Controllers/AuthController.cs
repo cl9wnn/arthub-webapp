@@ -8,7 +8,7 @@ using WebAPI.Services;
 
 namespace WebAPI.Controllers;
 
-public class AuthController(AccountService accountService, AvatarService avatarService) : MyBaseController
+public class AuthController(UserService userService, AccountService accountService) : MyBaseController
 {
     
     [HttpPost("/auth/signup")]
@@ -19,18 +19,23 @@ public class AuthController(AccountService accountService, AvatarService avatarS
         if (userModel == null)
             return new ErrorResult(400, "Invalid request");
         
-        var avatarResult = await avatarService.SaveAvatarAsync(userModel!.Avatar!, cancellationToken);
+        var avatarResult = await accountService.SaveAvatarAsync(userModel!.Avatar!, cancellationToken);
         
         if (!avatarResult.IsSuccess)
             return new ErrorResult(500, "Failed to save avatar: " + avatarResult.ErrorMessage);
         
         userModel!.User!.Avatar = avatarResult.Data;
         
-        var userResult = await accountService.RegisterUserAsync(userModel!.User!, cancellationToken);
+        var userResult = await userService.RegisterUserAsync(userModel!.User!, cancellationToken);
         
-          return userResult.IsSuccess
-               ? new JsonResult<JwtTokenModel>(userResult!.Data)
-               : new ErrorResult(userResult.StatusCode, userResult.ErrorMessage!);
+        if (!userResult.IsSuccess)
+        {
+            var deleteResult = await accountService.DeleteAvatarAsync(avatarResult.Data, cancellationToken);
+            return !deleteResult.IsSuccess 
+                ? new ErrorResult(deleteResult.StatusCode, deleteResult.ErrorMessage!)
+                : new ErrorResult(userResult.StatusCode, userResult.ErrorMessage!);
+        }
+        return new JsonResult<JwtTokenModel>(userResult.Data);
     }
     
 
@@ -39,7 +44,7 @@ public class AuthController(AccountService accountService, AvatarService avatarS
     {
         var userModel = await WebHelper.ReadBodyAsync<LoginModel>(context, cancellationToken);
 
-        var result = await accountService.LoginUserAsync(userModel!, cancellationToken);
+        var result = await userService.LoginUserAsync(userModel!, cancellationToken);
 
         return result.IsSuccess
             ? new JsonResult<JwtTokenModel>(result!.Data)

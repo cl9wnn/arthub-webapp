@@ -24,7 +24,7 @@ public class MinioService: IS3Storage<string>
         }
     }
 
-    public async Task<string> UploadFileAsync(byte[] fileBytes, string objectName, string contentType)
+    public async Task<string> UploadFileAsync(byte[] fileBytes, string objectName, string contentType, CancellationToken cancellationToken)
     {
         try
         {
@@ -36,18 +36,35 @@ public class MinioService: IS3Storage<string>
                 .WithObject(objectName)
                 .WithStreamData(stream)
                 .WithObjectSize(fileBytes.Length)
-                .WithContentType(contentType));
+                .WithContentType(contentType), cancellationToken);
 
             var objectUrl = $"{Endpoint}/{BucketName}/{objectName}";
             return objectUrl;
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             return null;
         }
     }
     
-    public async Task<byte[]> GetFileAsync(string objectName)
+    public async Task<bool> DeleteFileAsync(string objectName, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _minioClient.RemoveObjectAsync(new RemoveObjectArgs()
+                .WithBucket(BucketName)
+                .WithObject(objectName), cancellationToken);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка при удалении файла {objectName}: {ex.Message}");
+            return false;
+        }
+       
+    }
+    public async Task<byte[]> GetFileAsync(string objectName, CancellationToken cancellationToken)
     {
         try
         {
@@ -58,15 +75,15 @@ public class MinioService: IS3Storage<string>
                 .WithObject(objectName)
                 .WithCallbackStream(async (stream) =>
                 {
-                    await stream.CopyToAsync(memoryStream);
-                }));
+                    await stream.CopyToAsync(memoryStream, cancellationToken);
+                }), cancellationToken);
         
             return memoryStream.ToArray();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Ошибка при получении файла: {ex.Message}");
-            throw;
+            return null;
         }
     }
 }

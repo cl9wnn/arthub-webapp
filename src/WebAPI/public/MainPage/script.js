@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.getElementById('signupBtn').addEventListener('click', async (event) => {
     event.preventDefault();
-    window.location.href = '/account-settings';
+    window.location.href = '/register-account';
 });
 
 document.getElementById('marketBtn').addEventListener('click', async (event) => {

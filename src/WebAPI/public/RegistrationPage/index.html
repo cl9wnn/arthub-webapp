@@ -31,30 +31,29 @@
             <div class="form-group">
                 <label for="profile-name">Profile Name *</label>
                 <input type="text" id="profile-name" name="profile-name" placeholder="Enter your profile name" required>
-                <span class="error-message" id="profile-name-error"></span>
+                <span class="error-message" id="profileName-error"></span>
             </div>
 
             <!-- Настоящее имя -->
             <div class="form-group">
                 <label for="real-name">Real Name *</label>
                 <input type="text" id="real-name" name="real-name" placeholder="Enter your real name" required>
-                <span class="error-message" id="real-name-error"></span>
+                <span class="error-message" id="realName-error"></span>
             </div>
-
-            <!-- Кнопка отправки -->
-            <button type="button" id="submit-button">Submit</button>
         </div>
 
         <div class="form-section avatar-section">
+            <!-- аватар -->
             <div class="avatar" id="avatarPreview">Avatar</div>
             <input type="file" id="avatarInput" style="display: none;">
             <button class="upload-btn" id="uploadBtn">Upload New Avatar</button>
+            <span class="error-message" id="avatar-error"></span> 
         </div>
         
     </div>
     <div class="buttons">
-        <button class="back">Back</button>
-        <button class="next" id="nextBtn">Next</button>
+        <button class="back" id="backBtn">Back</button>
+        <button class="next" type="button" id="sendBtn">Send</button>
     </div>
 </div>
 <script  type="module" src="/static/RegistrationPage/script.js"></script>

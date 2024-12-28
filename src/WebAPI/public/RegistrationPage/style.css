@@ -48,7 +48,7 @@ h2 {
 
 .form-group input,
 .form-group select {
-    width: calc(100% - 20px); /* Учитываем отступы */
+    width: calc(100% - 20px); 
     padding: 10px;
     font-size: 14px;
     background-color: #333;
@@ -119,4 +119,27 @@ h2 {
 .next {
     background-color: #007bff;
     color: #fff;
+}
+
+.error-highlight {
+    animation: text-blink 0.3s ease-in-out;
+}
+
+@keyframes text-blink {
+    0% {
+        color: darkred;
+    }
+    50% {
+        color: #ff6363;
+    }
+    100% {
+        color: darkred;
+    }
+}
+
+.error-message {
+    color: darkred;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    transition: all 0.3s ease;
 }

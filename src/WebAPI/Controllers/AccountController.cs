@@ -10,7 +10,7 @@ using WebAPI.Services;
 
 namespace WebAPI.Controllers;
 
-public class AccountController(AvatarService avatarService): MyBaseController
+public class AccountController(AccountService accountService): MyBaseController
 {
     
     [HttpGet("/account")]
@@ -19,16 +19,13 @@ public class AccountController(AvatarService avatarService): MyBaseController
         const string path = "public/AccountPage/index.html";
         return new ResourceResult(path);
     }
-
     
-    [HttpGet("/account-settings")]
+    [HttpGet("/register-account")]
     public IMyActionResult ShowSettingsPageAsync(HttpListenerContext context, CancellationToken cancellationToken)
     {
         const string path = "public/RegistrationPage/index.html";
         return new ResourceResult(path);
     }
-    
-    
     
     [Authorize("user")]
     [HttpGet("/api/get-account")]
@@ -37,7 +34,7 @@ public class AccountController(AvatarService avatarService): MyBaseController
         if (!context.TryGetItem<int>("userId", out var userId))
             return new ErrorResult(400, "Not authorized");
 
-        var result = await avatarService.GetAccountDataAsync(userId, cancellationToken);
+        var result = await accountService.GetAccountDataAsync(userId, cancellationToken);
         
         return result.IsSuccess
             ? new JsonResult<UserProfileModel>(result.Data)

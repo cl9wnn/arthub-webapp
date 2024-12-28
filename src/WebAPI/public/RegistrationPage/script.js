@@ -1,14 +1,19 @@
-import { tokenStorage } from '../Auth/auth.js';
-import { showForm, createLoginForm, createElement} from '../Auth/auth.js';
+import {tokenStorage, createElement} from '../Auth/auth.js';
 
 const uploadBtn = document.getElementById('uploadBtn');
 const avatarInput = document.getElementById('avatarInput');
 avatarInput.setAttribute('accept', 'image/jpeg, image/png, image/gif, image/webp');
 const avatarPreview = document.getElementById('avatarPreview');
-const nextBtn = document.getElementById('nextBtn');
+const sendBtn = document.getElementById('sendBtn');
+const backBtn = document.getElementById('backBtn');
 
+
+backBtn.addEventListener('click', () => {
+    window.location.href = '/';
+});
 let avatarFile = null;
 
+// загрузка аватарки из директории
 uploadBtn.addEventListener('click', () => {
     avatarInput.click();
 });
@@ -29,6 +34,8 @@ avatarInput.addEventListener('change', (event) => {
         reader.readAsDataURL(file);
     }
 });
+
+// валидация полей формы
 const createErrorField = () => createElement('span', { className: 'error-message' });
 
 const validateFields = (data) => {
@@ -41,36 +48,60 @@ const validateFields = (data) => {
     if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/.test(data.password)) {
         errors.password = "Пароль должен быть от 8 до 20 символов, содержать минимум одну букву, одну цифру и один специальный символ.";
     }
+    
+    if (!/^[a-zA-Z0-9_.]{3,15}$/.test(data.profileName)) {
+        errors.profileName = "Имя пользователя должно быть от 3 до 15 символов и содержать только латинские буквы, цифры, точки или символы подчеркивания.";
+    }
+
+    if (!/^[a-zA-Zа-яА-ЯёЁ '-]{3,30}$/.test(data.realName)) {
+        errors.realName = "Имя должно быть от 3 до 50 символов и содержать только буквы, пробелы, дефисы или апострофы.";
+    }
 
     return errors;
 };
 
-document.getElementById('submit-button').addEventListener('click', async () => {
+const displayErrors = (errors) => {
+    document.querySelectorAll('.error-message').forEach(span => {
+        span.textContent = '';
+        span.classList.remove('error-highlight');
+    });
+
+    for (const [field, message] of Object.entries(errors)) {
+        const errorSpan = document.getElementById(`${field}-error`);
+        if (errorSpan) {
+            errorSpan.textContent = message;
+
+            errorSpan.classList.add('error-highlight');
+
+            setTimeout(() => errorSpan.classList.remove('error-highlight'), 300);
+        }
+    }
+};
+
+// отправка формы регистрации на сервер
+sendBtn.addEventListener('click', async () => {
     const login = document.getElementById('login').value;
     const password = document.getElementById('password').value;
     const profileName = document.getElementById('profile-name').value;
     const realName = document.getElementById('real-name').value;
 
-    if (!login || !password || !profileName || !realName) {
-        alert('All fields are required!');
-        return;
-    }
-
+    const formData = { login, password, profileName, realName };
+    const errors = validateFields(formData);
+    
     if (!avatarFile) {
-        alert('Please select an avatar before proceeding.');
-        return;
+        errors.avatar = "Please select an avatar before proceeding.";
     }
 
+    if (Object.keys(errors).length > 0) {
+        displayErrors(errors);
+        return;
+    }
+    
     const reader = new FileReader();
     reader.onload = async function (e) {
         const base64String = e.target.result.split(',')[1];
         const payload = JSON.stringify({
-            user: {
-                login: login,
-                password: password,
-                profileName: profileName,
-                realName: realName,
-            },
+            user: formData,
             avatar: {
                 contentType: avatarFile.type,
                 fileData: base64String
@@ -87,18 +118,16 @@ document.getElementById('submit-button').addEventListener('click', async () => {
             });
 
             const data = await response.json();
-            console.log(data);
             
             if (response.ok) {
                 tokenStorage.save(data.token);
                 window.location.href = '/account';
             } else {
-                alert(data.error || 'Ошибка при выполнении запроса');
+                alert(data || 'Ошибка при выполнении запроса');
             }
         } catch (error) {
             alert(error.message);
         }
     };
-
     reader.readAsDataURL(avatarFile);
 });

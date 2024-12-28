@@ -86,7 +86,7 @@ const handleSubmit = async (path, data) => {
 
         const { token } = await response.json();
         tokenStorage.save(token);
-        alert('Успешно!');
+        window.location.reload();
     }
     catch (error) {
         alert(error.message);

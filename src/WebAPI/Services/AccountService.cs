@@ -1,54 +1,56 @@
-﻿using Persistence;
+﻿using MyFramework.Contracts;
 using Persistence.Entities;
 using Persistence.Repositories;
 using WebAPI.Models;
 
 namespace WebAPI.Services;
 
-public class AccountService(UserRepository userRepository)
+public class AccountService(IS3Storage<string> storage, UserRepository userRepository)
 {
-    public async Task<Result<JwtTokenModel>> RegisterUserAsync(User user, CancellationToken cancellationToken)
+    public async Task<Result<string>> SaveAvatarAsync(FileModel? file, CancellationToken cancellationToken)
     {
-        if (await userRepository.GetUserAsync(user.Login, cancellationToken) != null)
-            return Result<JwtTokenModel>.Failure(409,$"User with login {user.Login} already exists.")!; 
+        if (file == null)
+            return Result<string>.Failure(404, "File not uploaded!")!;
         
-        var validator = new UserValidator();
-        var validationResult = await  validator.ValidateAsync(user, cancellationToken);
+        if (!file.ContentType!.StartsWith("image/"))
+            return Result<string>.Failure(404, "File is not an image!")!;
+        
+        var fileBytes = Convert.FromBase64String(file.FileData!);
+        var fileType = file.ContentType!.Split('/')[1];
+        var fileName = $"{file.FileName}.{fileType}";
+        
+        var fileUrl = await storage.UploadFileAsync(fileBytes, $"avatars/{fileName}", file.ContentType!, cancellationToken);
 
-        if (!validationResult.IsValid)
-            return Result<JwtTokenModel>.Failure(401, validationResult.ToString())!;
-
-        user!.Password = MyPasswordHasher.HashPassword(user.Password);
-        
-        var createdUser = await userRepository.CreateUserAsync(user, cancellationToken);
-        
-        var authResult =  new JwtTokenModel
-        {
-            Token = JwtService.GenerateJwtToken(createdUser)
-        };
-        return Result<JwtTokenModel>.Success(authResult);
+        return fileUrl == null
+            ? Result<string>.Failure(404,"Ошибка сохранения файла!")!
+            : Result<string>.Success(fileName!);
     }
-
-    public async Task<Result<JwtTokenModel>> LoginUserAsync(LoginModel model, CancellationToken cancellationToken)
+    
+    public async Task<Result<bool>> DeleteAvatarAsync(string fileName, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(model.Login) || string.IsNullOrWhiteSpace(model.Password))
-            return Result<JwtTokenModel>.Failure(400,"Login or Password cannot be null or empty")!;
-        
-        var user = await userRepository.GetUserAsync(model.Login, cancellationToken);
-        
-        if (user == null)
-            return Result<JwtTokenModel>.Failure(404, $"User with login '{model.Login}' was not found.")!;
-                
-        var validationResult = MyPasswordHasher.ValidatePassword(user!.Password!, model!.Password!);
+            var objectName = $"avatars/{fileName}";
+            
+            var isDeleted = await storage.DeleteFileAsync(objectName, cancellationToken);
 
-        if (!validationResult)
-            return Result<JwtTokenModel>.Failure(401,"Invalid password.")!;
+            return isDeleted
+                ? Result<bool>.Success(true)
+                : Result<bool>.Failure(400, "Ошибка удаления файла!");
+    }    
+    
+    public async Task<Result<UserProfileModel>> GetAccountDataAsync(int id, CancellationToken cancellationToken)
+    {
+        var user = await userRepository.GetUserAsync(id, cancellationToken);
+
+        if (user == null)
+            return Result<UserProfileModel>.Failure(404, "User dont found")!;
         
-        var authResult =  new JwtTokenModel
+        var profileData = new UserProfileModel
         {
-            Token = JwtService.GenerateJwtToken(user)
+            ProfileName = user.ProfileName,
+            RealName = user.RealName,
+            Avatar = user.Avatar
         };
         
-        return Result<JwtTokenModel>.Success(authResult);
+        return Result<UserProfileModel>.Success(profileData);
     }
 }
