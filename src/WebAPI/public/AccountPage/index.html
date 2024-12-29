@@ -10,16 +10,27 @@
 <body>
 <div class="wrapper">
     <div class="profile-header">
-        <img id="avatarImg"  alt="User Avatar">
+        <img id="avatarImg" alt="User Avatar">
         <div class="profile-info">
-            <h1 id="profileName"></h1>
-            <h1 id="realName"></h1>
-            <p>Russia</p>
-            <div class="profile-links">
-                <a href="#">Edit Profile</a>
-                <a href="#">Friends</a>
-                <a href="#">Settings</a>
+            <div class="name-info">
+                <h1 id="profileName"></h1>
+                <h1 id="realName"></h1>
             </div>
+            <div class="contact-info">
+                <p id="country"></p>
+                <p id="contact-info">egor345@mail.ru</p>
+            </div>
+        </div>
+        <div class="button-container">
+            <button class="profile-button" id="editBtn">Edit Profile</button>
+            <button class="profile-button" id="upgradeBtn">Upgrade to artist</button>
+        </div>
+    </div>
+    <div class="portfolio">
+        <h1 id="portfolio">Portfolio</h1>
+        <div class="portfolio-container">
+            <p id="portfolio-text">Add your own artworks so that others can rate and promote you</p>
+            <button class="profile-button" id="addArtBtn">Add artwork</button>
         </div>
     </div>
 </div>

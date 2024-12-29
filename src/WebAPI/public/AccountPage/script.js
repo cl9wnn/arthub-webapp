@@ -6,7 +6,8 @@ const avatarBucketPath = 'http://localhost:9000/image-bucket/avatars/';
 const avatarImg = document.getElementById('avatarImg');
 const realName = document.getElementById('realName');
 const profileName = document.getElementById('profileName');
-
+const contactInfo = document.getElementById('contact-info');
+const country = document.getElementById('country');
 
 async function loadAccountData() {
     const token = tokenStorage.get();
@@ -25,11 +26,15 @@ async function loadAccountData() {
         if (response.ok) {
             realName.innerText = data.realName;
             profileName.innerText = data.profileName;
+            contactInfo.innerText = data.contactInfo;
             avatarImg.src = `${avatarBucketPath}${data.avatar}`;
+            country.innerText = data.country;
         } else {
-            realName.innerText = 'Username';
-            profileName.innerText = 'Real name';
+            realName.innerText = 'username';
+            profileName.innerText = 'about you';
+            contactInfo.innerText = 'contact Info';
             avatarImg.src = `${avatarBucketPath}/default_avatar.png`;
+            country.innerText = 'not found';
 
             showForm(createLoginForm, '/auth/signin', 'Sign In');
         }

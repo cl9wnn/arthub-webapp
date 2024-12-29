@@ -57,6 +57,14 @@ const validateFields = (data) => {
         errors.realName = "Имя должно быть от 3 до 50 символов и содержать только буквы, пробелы, дефисы или апострофы.";
     }
 
+    if (
+        !/^(\+7|8)\d{10}$/.test(data.contactInfo) &&
+        !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(data.contactInfo) &&
+        !/^(https?:\/\/)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}\/?.*$/.test(data.contactInfo)
+    ) {
+        errors.contactInfo = "Enter the correct phone number, email, or link.";
+    }
+    
     return errors;
 };
 
@@ -84,12 +92,18 @@ sendBtn.addEventListener('click', async () => {
     const password = document.getElementById('password').value;
     const profileName = document.getElementById('profile-name').value;
     const realName = document.getElementById('real-name').value;
+    const contactInfo = document.getElementById('contactInfo').value;
+    const country = document.getElementById('country').value;
 
-    const formData = { login, password, profileName, realName };
+
+    const formData = { login, password, profileName, realName, contactInfo, country };
     const errors = validateFields(formData);
     
     if (!avatarFile) {
-        errors.avatar = "Please select an avatar before proceeding.";
+        errors.avatar = "Выберите ваш аватар";
+    }
+    if (!country) {
+        errors.country = "Выберите вашу страну";
     }
 
     if (Object.keys(errors).length > 0) {

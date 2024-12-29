@@ -1,75 +1,103 @@
 ﻿body {
     margin: 0;
+    padding: 0;
     font-family: Arial, sans-serif;
-    background-color: #1b2838;
+    background: #404055;
+    background-size: cover;
     color: #c7d5e0;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     height: 100vh;
 }
 
 .wrapper {
-    width: 100%;
-    max-width: 800px;
+    width: 800px;
+    background-color: rgba(27, 27, 27, 0.9);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    height: 100vh;
 }
 
 .profile-header {
     display: flex;
     align-items: center;
-    background-color: #171a21;
-    padding: 20px;
-    border-bottom: 1px solid #4c6f8c;
+    border-bottom: 2px solid #586375;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    position: relative;
 }
 
-.avatar {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    border: 3px solid #4c6f8c;
+#avatarImg {
+    width: 150px;
+    height: 150px;
+    border-radius: 4px;
     margin-right: 20px;
+    border: 2px solid #4d6d9a;
+    background-color: #000;
 }
 
 .profile-info {
-    display: flex;
-    flex-direction: column;
+    flex-grow: 1;
 }
 
 .profile-info h1 {
     margin: 0;
-    font-size: 24px;
-    color: #fff;
+    font-size: 2em;
+    font-weight: normal;
+    color: #ffffff;
+}
+
+#realName {
+    font-size: 1em;
+    font-weight: lighter;
+    color: #8c8c8c;
+    margin-top: 5px;
 }
 
 .profile-info p {
     margin: 5px 0 0;
-    color: #a9b8c9;
+    font-size: 1em;
+    color: #8fa3b0;
 }
 
-.profile-links {
-    margin-top: 10px;
+.profile-button {
     display: flex;
-    gap: 10px;
-}
-
-.profile-links a {
-    text-decoration: none;
-    color: #66c0f4;
-    padding: 5px 10px;
-    border: 1px solid #4c6f8c;
-    border-radius: 4px;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-.profile-links a:hover {
     background-color: #66c0f4;
-    color: #171a21;
+    color: #ffffff;
+    border: none;
+    padding: 10px 15px;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
 }
 
-#avatarImg{
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: cover; 
-    width: 80px; 
-    height: 80px; 
+.profile-button:hover {
+    background-color: #5598c4;
+}
+
+.name-info{
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 30px;
+}
+.contact-info{
+    display: flex;
+    flex-direction: column;
+}
+
+.button-container{
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-button{
+    margin: 10px 15px;
+}
+
+#portfolio-text{
+    color: #676767;
 }

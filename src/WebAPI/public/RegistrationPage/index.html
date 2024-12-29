@@ -40,6 +40,26 @@
                 <input type="text" id="real-name" name="real-name" placeholder="Enter your real name" required>
                 <span class="error-message" id="realName-error"></span>
             </div>
+
+            <!-- Контакт -->
+            <div class="form-group">
+                <label for="contactInfo">Contact *</label>
+                <input type="text" id="contactInfo" name="contactInfo" placeholder="Enter one contact for communication" required>
+                <span class="error-message" id="contactInfo-error"></span>
+            </div>
+            
+            <!-- Страна -->
+            <div class="form-group">
+                <label for="country">Country *</label>
+                <select id="country" name="country" required>
+                    <option value="">Select your country</option>
+                    <option value="United States">United States</option>
+                    <option value="United Kingdom">United Kingdom</option>
+                    <option value="Russia">Russia</option>
+                    <option value="China">China</option>
+                </select>
+                <span class="error-message" id="country-error"></span>
+            </div>
         </div>
 
         <div class="form-section avatar-section">
@@ -49,7 +69,6 @@
             <button class="upload-btn" id="uploadBtn">Upload New Avatar</button>
             <span class="error-message" id="avatar-error"></span> 
         </div>
-        
     </div>
     <div class="buttons">
         <button class="back" id="backBtn">Back</button>

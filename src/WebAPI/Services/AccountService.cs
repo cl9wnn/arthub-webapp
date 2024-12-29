@@ -48,7 +48,9 @@ public class AccountService(IS3Storage<string> storage, UserRepository userRepos
         {
             ProfileName = user.ProfileName,
             RealName = user.RealName,
-            Avatar = user.Avatar
+            Avatar = user.Avatar,
+            ContactInfo = user.ContactInfo,
+            Country = user.Country
         };
         
         return Result<UserProfileModel>.Success(profileData);
