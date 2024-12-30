@@ -2,9 +2,6 @@
 using MyFramework;
 using MyFramework.Attributes;
 using MyFramework.Contracts;
-using MyORM;
-using Persistence.Entities;
-using Persistence.Repositories;
 using WebAPI.Models;
 using WebAPI.Services;
 
@@ -21,23 +18,56 @@ public class AccountController(AccountService accountService): MyBaseController
     }
     
     [HttpGet("/register-account")]
-    public IMyActionResult ShowSettingsPageAsync(HttpListenerContext context, CancellationToken cancellationToken)
+    public IMyActionResult ShowRegisterPageAsync(HttpListenerContext context, CancellationToken cancellationToken)
     {
         const string path = "public/RegistrationPage/index.html";
         return new ResourceResult(path);
     }
     
-    [Authorize("user")]
+    [HttpGet("/register-artist")]
+    public IMyActionResult ShowRegistrationArtistPageAsync(HttpListenerContext context, CancellationToken cancellationToken)
+    {
+        const string path = "public/RegistrationArtistPage/index.html";
+        return new ResourceResult(path);
+    }
+    
+    [Authorize("user", "artist")]
     [HttpGet("/api/get-account")]
-    public async Task<IMyActionResult> GetAccountInfoAsync(HttpListenerContext context, CancellationToken cancellationToken)
+    public async Task<IMyActionResult> ShowAccountInfoAsync(HttpListenerContext context, CancellationToken cancellationToken)
     {
         if (!context.TryGetItem<int>("userId", out var userId))
             return new ErrorResult(400, "Not authorized");
 
-        var result = await accountService.GetAccountDataAsync(userId, cancellationToken);
-        
-        return result.IsSuccess
-            ? new JsonResult<UserProfileModel>(result.Data)
-            : new ErrorResult(result.StatusCode, result.ErrorMessage!);
+        if (!context.TryGetItem<string>("userRole", out var userRole))
+            return new ErrorResult(400, "User role not provided");
+
+        switch (userRole)
+        {
+            case "user":
+            {
+                var userResult = await accountService.GetUserDataAsync(userId, cancellationToken);
+
+                return userResult.IsSuccess
+                    ? new JsonResult<UserProfileModel>(userResult.Data)
+                    : new ErrorResult(userResult.StatusCode, userResult.ErrorMessage!);
+            }
+            case "artist":
+            {
+                var artistResult = await accountService.GetUpgradeUserDataAsync(userId, cancellationToken);
+
+                return artistResult.IsSuccess
+                    ? new JsonResult<ArtistProfileModel>(artistResult.Data)
+                    : new ErrorResult(artistResult.StatusCode, artistResult.ErrorMessage!);
+            }
+            default:
+                return new ErrorResult(403, "Invalid user role");
+        }
+    }
+
+    [Authorize("artist")]
+    [HttpGet("/api/add-artwork")]
+    public IMyActionResult AddArtworkAsync(HttpListenerContext context, CancellationToken cancellationToken)
+    {
+        return new JsonResult<string>("add-artwork");
     }
 }

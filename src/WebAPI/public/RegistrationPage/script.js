@@ -52,18 +52,6 @@ const validateFields = (data) => {
     if (!/^[a-zA-Z0-9_.]{3,15}$/.test(data.profileName)) {
         errors.profileName = "Имя пользователя должно быть от 3 до 15 символов и содержать только латинские буквы, цифры, точки или символы подчеркивания.";
     }
-
-    if (!/^[a-zA-Zа-яА-ЯёЁ '-]{3,30}$/.test(data.realName)) {
-        errors.realName = "Имя должно быть от 3 до 50 символов и содержать только буквы, пробелы, дефисы или апострофы.";
-    }
-
-    if (
-        !/^(\+7|8)\d{10}$/.test(data.contactInfo) &&
-        !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(data.contactInfo) &&
-        !/^(https?:\/\/)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}\/?.*$/.test(data.contactInfo)
-    ) {
-        errors.contactInfo = "Enter the correct phone number, email, or link.";
-    }
     
     return errors;
 };
@@ -91,12 +79,10 @@ sendBtn.addEventListener('click', async () => {
     const login = document.getElementById('login').value;
     const password = document.getElementById('password').value;
     const profileName = document.getElementById('profile-name').value;
-    const realName = document.getElementById('real-name').value;
-    const contactInfo = document.getElementById('contactInfo').value;
     const country = document.getElementById('country').value;
 
 
-    const formData = { login, password, profileName, realName, contactInfo, country };
+    const formData = { login, password, profileName, country };
     const errors = validateFields(formData);
     
     if (!avatarFile) {

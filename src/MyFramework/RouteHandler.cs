@@ -73,13 +73,14 @@ public class RouteHandler
                 await WebHelper.ShowError(401,"Not authorized", context, ctx.Token);
                 return;
             }
-            if (!authorizeAttribute.Role.Contains(user.Role!))
+            if (!authorizeAttribute.Roles.Contains(user.Role!))
             {
                 await WebHelper.ShowError(403, "Forbidden: Insufficient permissions", context, ctx.Token);
                 return;
             }
             
             context.SetItem("userId", user.UserId);
+            context.SetItem("userRole", user.Role!);
         }
         
         var result = route.Action.Invoke(controller, new object[] { context, ctx.Token });

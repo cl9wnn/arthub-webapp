@@ -15,7 +15,7 @@ public class MarketController: MyBaseController
         return new ResourceResult(path);
     }
 
-    [Authorize("user")]
+    [Authorize("user", "artist")]
     [HttpPost("/api/buy")]
     public IMyActionResult TestBuy(HttpListenerContext context, CancellationToken cancellationToken)
     {

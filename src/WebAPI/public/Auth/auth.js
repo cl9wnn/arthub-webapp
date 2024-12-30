@@ -33,14 +33,22 @@ const createPopup = (onClose) => {
 };
 
 export const showForm = (createFormMethod, path, buttonText) => {
-    const overlay = createOverlay();
-    const popup = createPopup(() => document.body.removeChild(overlay));
+    return new Promise((resolve) => {
+        const overlay = createOverlay();
+        const popup = createPopup(() => {
+            document.body.removeChild(overlay);
+            resolve(false); 
+        });
 
-    const form = createFormMethod(() => document.body.removeChild(overlay), path, buttonText);
-    popup.appendChild(form);
-    overlay.appendChild(popup);
+        const form = createFormMethod(() => {
+            document.body.removeChild(overlay);
+            resolve(true); 
+        }, path, buttonText);
 
-    document.body.appendChild(overlay);
+        popup.appendChild(form);
+        overlay.appendChild(popup);
+        document.body.appendChild(overlay);
+    });
 };
 
 const createInputField = (type, name, placeholder) =>
@@ -86,7 +94,6 @@ const handleSubmit = async (path, data) => {
 
         const { token } = await response.json();
         tokenStorage.save(token);
-        window.location.reload();
     }
     catch (error) {
         alert(error.message);

@@ -10,10 +10,6 @@ public class User: IAuthEntity
     public string? Password { get; set; }
     [ColumnName("profile_name")]
     public string? ProfileName { get; init; }
-    [ColumnName("real_name")]
-    public string? RealName { get; init; }
-    [ColumnName("contact_info")]
-    public string? ContactInfo { get; set; }
     public string? Country { get; set; }
     public string? Avatar { get; set; }
     public string? Role { get; init; }

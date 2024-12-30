@@ -1,5 +1,4 @@
-﻿import { tokenStorage } from '../Auth/auth.js';
-import { showForm, createLoginForm } from '../Auth/auth.js';
+﻿import {tokenStorage, showForm, createLoginForm } from '../Auth/auth.js';
 
 const testBtn = document.getElementById('testBuy');
 
@@ -21,7 +20,12 @@ testBtn.addEventListener('click', async () => {
             if (response.ok) {
                 alert(data);
             } else {
-                showForm(createLoginForm, '/auth/signin', 'Sign In');
+                if (data == 'Not authorized') {
+                    showForm(createLoginForm, '/auth/signin', 'Sign In');
+                }
+                else{
+                    alert (data || 'Ошибка на сервере!');
+                }
             }
         } catch (error) {
             alert(error.message);

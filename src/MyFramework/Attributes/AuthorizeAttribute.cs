@@ -1,7 +1,7 @@
 ﻿namespace MyFramework.Attributes;
 
 [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
-public class AuthorizeAttribute(string role) : Attribute
+public class AuthorizeAttribute(params string[] roles) : Attribute
 {
-    public string Role { get; } = role;
+    public string[] Roles { get; } = roles;
 }

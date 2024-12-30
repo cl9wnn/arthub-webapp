@@ -14,7 +14,6 @@ public class AuthorizationService: IAuthService //TODO: переделать!
         if (authHeader == null)
         {
             return Task.FromResult<IAuthEntity?>(null);
-
         }
 
         var token = authHeader.Split()[1];

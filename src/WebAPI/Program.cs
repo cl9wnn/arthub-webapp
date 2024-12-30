@@ -16,9 +16,12 @@ var serviceProvider = new MyServiceCollection();
 
 serviceProvider.AddSingleton<QueryMapper>();
 serviceProvider.AddSingleton<UserRepository>();
+serviceProvider.AddSingleton<ArtistRepository>();
 serviceProvider.AddSingleton<UserService>();
-serviceProvider.AddSingleton<IS3Storage<string>,MinioService>();
 serviceProvider.AddSingleton<AccountService>();
+serviceProvider.AddSingleton<ArtistService>();
+serviceProvider.AddSingleton<IS3Storage<string>,MinioService>();
+
 
 var authService = new AuthorizationService(); 
 
