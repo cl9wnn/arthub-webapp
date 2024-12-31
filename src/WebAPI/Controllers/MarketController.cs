@@ -9,7 +9,7 @@ namespace WebAPI.Controllers;
 public class MarketController: MyBaseController
 {
     [HttpGet("/market")]
-    public IMyActionResult ShowMarketPage(HttpListenerContext context, CancellationToken cancellationToken)
+    public IMyActionResult ShowMarket(HttpListenerContext context, CancellationToken cancellationToken)
     {
         const string path = "public/MarketPage/index.html";
         return new ResourceResult(path);

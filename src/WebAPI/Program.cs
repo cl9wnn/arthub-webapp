@@ -17,9 +17,12 @@ var serviceProvider = new MyServiceCollection();
 serviceProvider.AddSingleton<QueryMapper>();
 serviceProvider.AddSingleton<UserRepository>();
 serviceProvider.AddSingleton<ArtistRepository>();
+serviceProvider.AddSingleton<ArtworkRepository>();
 serviceProvider.AddSingleton<UserService>();
 serviceProvider.AddSingleton<AccountService>();
 serviceProvider.AddSingleton<ArtistService>();
+serviceProvider.AddSingleton<ArtworkService>();
+serviceProvider.AddSingleton<ArtistRepository>();
 serviceProvider.AddSingleton<IS3Storage<string>,MinioService>();
 
 

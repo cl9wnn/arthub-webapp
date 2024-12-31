@@ -61,13 +61,41 @@ h2 {
     color: #fff;
 }
 
+.art-section {
+    text-align: center;
+}
+
+.art {
+    width: 400px; 
+    margin: 0 auto 15px;
+    background-color: #333;
+    border: 2px dashed #555;
+    border-radius: 5%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #aaa;
+    overflow: hidden; 
+}
+
 .form-header {
     font-size:20px;
     margin-bottom: 20px;
 }
+.upload-btn {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    background-color: #444;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+}
 
-
-#summary{
+#description{
     width: calc(100% - 60px);
     padding: 10px;
     font-size: 14px;
@@ -75,6 +103,37 @@ h2 {
     border: 1px solid #444;
     border-radius: 4px;
     color: #fff;
+}
+
+.tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; 
+    margin-top: 10px;
+}
+
+.tag {
+    padding: 8px 16px; 
+    font-size: 14px;
+    font-family: Arial, sans-serif; 
+    color: #333; 
+    background-color: #f9f9f9; 
+    border: 2px solid #ddd; 
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.tag:hover {
+    background-color: #e0e0e0; 
+    border-color: #bbb; 
+}
+
+.tag.selected {
+    background-color: #007bff; 
+    color: white; 
+    border-color: #0056b3; 
+    font-weight: bold; 
 }
 
 .buttons {

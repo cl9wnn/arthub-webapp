@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New artwork</title>
+    <link rel="stylesheet" href="/static/AddArtworkPage/style.css">
+    <link rel="stylesheet" href="/static/Auth/auth.css">
+</head>
+<body>
+<div class="container">
+    <h1>Create artwork</h1>
+    <h2>Artwork form</h2>
+    <div class="form-container">
+
+        <div class="form-section">
+            <h1 class="form-header">Title</h1>
+            
+            <!-- название работы -->
+            <div class="form-group">
+                <label for="title">Artwork's title *</label>
+                <input type="text" id="title" name="title" placeholder="Enter artwork's title" required>
+                <span class="error-message" id="title-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="category">Categories *</label>
+                <select id="category" name="category" required>
+                    <option value="">Select artwork's category</option>
+                    <option value="portrait">portrait</option>
+                    <option value="landscape">landscape</option>
+                    <option value="abstraction">abstraction</option>
+                    <option value="anime">anime</option>
+                </select>
+                <span class="error-message" id="category-error"></span>
+            </div>
+
+            <!-- Теги -->
+            <div class="form-group">
+                <label>Tags (choose up to 3)</label>
+                <div id="tag-container" class="tag-container">
+                    <button type="button" class="tag" data-tag="creative">Creative</button>
+                    <button type="button" class="tag" data-tag="colorful">Colorful</button>
+                    <button type="button" class="tag" data-tag="minimal">Minimal</button>
+                    <button type="button" class="tag" data-tag="modern">Modern</button>
+                    <button type="button" class="tag" data-tag="traditional">Traditional</button>
+                </div>
+                <span class="error-message" id="tags-error"></span>
+            </div>
+        </div>
+
+        <div class="form-section" id="description-section">
+            <h1 class="form-header">Description</h1>
+
+            <!-- Описание работы -->
+            <div class="form-group">
+                <label for="description">Artwork's description *</label>
+                <textarea id="description" name="description" placeholder="Describe your artwork briefly" rows="5" required></textarea>
+                <span class="error-message" id="description-error"></span>
+            </div>
+        </div>
+
+        <div class="form-section art-section">
+            <h1 class="form-header">Art</h1>
+
+            <!-- Арт -->
+            <div class="art" id="artPreview">Artwork</div>
+            <input type="file" id="artInput" style="display: none;">
+            <button class="upload-btn" id="uploadBtn">Upload artwork</button>
+            <span class="error-message" id="art-error"></span>
+        </div>
+    </div>
+    <div class="buttons">
+        <button class="back" id="backBtn">Back</button>
+        <button class="next" type="button" id="sendBtn">Send</button>
+    </div>
+</div>
+<script  type="module" src="/static/AddArtworkPage/script.js"></script>
+</body>
+</html>

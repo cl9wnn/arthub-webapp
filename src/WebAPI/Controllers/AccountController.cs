@@ -63,11 +63,4 @@ public class AccountController(AccountService accountService): MyBaseController
                 return new ErrorResult(403, "Invalid user role");
         }
     }
-
-    [Authorize("artist")]
-    [HttpGet("/api/add-artwork")]
-    public IMyActionResult AddArtworkAsync(HttpListenerContext context, CancellationToken cancellationToken)
-    {
-        return new JsonResult<string>("add-artwork");
-    }
 }

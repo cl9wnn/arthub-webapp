@@ -2,10 +2,10 @@ import {tokenStorage, createElement} from '../Auth/auth.js';
 
 const uploadBtn = document.getElementById('uploadBtn');
 const avatarInput = document.getElementById('avatarInput');
-avatarInput.setAttribute('accept', 'image/jpeg, image/png, image/gif, image/webp');
 const avatarPreview = document.getElementById('avatarPreview');
 const sendBtn = document.getElementById('sendBtn');
 const backBtn = document.getElementById('backBtn');
+avatarInput.setAttribute('accept', 'image/jpeg, image/png, image/gif, image/webp');
 
 
 backBtn.addEventListener('click', () => {
@@ -52,6 +52,9 @@ const validateFields = (data) => {
     if (!/^[a-zA-Z0-9_.]{3,15}$/.test(data.profileName)) {
         errors.profileName = "Имя пользователя должно быть от 3 до 15 символов и содержать только латинские буквы, цифры, точки или символы подчеркивания.";
     }
+    if (!data.country) {
+        errors.country = "Выберите вашу страну";
+    }
     
     return errors;
 };
@@ -87,9 +90,6 @@ sendBtn.addEventListener('click', async () => {
     
     if (!avatarFile) {
         errors.avatar = "Выберите ваш аватар";
-    }
-    if (!country) {
-        errors.country = "Выберите вашу страну";
     }
 
     if (Object.keys(errors).length > 0) {
