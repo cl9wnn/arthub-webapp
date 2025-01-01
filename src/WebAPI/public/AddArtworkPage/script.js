@@ -141,13 +141,12 @@ document.getElementById('sendBtn').addEventListener('click', async () => {
                 },
                 body: payload
             });
-
-            const data = await response.json();
-
+            
             if (response.ok) {
                 alert("Отправлено успешно!");
                 window.location.href = '/account';
             } else {
+                const data = await response.json();
                 if (data == 'Not authorized') {
                     await showForm(createLoginForm, '/auth/signin', 'Sign In');
                 }

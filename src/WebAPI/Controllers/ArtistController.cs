@@ -11,12 +11,11 @@ public class ArtistController(ArtistService artistService) : MyBaseController
 {
     [Authorize("user")]
     [HttpPost("/api/upgrade-user")]
-    public async Task<IMyActionResult> RegisterArtistAsync(HttpListenerContext context, CancellationToken cancellationToken)
+    public async Task<IMyActionResult> RegisterArtistAsync([FromBody] SignUpArtistModel? artistModel,
+        HttpListenerContext context, CancellationToken cancellationToken)
     {
         if (!context.TryGetItem<int>("userId", out var userId))
             return new ErrorResult(400, "Not authorized");
-        
-        var artistModel = await WebHelper.ReadBodyAsync<SignUpArtistModel>(context, cancellationToken);
         
         if (artistModel == null)
             return new ErrorResult(400, "Invalid request");

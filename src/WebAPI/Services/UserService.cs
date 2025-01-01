@@ -29,7 +29,7 @@ public class UserService(UserRepository userRepository)
         return Result<JwtTokenModel>.Success(authResult);
     }
 
-    public async Task<Result<JwtTokenModel>> LoginUserAsync(LoginModel model, CancellationToken cancellationToken)
+    public async Task<Result<JwtTokenModel>> LoginUserAsync(LoginModel model, CancellationToken cancellationToken=default)
     {
         if (string.IsNullOrWhiteSpace(model.Login) || string.IsNullOrWhiteSpace(model.Password))
             return Result<JwtTokenModel>.Failure(400, "Login or Password cannot be null or empty")!;

@@ -11,21 +11,21 @@ public class AccountController(AccountService accountService): MyBaseController
 {
     
     [HttpGet("/account")]
-    public IMyActionResult ShowAccountPageAsync(HttpListenerContext context, CancellationToken cancellationToken)
+    public IMyActionResult ShowAccountPageAsync()
     {
         const string path = "public/AccountPage/index.html";
         return new ResourceResult(path);
     }
     
     [HttpGet("/register-account")]
-    public IMyActionResult ShowRegisterPageAsync(HttpListenerContext context, CancellationToken cancellationToken)
+    public IMyActionResult ShowRegisterPageAsync()
     {
         const string path = "public/RegistrationPage/index.html";
         return new ResourceResult(path);
     }
     
     [HttpGet("/register-artist")]
-    public IMyActionResult ShowRegistrationArtistPageAsync(HttpListenerContext context, CancellationToken cancellationToken)
+    public IMyActionResult ShowRegistrationArtistPageAsync()
     {
         const string path = "public/RegistrationArtistPage/index.html";
         return new ResourceResult(path);

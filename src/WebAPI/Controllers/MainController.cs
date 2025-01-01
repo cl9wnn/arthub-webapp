@@ -9,7 +9,7 @@ namespace WebAPI.Controllers;
 public class MainController: MyBaseController
 {
     [HttpGet("/")]
-    public IMyActionResult ShowIndexAsync(HttpListenerContext context, CancellationToken cancellationToken)
+    public IMyActionResult ShowIndexAsync()
     {
         const string path = "public/MainPage/index.html";
         return new ResourceResult(path);

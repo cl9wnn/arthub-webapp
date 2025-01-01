@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Reflection;
 using System.Reflection.Metadata;
+using System.Text.Json;
 using MyFramework.Attributes;
 using MyFramework.Contracts;
 
@@ -8,7 +9,7 @@ namespace MyFramework;
 
 public class RouteHandler
 {
-    private readonly List<(string Path, string Method, MethodInfo Action)> _routes = [];
+    private readonly List<Route> _routes = [];
     private readonly IMyServiceProvider _serviceProvider;
     private readonly IAuthService _authService;
     
@@ -32,29 +33,21 @@ public class RouteHandler
                 var attributes = method.GetCustomAttributes<RouteAttribute>();
                 foreach (var attribute in attributes)
                 {
-                    _routes.Add((attribute.Path, attribute.Method, method));
+                    var route = new Route(attribute.Path, attribute.Method, method);
+                    _routes.Add(route);
                 }
             }
         }
     }
-  
-    public async Task HandleRequest(HttpListenerContext context)
+    
+  public async Task HandleRequest(HttpListenerContext context)
+{
+    var ctx = new CancellationTokenSource();
+
+    try
     {
-        var path = context.Request.Url?.LocalPath;
-        var method = context.Request.HttpMethod;
-        var ctx = new CancellationTokenSource();
-
-        if (path == null)
-        {
-            await WebHelper.ShowError(404, "Page not found", context, ctx.Token);
-            return;
-        }
-
-        var route = _routes.FirstOrDefault(r =>
-            r.Method.Equals(method) &&
-            MatchRoute(path, r.Path));
-
-        if (route == default)
+        var route = GetRoute(context);
+        if (route == null)
         {
             await WebHelper.ShowError(404, "Page not found", context, ctx.Token);
             return;
@@ -62,46 +55,115 @@ public class RouteHandler
 
         var controller = CreateControllerInstance(route.Action.DeclaringType!);
         
-        var authorizeAttribute = route.Action.GetCustomAttribute<AuthorizeAttribute>() ??
-                                 route.Action.DeclaringType?.GetCustomAttribute<AuthorizeAttribute>();
-        
-        if (authorizeAttribute != null)
+        if (controller == null)
         {
-            var user = await _authService.AuthorizeUserAsync(context, ctx.Token);
-            if (user == null)
-            {
-                await WebHelper.ShowError(401,"Not authorized", context, ctx.Token);
-                return;
-            }
-            if (!authorizeAttribute.Roles.Contains(user.Role!))
-            {
-                await WebHelper.ShowError(403, "Forbidden: Insufficient permissions", context, ctx.Token);
-                return;
-            }
-            
-            context.SetItem("userId", user.UserId);
-            context.SetItem("userRole", user.Role!);
+            await WebHelper.ShowError(404, "incorrect request ", context, ctx.Token);
+            return;
         }
-        
-        var result = route.Action.Invoke(controller, new object[] { context, ctx.Token });
-        
-        if (result is Task<IMyActionResult> asyncResult)
-        {
-            var actionResult = await asyncResult;
-            await actionResult.ExecuteAsync(context, ctx.Token);
-        }
-        else if (result is IMyActionResult syncResult)
-        {
-            await syncResult.ExecuteAsync(context, ctx.Token);
-        }
+
+        if (!await AuthorizeRequest(context, route, ctx.Token))
+            return;
+
+        var args = await GetActionArguments(context, route, ctx.Token);
+
+        await ExecuteAction(route, controller, args, context, ctx.Token);
     }
+    catch (Exception ex)
+    {
+        await WebHelper.ShowError(500, "Internal server error", context, ctx.Token);
+    }
+}
+
+private Route? GetRoute(HttpListenerContext context)
+{
+    var path = context.Request.Url?.LocalPath;
+    var method = context.Request.HttpMethod;
+
+    if (path == null)
+        return null;
+
+    return _routes.Select(r => new Route(r.Path, r.Method, r.Action))
+                  .FirstOrDefault(r =>
+                      r.Method.Equals(method, StringComparison.OrdinalIgnoreCase) &&
+                      MatchRoute(path, r.Path));
+}
+
+private async Task<bool> AuthorizeRequest(HttpListenerContext context, Route route, CancellationToken cancellationToken)
+{
+    var authorizeAttribute = route.Action.GetCustomAttribute<AuthorizeAttribute>() ??
+                             route.Action.DeclaringType?.GetCustomAttribute<AuthorizeAttribute>();
+
+    if (authorizeAttribute == null)
+        return true;
+
+    var user = await _authService.AuthorizeUserAsync(context, cancellationToken);
+
+    if (user == null)
+    {
+        await WebHelper.ShowError(401, "Not authorized", context, cancellationToken);
+        return false;
+    }
+
+    if (!authorizeAttribute.Roles.Contains(user.Role!))
+    {
+        await WebHelper.ShowError(403, "Forbidden: Insufficient permissions", context, cancellationToken);
+        return false;
+    }
+
+    context.SetItem("userId", user.UserId);
+    context.SetItem("userRole", user.Role!);
+    return true;
+}
+
+private async Task<object?[]> GetActionArguments(HttpListenerContext context, Route route, CancellationToken cancellationToken)
+{
+    var parameters = route.Action.GetParameters();
+    var args = new object?[parameters.Length];
+
+    for (var i = 0; i < parameters.Length; i++)
+    {
+        var parameter = parameters[i];
+
+        args[i] = parameter.ParameterType switch
+        {
+            Type type when parameter.GetCustomAttribute<FromBodyAttribute>() != null => await WebHelper.ReadBodyAsync(
+                context, cancellationToken, parameter.ParameterType),
+            Type type when type == typeof(CancellationToken) => cancellationToken,
+            Type type when type == typeof(HttpListenerContext) => context,
+            _ => null
+        };
+    }
+    return args;
+}
+
+private async Task ExecuteAction(Route route, object controller, object?[] args, HttpListenerContext context, CancellationToken cancellationToken)
+{
+    var result = route.Action.Invoke(controller, args);
+
+    switch (result)
+    {
+        case Task<IMyActionResult> asyncResult:
+            var actionResult = await asyncResult;
+            await actionResult.ExecuteAsync(context, cancellationToken);
+            break;
+
+        case IMyActionResult syncResult:
+            await syncResult.ExecuteAsync(context, cancellationToken);
+            break;
+
+        default:
+            await WebHelper.ShowError(500, "Invalid action result", context, cancellationToken);
+            break;
+    }
+}
+
     
     private object? CreateControllerInstance(Type controllerType)
     {
         var constructor = controllerType.GetConstructors().FirstOrDefault();
 
         if (constructor == null)
-            throw new InvalidOperationException($"No public constructors found for {controllerType.Name}");
+            return null;
 
         var parameters = constructor.GetParameters();
         var args = parameters.Select(p => _serviceProvider.GetService(p.ParameterType)).ToArray();

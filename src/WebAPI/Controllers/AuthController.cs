@@ -12,21 +12,19 @@ public class AuthController(UserService userService, FileService fileService) : 
 {
     
     [HttpPost("/auth/signup")]
-    public async Task<IMyActionResult> Register(HttpListenerContext context, CancellationToken cancellationToken)
+    public async Task<IMyActionResult> Register([FromBody] SignUpModel? signUpModel, CancellationToken cancellationToken)
     {
-        var userModel = await WebHelper.ReadBodyAsync<SignUpModel>(context, cancellationToken);
-        
-        if (userModel == null)
+        if (signUpModel == null)
             return new ErrorResult(400, "Invalid request");
         
-        var avatarResult = await fileService.SaveFileAsync(userModel!.Avatar!, "avatars", cancellationToken);
+        var avatarResult = await fileService.SaveFileAsync(signUpModel!.Avatar!, "avatars", cancellationToken);
         
         if (!avatarResult.IsSuccess)
             return new ErrorResult(500, "Failed to save avatar: " + avatarResult.ErrorMessage);
         
-        userModel!.User!.Avatar = avatarResult.Data;
+        signUpModel!.User!.Avatar = avatarResult.Data;
         
-        var userResult = await userService.RegisterUserAsync(userModel!.User!, cancellationToken);
+        var userResult = await userService.RegisterUserAsync(signUpModel!.User!, cancellationToken);
         
         if (!userResult.IsSuccess)
         {
@@ -40,11 +38,12 @@ public class AuthController(UserService userService, FileService fileService) : 
     
 
     [HttpPost("/auth/signin")]
-    public async Task<IMyActionResult> Login(HttpListenerContext context, CancellationToken cancellationToken)
+    public async Task<IMyActionResult> Login([FromBody] LoginModel? loginModel, CancellationToken cancellationToken)
     {
-        var userModel = await WebHelper.ReadBodyAsync<LoginModel>(context, cancellationToken);
-
-        var result = await userService.LoginUserAsync(userModel!, cancellationToken);
+        if (loginModel == null)
+            return new ErrorResult(400, "Invalid request");
+        
+        var result = await userService.LoginUserAsync(loginModel!, cancellationToken);
 
         return result.IsSuccess
             ? new JsonResult<JwtTokenModel>(result!.Data)

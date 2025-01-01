@@ -2,6 +2,7 @@
 using MyFramework;
 using MyFramework.Attributes;
 using MyFramework.Contracts;
+using MyFramework.Views;
 using Persistence.Entities;
 using WebAPI.Models;
 using WebAPI.Services;
@@ -11,7 +12,7 @@ namespace WebAPI.Controllers;
 public class ArtworkController(ArtworkService artworkService, FileService fileService): MyBaseController
 {
     [HttpGet("/new/artwork")]
-    public IMyActionResult ShowAddArtworkPage(HttpListenerContext context, CancellationToken cancellationToken)
+    public IMyActionResult ShowAddArtworkPage()
     {
         const string path = "public/AddArtworkPage/index.html";
         return new ResourceResult(path);
@@ -19,17 +20,16 @@ public class ArtworkController(ArtworkService artworkService, FileService fileSe
     
     [Authorize("artist")]
     [HttpPost("/api/add-artwork")]
-    public async Task<IMyActionResult> AddArtworkAsync(HttpListenerContext context, CancellationToken cancellationToken)
+    public async Task<IMyActionResult> AddArtworkAsync([FromBody] ArtworkModel? artworkModel,
+        HttpListenerContext context, CancellationToken cancellationToken)
     {
         if (!context.TryGetItem<int>("userId", out var userId))
             return new ErrorResult(400, "Not authorized");
         
-        var artModel = await WebHelper.ReadBodyAsync<ArtworkModel>(context, cancellationToken);
-        
-        if (artModel == null)
+        if (artworkModel == null)
             return new ErrorResult(400, "Invalid request");
         
-        var artResult = await artworkService.SaveArtAsync(artModel, userId, cancellationToken);
+        var artResult = await artworkService.SaveArtAsync(artworkModel, userId, cancellationToken);
         
         if (!artResult.IsSuccess)
         {
@@ -38,6 +38,6 @@ public class ArtworkController(ArtworkService artworkService, FileService fileSe
                 ? new ErrorResult(deleteResult.StatusCode, deleteResult.ErrorMessage!)
                 : new ErrorResult(artResult.StatusCode, artResult.ErrorMessage!);
         }
-        return new JsonResult<string>("success");
+        return new Ok();
     }
 }

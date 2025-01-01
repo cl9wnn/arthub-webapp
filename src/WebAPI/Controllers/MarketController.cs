@@ -9,7 +9,7 @@ namespace WebAPI.Controllers;
 public class MarketController: MyBaseController
 {
     [HttpGet("/market")]
-    public IMyActionResult ShowMarket(HttpListenerContext context, CancellationToken cancellationToken)
+    public IMyActionResult ShowMarket()
     {
         const string path = "public/MarketPage/index.html";
         return new ResourceResult(path);
@@ -17,7 +17,7 @@ public class MarketController: MyBaseController
 
     [Authorize("user", "artist")]
     [HttpPost("/api/buy")]
-    public IMyActionResult TestBuy(HttpListenerContext context, CancellationToken cancellationToken)
+    public IMyActionResult TestBuy()
     {
         return new JsonResult<string>("Удачная покупка (вы авторизованы)");
     }

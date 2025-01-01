@@ -45,6 +45,4 @@ public class AccountService(IS3Storage<string> storage, UserRepository userRepos
         
         return Result<ArtistProfileModel>.Success(profileData);
     }
-    
-    
 }
