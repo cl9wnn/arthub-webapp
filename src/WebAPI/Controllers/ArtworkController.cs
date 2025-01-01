@@ -20,7 +20,7 @@ public class ArtworkController(ArtworkService artworkService, FileService fileSe
     
     [Authorize("artist")]
     [HttpPost("/api/add-artwork")]
-    public async Task<IMyActionResult> AddArtworkAsync([FromBody] ArtworkModel? artworkModel,
+    public async Task<IMyActionResult> AddArtworkAsync([FromBody] RequestArtworkModel? artworkModel,
         HttpListenerContext context, CancellationToken cancellationToken)
     {
         if (!context.TryGetItem<int>("userId", out var userId))

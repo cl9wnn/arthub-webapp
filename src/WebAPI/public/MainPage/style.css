@@ -97,38 +97,88 @@ header h1 {
 
 /*  --------------------------------  MAIN -------------------------------- */
 
-.container {
+.artwork-container {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 6px;
-    padding: 20px;
-    padding-top: 100px;
+    padding: 100px 20px 20px;
 }
 
-.container img {
+.artwork {
+    position: relative;
+    overflow: hidden;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    cursor:pointer;
+}
+
+.artwork img {
     width: 100%;
     aspect-ratio: 1 / 1;
     object-fit: cover;
-    border-radius: 6px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease;
+}
+
+.artwork:hover img {
+    transform: scale(1.07);
+}
+
+.artwork-info {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.artwork-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left:10px;
+}
+
+.artwork:hover .artwork-info {
+    opacity: 1;
+}
+
+.artwork-info h3 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.artwork-info p {
+    margin: 4px 0 0;
+    font-size: 14px;
+}
+
+.artwork-info .avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
 }
 
 @media (max-width: 1200px) {
-    .container {
-        grid-template-columns: repeat(3, 1fr);
+    .artwork-container {
+        grid-template-columns: repeat(4, 1fr);
     }
 }
 
 @media (max-width: 800px) {
-    .container {
+    .artwork-container {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 500px) {
-    .container {
+    .artwork-container {
         grid-template-columns: 1fr;
     }
 }
-
-

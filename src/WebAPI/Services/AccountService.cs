@@ -18,7 +18,7 @@ public class AccountService(IS3Storage<string> storage, UserRepository userRepos
         var profileData = new UserProfileModel
         {
             ProfileName = user.ProfileName,
-            Avatar = user.Avatar,
+            AvatarPath = user.AvatarPath,
             Country = user.Country,
             Role = "user"
         };
@@ -38,7 +38,7 @@ public class AccountService(IS3Storage<string> storage, UserRepository userRepos
             ProfileName = user.ProfileName,
             Fullname = user.Fullname,
             ContactInfo = user.ContactInfo,
-            Avatar = user.Avatar,
+            AvatarPath = user.AvatarPath,
             Country = user.Country,
             Role = "artist"
         };

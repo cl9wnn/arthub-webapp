@@ -11,6 +11,7 @@ public class User: IAuthEntity
     [ColumnName("profile_name")]
     public string? ProfileName { get; init; }
     public string? Country { get; set; }
-    public string? Avatar { get; set; }
+    [ColumnName("avatar_path")]
+    public string? AvatarPath { get; set; }
     public string? Role { get; init; }
 }

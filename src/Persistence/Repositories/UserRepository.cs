@@ -9,8 +9,8 @@ public class UserRepository(QueryMapper queryMapper)
     public async Task<User?> CreateUserAsync(User user, CancellationToken cancellationToken = default)
     {
         FormattableString sqlQuery = $"""
-                                      INSERT INTO "users" (login, password, profile_name, country, avatar) 
-                                      VALUES ({user.Login}, {user.Password}, {user.ProfileName}, {user.Country}, {user.Avatar})
+                                      INSERT INTO "users" (login, password, profile_name, country, avatar_path) 
+                                      VALUES ({user.Login}, {user.Password}, {user.ProfileName}, {user.Country}, {user.AvatarPath})
                                       RETURNING *;
                                       """;
         
@@ -30,7 +30,7 @@ public class UserRepository(QueryMapper queryMapper)
     public async Task<User?> GetUserAsyncById(int id, CancellationToken cancellationToken = default)
     {
         FormattableString sqlQuery = $"""
-                                      SELECT profile_name, country, avatar 
+                                      SELECT profile_name, country, avatar_path
                                       FROM users 
                                       WHERE user_id = {id};
                                       """;
@@ -43,7 +43,7 @@ public class UserRepository(QueryMapper queryMapper)
     public async Task<UpgradeUser?> GetUpgradeUserAsyncById(int id, CancellationToken cancellationToken = default)
     {
         FormattableString sqlQuery = $"""
-                                      SELECT profile_name, fullname, contact_info, country, avatar 
+                                      SELECT profile_name, fullname, contact_info, country, avatar_path 
                                       FROM users 
                                       INNER JOIN artists ON users.user_id = artists.user_id
                                       WHERE users.user_id = {id};

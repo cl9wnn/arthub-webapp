@@ -2,7 +2,7 @@
 
 namespace WebAPI.Models;
 
-public class ArtworkModel
+public class RequestArtworkModel
 {
     public string? Title { get; set; }
     public string? Category { get; set; }

@@ -22,7 +22,7 @@ public class AuthController(UserService userService, FileService fileService) : 
         if (!avatarResult.IsSuccess)
             return new ErrorResult(500, "Failed to save avatar: " + avatarResult.ErrorMessage);
         
-        signUpModel!.User!.Avatar = avatarResult.Data;
+        signUpModel!.User!.AvatarPath = avatarResult.Data;
         
         var userResult = await userService.RegisterUserAsync(signUpModel!.User!, cancellationToken);
         

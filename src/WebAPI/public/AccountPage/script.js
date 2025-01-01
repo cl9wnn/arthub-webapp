@@ -1,6 +1,6 @@
 import {createLoginForm, showForm, tokenStorage} from "../Auth/auth.js";
 
-const avatarBucketPath = 'http://localhost:9000/image-bucket/avatars/';
+const avatarFolderPath = 'http://localhost:9000/image-bucket/avatars/';
 // для апгрейда и для добавления работы в зависимости от роли
 const addArtworkBtn = document.getElementById('addArtBtn'); 
 const portfolioText = document.getElementById('portfolio-text');
@@ -31,7 +31,7 @@ async function renderAccountData(data) {
     addArtworkBtn.textContent = 'Upgrade';
     portfolioText.innerText = 'Improve your account by filling additional information to add own artworks';
     profileName.innerText = data.profileName;
-    avatarImg.src = `${avatarBucketPath}${data.avatar}`;
+    avatarImg.src = `${avatarFolderPath}${data.avatarPath}`;
     country.innerText = data.country;
 }
 
