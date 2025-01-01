@@ -8,7 +8,7 @@ using WebAPI.Services;
 
 namespace WebAPI.Controllers;
 
-public class AuthController(UserService userService, AccountService accountService) : MyBaseController
+public class AuthController(UserService userService, FileService fileService) : MyBaseController
 {
     
     [HttpPost("/auth/signup")]
@@ -19,7 +19,7 @@ public class AuthController(UserService userService, AccountService accountServi
         if (userModel == null)
             return new ErrorResult(400, "Invalid request");
         
-        var avatarResult = await accountService.SaveAvatarAsync(userModel!.Avatar!, cancellationToken);
+        var avatarResult = await fileService.SaveFileAsync(userModel!.Avatar!, "avatars", cancellationToken);
         
         if (!avatarResult.IsSuccess)
             return new ErrorResult(500, "Failed to save avatar: " + avatarResult.ErrorMessage);
@@ -30,7 +30,7 @@ public class AuthController(UserService userService, AccountService accountServi
         
         if (!userResult.IsSuccess)
         {
-            var deleteResult = await accountService.DeleteAvatarAsync(avatarResult.Data, cancellationToken);
+            var deleteResult = await fileService.DeleteFileAsync(avatarResult.Data, "avatars",cancellationToken);
             return !deleteResult.IsSuccess 
                 ? new ErrorResult(deleteResult.StatusCode, deleteResult.ErrorMessage!)
                 : new ErrorResult(userResult.StatusCode, userResult.ErrorMessage!);

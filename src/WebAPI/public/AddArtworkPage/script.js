@@ -146,6 +146,7 @@ document.getElementById('sendBtn').addEventListener('click', async () => {
 
             if (response.ok) {
                 alert("Отправлено успешно!");
+                window.location.href = '/account';
             } else {
                 if (data == 'Not authorized') {
                     await showForm(createLoginForm, '/auth/signin', 'Sign In');

@@ -2,12 +2,13 @@
 using MyFramework;
 using MyFramework.Attributes;
 using MyFramework.Contracts;
+using Persistence.Entities;
 using WebAPI.Models;
 using WebAPI.Services;
 
 namespace WebAPI.Controllers;
 
-public class ArtworkController(ArtworkService artworkService): MyBaseController
+public class ArtworkController(ArtworkService artworkService, FileService fileService): MyBaseController
 {
     [HttpGet("/new/artwork")]
     public IMyActionResult ShowAddArtworkPage(HttpListenerContext context, CancellationToken cancellationToken)
@@ -28,12 +29,11 @@ public class ArtworkController(ArtworkService artworkService): MyBaseController
         if (artModel == null)
             return new ErrorResult(400, "Invalid request");
         
-        var artResult = await artworkService.SaveArtAsync(artModel.Title!, artModel.Category!, artModel.Description!, 
-           artModel.Tags!, artModel!.ArtFile, userId, cancellationToken);
+        var artResult = await artworkService.SaveArtAsync(artModel, userId, cancellationToken);
         
         if (!artResult.IsSuccess)
         {
-            var deleteResult = await artworkService.DeleteArtAsync(artResult.Data.ArtworkPath!, cancellationToken);
+            var deleteResult = await fileService.DeleteFileAsync(artResult.Data!.ArtworkPath!, "arts", cancellationToken);
             return !deleteResult.IsSuccess 
                 ? new ErrorResult(deleteResult.StatusCode, deleteResult.ErrorMessage!)
                 : new ErrorResult(artResult.StatusCode, artResult.ErrorMessage!);

@@ -5,59 +5,35 @@ using WebAPI.Validators;
 
 namespace WebAPI.Services;
 
-public class ArtworkService(IS3Storage<string> storage, ArtworkRepository repository)
+public class ArtworkService(IS3Storage<string> storage, FileService service, ArtworkRepository repository)
 {
-    public async Task<Result<Artwork>> SaveArtAsync(string title, string category, string description,
-        List<string> tags, FileModel? artFile, int userId, CancellationToken cancellationToken)
+    public async Task<Result<Artwork>> SaveArtAsync(ArtworkModel model, int userId, CancellationToken cancellationToken)
     {
-        if (artFile == null)
-            return Result<Artwork>.Failure(404, "File not uploaded!")!;
+        var saveFileResult = await service.SaveFileAsync(model.ArtFile, "arts", cancellationToken);
 
-        if (!artFile.ContentType!.StartsWith("image/"))
-            return Result<Artwork>.Failure(404, "File is not an image!")!;
-
-        var fileBytes = Convert.FromBase64String(artFile.FileData!);
-        var fileType = artFile.ContentType!.Split('/')[1];
-        var fileName = $"{artFile.FileName}.{fileType}";
-
-        var fileUrl = await storage.UploadFileAsync(fileBytes, $"arts/{fileName}", artFile.ContentType!, cancellationToken);
-
-        if (fileUrl == null)
-            return Result<Artwork>.Failure(404, "Ошибка сохранения файла!")!;
+        if (!saveFileResult.IsSuccess)
+            return Result<Artwork>.Failure(saveFileResult.StatusCode, saveFileResult.ErrorMessage!)!;
 
         var artwork = new Artwork
         {
-            Title = title,
-            Category = category,
-            Description = description,
-            ArtworkPath = fileName,
+            Title = model.Title,
+            Category = model.Category,
+            Description = model.Description,
+            ArtworkPath = saveFileResult.Data,
             UserId = userId
         };
         
-        var createdArt = await CreateArtworkAsync(artwork, tags, cancellationToken);
-        return Result<Artwork>.Success(createdArt!);
-    }
-
-    private async Task<Artwork?> CreateArtworkAsync(Artwork artwork, List<string> tags, CancellationToken cancellationToken)
-    {
         var validator = new ArtworkValidator();
         var validationResult = await validator.ValidateAsync(artwork, cancellationToken);
 
         if (!validationResult.IsValid)
-            return null;
+            return Result<Artwork>.Failure(400, validationResult.ToString())!;
 
-        return await repository.InsertArtworkAsync(artwork, tags, cancellationToken);
-    }
-
-    public async Task<Result<bool>> DeleteArtAsync(string fileName, CancellationToken cancellationToken)
-    {
-        var objectName = $"arts/{fileName}";
-
-        var isDeleted = await storage.DeleteFileAsync(objectName, cancellationToken);
-
-        return isDeleted
-            ? Result<bool>.Success(true)
-            : Result<bool>.Failure(400, "Ошибка удаления файла!");
+        var createdArt = await repository.InsertArtworkAsync(artwork, model.Tags!, cancellationToken);
+        
+        return createdArt == null
+            ? Result<Artwork>.Failure(400, "Could not save artwork")!
+            : Result<Artwork>.Success(createdArt);
     }
 }
     

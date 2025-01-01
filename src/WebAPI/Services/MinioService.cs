@@ -24,7 +24,7 @@ public class MinioService: IS3Storage<string>
         }
     }
 
-    public async Task<string> UploadFileAsync(byte[] fileBytes, string objectName, string contentType, CancellationToken cancellationToken)
+    public async Task<string?> UploadFileAsync(byte[] fileBytes, string objectName, string contentType, CancellationToken cancellationToken)
     {
         try
         {
@@ -43,7 +43,6 @@ public class MinioService: IS3Storage<string>
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
             return null;
         }
     }

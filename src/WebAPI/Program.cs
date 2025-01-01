@@ -20,6 +20,7 @@ serviceProvider.AddSingleton<ArtistRepository>();
 serviceProvider.AddSingleton<ArtworkRepository>();
 serviceProvider.AddSingleton<UserService>();
 serviceProvider.AddSingleton<AccountService>();
+serviceProvider.AddSingleton<FileService>();
 serviceProvider.AddSingleton<ArtistService>();
 serviceProvider.AddSingleton<ArtworkService>();
 serviceProvider.AddSingleton<ArtistRepository>();

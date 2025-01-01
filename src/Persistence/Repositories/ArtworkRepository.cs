@@ -14,12 +14,12 @@ public class ArtworkRepository(QueryMapper queryMapper)
                                               RETURNING artwork_id, title, category, description, artwork_path, user_id;
                                               """;
         
-        var queryResult =await queryMapper.ExecuteAndReturnAsync<Artwork>(insertArtworkQuery, cancellationToken);
+        var queryResult =await queryMapper.ExecuteAndReturnAsync<Artwork?>(insertArtworkQuery, cancellationToken);
         
         if (queryResult == null)
             return null;
         
-       await SaveTagsAsync(tags, queryResult!.ArtworkId, cancellationToken);
+        await SaveTagsAsync(tags, queryResult!.ArtworkId, cancellationToken);
         return queryResult;
     }
 
@@ -37,7 +37,6 @@ public class ArtworkRepository(QueryMapper queryMapper)
             
             if (tagId == -1)
             {
-                //ролл бек
                 throw new InvalidDataException("Такого тега не существует!");
             }
 
