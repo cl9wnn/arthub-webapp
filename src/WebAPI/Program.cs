@@ -1,12 +1,10 @@
 ﻿using System.Net;
+using BusinessLogic.Interfaces;
+using BusinessLogic.Services;
+using Infrastructure;
 using MyFramework;
 using MyORM;
-using Npgsql;
-using Persistence;
-using Persistence.Entities;
 using Persistence.Repositories;
-using WebAPI;
-using WebAPI.Services;
 
 var httpListener = new HttpListener();
 httpListener.Prefixes.Add("http://localhost:5050/");
@@ -25,10 +23,10 @@ serviceProvider.AddSingleton<ArtistService>();
 serviceProvider.AddSingleton<ArtworkService>();
 serviceProvider.AddSingleton<ArtistRepository>();
 serviceProvider.AddSingleton<IS3Storage<string>,MinioService>();
+serviceProvider.AddSingleton<IPasswordHasher, PasswordHasher>();
 
 
 var authService = new AuthorizationService(); 
-
 var routeHandler = new RouteHandler(serviceProvider, authService);
 
 while (httpListener.IsListening)

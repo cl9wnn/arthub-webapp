@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Persistence.Entities;
-namespace WebAPI.Services;
+namespace BusinessLogic.Services;
 
 public static class JwtService
 {

@@ -1,7 +1,6 @@
 ﻿namespace WebAPI.Models;
-public class FileModel
+public class FileDto
 {
-    public string? FileName { get; } = Guid.NewGuid().ToString();
     public string? ContentType { get; init; }
     public string? FileData { get; init; }
 }

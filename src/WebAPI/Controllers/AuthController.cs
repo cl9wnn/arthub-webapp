@@ -1,49 +1,47 @@
-﻿using System.Net;
+﻿using BusinessLogic.Models;
+using BusinessLogic.Services;
 using MyFramework;
 using MyFramework.Attributes;
 using MyFramework.Contracts;
-using Persistence.Entities;
 using WebAPI.Models;
-using WebAPI.Services;
 
 namespace WebAPI.Controllers;
 
-public class AuthController(UserService userService, FileService fileService) : MyBaseController
+public class AuthController(UserService userService) : MyBaseController
 {
     
     [HttpPost("/auth/signup")]
-    public async Task<IMyActionResult> Register([FromBody] SignUpModel? signUpModel, CancellationToken cancellationToken)
+    public async Task<IMyActionResult> Register([FromBody] SignupRequest? signUpDto, CancellationToken cancellationToken)
     {
-        if (signUpModel == null)
+        if (signUpDto == null || signUpDto.Avatar == null || signUpDto.User == null)
             return new ErrorResult(400, "Invalid request");
         
-        var avatarResult = await fileService.SaveFileAsync(signUpModel!.Avatar!, "avatars", cancellationToken);
-        
-        if (!avatarResult.IsSuccess)
-            return new ErrorResult(500, "Failed to save avatar: " + avatarResult.ErrorMessage);
-        
-        signUpModel!.User!.AvatarPath = avatarResult.Data;
-        
-        var userResult = await userService.RegisterUserAsync(signUpModel!.User!, cancellationToken);
-        
-        if (!userResult.IsSuccess)
+        var userDto = signUpDto.User;
+        var avatarDto = signUpDto.Avatar;
+
+        var userModel = new UserModel
         {
-            var deleteResult = await fileService.DeleteFileAsync(avatarResult.Data, "avatars",cancellationToken);
-            return !deleteResult.IsSuccess 
-                ? new ErrorResult(deleteResult.StatusCode, deleteResult.ErrorMessage!)
-                : new ErrorResult(userResult.StatusCode, userResult.ErrorMessage!);
-        }
-        return new JsonResult<JwtTokenModel>(userResult.Data);
+            Login = userDto.Login,
+            Password = userDto.Password,
+            ProfileName = userDto.ProfileName,
+            Country = userDto.Country
+        };
+        
+        var userResult = await userService.RegisterUserAsync(userModel, avatarDto.FileData!, avatarDto.ContentType!, cancellationToken);
+        
+        return userResult.IsSuccess
+            ? new JsonResult<JwtTokenModel>(userResult!.Data)
+            : new ErrorResult(userResult.StatusCode, userResult.ErrorMessage!);
     }
     
 
     [HttpPost("/auth/signin")]
-    public async Task<IMyActionResult> Login([FromBody] LoginModel? loginModel, CancellationToken cancellationToken)
+    public async Task<IMyActionResult> Login([FromBody] UserSigninDto? signinDto, CancellationToken cancellationToken)
     {
-        if (loginModel == null)
+        if (signinDto == null)
             return new ErrorResult(400, "Invalid request");
         
-        var result = await userService.LoginUserAsync(loginModel!, cancellationToken);
+        var result = await userService.LoginUserAsync(signinDto.Login!, signinDto.Password!, cancellationToken);
 
         return result.IsSuccess
             ? new JsonResult<JwtTokenModel>(result!.Data)

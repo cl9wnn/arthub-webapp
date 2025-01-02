@@ -4,12 +4,13 @@ namespace Persistence.Repositories;
 
 public class ArtistRepository(QueryMapper queryMapper)
 {
-    public async Task CreateArtistAsync(int id, string fullname, string contactInfo, string summary, 
-        CancellationToken cancellationToken = default)
+    public async Task CreateArtistAsync(int userId, string fullname, string summary, string contactInfo,
+        CancellationToken cancellationToken)
     {
         FormattableString sqlQuery = $"""
                                         INSERT INTO "artists"
-                                        VALUES ({id}, {fullname}, {contactInfo}, {summary});
+                                        VALUES ({userId}, {fullname},
+                                        {contactInfo}, {summary});
                                       """;
         await queryMapper.ExecuteAsync(sqlQuery, cancellationToken);
     }

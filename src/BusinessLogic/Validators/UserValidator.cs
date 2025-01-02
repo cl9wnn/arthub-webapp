@@ -1,12 +1,11 @@
-﻿using System.Data;
-using System.Text.RegularExpressions;
+﻿using BusinessLogic.Models;
 using FluentValidation;
 using Persistence.Entities;
 using WebAPI.Models;
 
-namespace WebAPI;
+namespace BusinessLogic.Validators;
 
-public class UserValidator:AbstractValidator<User>
+public class UserValidator:AbstractValidator<UserModel>
 {
     public UserValidator()
     {

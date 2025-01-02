@@ -1,4 +1,4 @@
-﻿namespace WebAPI;
+﻿namespace BusinessLogic.Interfaces;
 
 public interface IS3Storage<T>
 {

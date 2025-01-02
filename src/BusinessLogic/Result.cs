@@ -1,4 +1,4 @@
-﻿namespace WebAPI;
+﻿namespace BusinessLogic;
 
 public class Result<T>(bool isSuccess, T data, string? errorMessage, int statusCode)
 {

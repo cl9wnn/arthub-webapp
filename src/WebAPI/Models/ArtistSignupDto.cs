@@ -1,6 +1,6 @@
 ﻿namespace WebAPI.Models;
 
-public class SignUpArtistModel
+public class ArtistSignupDto
 {
     public string? Fullname { get; set; }
     public string? ContactInfo { get; set; }

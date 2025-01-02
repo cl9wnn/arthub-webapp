@@ -1,10 +1,11 @@
 ﻿using System.Text.RegularExpressions;
+using BusinessLogic.Models;
 using FluentValidation;
 using WebAPI.Models;
 
-namespace WebAPI;
+namespace BusinessLogic.Validators;
 
-public class ArtistValidator: AbstractValidator<SignUpArtistModel>
+public class ArtistValidator: AbstractValidator<ArtistModel>
 {
     public ArtistValidator()
     {

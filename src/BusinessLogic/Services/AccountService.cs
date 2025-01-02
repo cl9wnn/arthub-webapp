@@ -1,11 +1,10 @@
-﻿using MyFramework.Contracts;
-using Persistence.Entities;
+﻿using BusinessLogic.Interfaces;
 using Persistence.Repositories;
 using WebAPI.Models;
 
-namespace WebAPI.Services;
+namespace BusinessLogic.Services;
 
-public class AccountService(IS3Storage<string> storage, UserRepository userRepository)
+public class AccountService(UserRepository userRepository)
 {
     
     public async Task<Result<UserProfileModel>> GetUserDataAsync(int id, CancellationToken cancellationToken)

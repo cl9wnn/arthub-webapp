@@ -2,7 +2,7 @@
 using MyFramework;
 using MyFramework.Attributes;
 using MyFramework.Contracts;
-using WebAPI.Services;
+using BusinessLogic.Services;
 
 namespace WebAPI.Controllers;
 

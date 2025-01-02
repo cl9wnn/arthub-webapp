@@ -1,6 +1,4 @@
-﻿using System.Data;
-using MyORM;
-using Npgsql;
+﻿using MyORM;
 using Persistence.Entities;
 namespace Persistence.Repositories;
 

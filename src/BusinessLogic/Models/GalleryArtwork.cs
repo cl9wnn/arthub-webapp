@@ -1,6 +1,6 @@
 ﻿namespace WebAPI.Models;
 
-public class ResponseArtworkModel
+public class GalleryArtwork
 {
     public string? Title { get; set; }
     public string? ArtworkPath { get; set; }

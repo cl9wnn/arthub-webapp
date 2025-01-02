@@ -3,7 +3,7 @@ using MyFramework;
 using MyFramework.Contracts;
 using Persistence.Entities;
 
-namespace WebAPI.Services;
+namespace BusinessLogic.Services;
 
 public class AuthorizationService: IAuthService //TODO: переделать!
 {

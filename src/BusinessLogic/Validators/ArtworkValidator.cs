@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
-using Persistence.Entities;
+using BusinessLogic.Models;
 
-namespace WebAPI.Validators;
+namespace BusinessLogic.Validators;
 
-public class ArtworkValidator: AbstractValidator<Artwork>
+public class ArtworkValidator: AbstractValidator<ArtworkModel>
 {
     public ArtworkValidator()
     {
@@ -20,8 +20,5 @@ public class ArtworkValidator: AbstractValidator<Artwork>
         RuleFor(a => a.Description)
             .MaximumLength(300)
             .WithMessage("Description must not exceed 300 characters.");
-
-        RuleFor(a => a.ArtworkPath)
-            .NotEmpty().WithMessage("ArtworkPath is required.");
     }
 }

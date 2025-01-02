@@ -17,15 +17,17 @@
 	<ItemGroup>
 	  <PackageReference Include="FluentValidation" Version="11.11.0" />
 	  <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.3.0" />
-	  <PackageReference Include="Minio" Version="6.0.3" />
+	  <PackageReference Include="Minio" Version="6.0.4" />
 	  <PackageReference Include="Npgsql" Version="9.0.2" />
 	  <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.0" />
 	</ItemGroup>
 	
 	<ItemGroup>
+	  <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
 	  <ProjectReference Include="..\MyORM\MyORM.csproj" />
 	  <ProjectReference Include="..\MyFramework\MyFramework.csproj" />
 	  <ProjectReference Include="..\Persistence\Persistence.csproj" />
+		<ProjectReference Include="..\BusinessLogic\BusinessLogic.csproj" />
 	</ItemGroup>
 
 </Project>

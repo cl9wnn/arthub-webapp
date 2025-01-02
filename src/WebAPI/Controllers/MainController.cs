@@ -1,10 +1,8 @@
-﻿using System.Net;
+﻿using BusinessLogic.Services;
 using MyFramework;
 using MyFramework.Attributes;
 using MyFramework.Contracts;
-using Persistence.Entities;
 using WebAPI.Models;
-using WebAPI.Services;
 
 
 namespace WebAPI.Controllers;
@@ -24,7 +22,7 @@ public class MainController(ArtworkService artworkService): MyBaseController
         var artworksResult = await artworkService.GetArtworksInfoAsync(cancellationToken);
 
         return artworksResult.IsSuccess
-            ? new JsonResult<List<ResponseArtworkModel>>(artworksResult.Data)
+            ? new JsonResult<List<GalleryArtwork>>(artworksResult.Data)
             : new ErrorResult(artworksResult.StatusCode, artworksResult.ErrorMessage!);
     }
 }

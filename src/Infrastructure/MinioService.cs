@@ -1,6 +1,7 @@
 ﻿using Minio;
 using Minio.DataModel.Args;
-namespace WebAPI.Services;
+using BusinessLogic.Interfaces;
+namespace Infrastructure;
 
 public class MinioService: IS3Storage<string>
 {
