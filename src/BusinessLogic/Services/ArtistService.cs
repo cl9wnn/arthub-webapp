@@ -1,7 +1,6 @@
 ﻿using BusinessLogic.Models;
 using BusinessLogic.Validators;
 using Persistence.Repositories;
-using WebAPI.Models;
 
 namespace BusinessLogic.Services;
 

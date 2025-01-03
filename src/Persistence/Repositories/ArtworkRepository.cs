@@ -22,6 +22,43 @@ public class ArtworkRepository(QueryMapper queryMapper)
         await SaveTagsAsync(tags, queryResult!.ArtworkId, cancellationToken);
         return queryResult;
     }
+    
+
+    public async Task<List<Artwork>?> GetGalleryArtworksAsync(CancellationToken cancellationToken)
+    {
+        FormattableString insertArtworkTagQuery = $"""
+                                                     SELECT artwork_id, title, artwork_path, artworks.user_id, users.profile_name 
+                                                     FROM artworks
+                                                     JOIN users ON artworks.user_id = users.user_id
+                                                     """;
+        var artworks = 
+            await queryMapper.ExecuteAndReturnListAsync<Artwork?>(insertArtworkTagQuery, cancellationToken);
+        
+        return artworks;
+    }
+
+    public async Task<Artwork?> GetArtworkByIdAsync(int artworkId, CancellationToken cancellationToken)
+    {
+        FormattableString sqlQuery = $"""
+                                        SELECT artwork_id, title, category, description, artwork_path, user_id
+                                        FROM artworks
+                                        WHERE artwork_id = {artworkId};
+                                      """;
+        
+        return await queryMapper.ExecuteAndReturnAsync<Artwork?>(sqlQuery, cancellationToken);
+    }
+    
+    public async Task<List<Tag>?> GetTagsByIdAsync(int artworkId, CancellationToken cancellationToken)
+    {
+        FormattableString sqlQuery = $"""
+                                      SELECT name
+                                      FROM tags
+                                      JOIN artworktags ON tags.tag_id = artworktags.tag_id 
+                                      WHERE artwork_id = {artworkId};
+                                      """;
+        
+        return await queryMapper.ExecuteAndReturnListAsync<Tag>(sqlQuery, cancellationToken)!;
+    }
 
     private async Task SaveTagsAsync(List<string> tags, int artworkId, CancellationToken cancellationToken)
     {
@@ -40,25 +77,12 @@ public class ArtworkRepository(QueryMapper queryMapper)
             }
 
             FormattableString insertArtworkTagQuery = $"""
-                                                         INSERT INTO artworkTags (artwork_id, tag_id)
-                                                         VALUES ({artworkId}, {tagId});
-                                                     """;
+                                                           INSERT INTO artworkTags (artwork_id, tag_id)
+                                                           VALUES ({artworkId}, {tagId});
+                                                       """;
 
             await queryMapper.ExecuteAsync(insertArtworkTagQuery, cancellationToken);
         }
-    }
-
-    public async Task<List<Artwork>?> GetArtworksWithUserDetailsAsync(CancellationToken cancellationToken)
-    {
-        FormattableString insertArtworkTagQuery = $"""
-                                                     SELECT artwork_id, title, artwork_path, artworks.user_id, users.profile_name 
-                                                     FROM artworks
-                                                     JOIN users ON artworks.user_id = users.user_id
-                                                     """;
-        var artworks = 
-            await queryMapper.ExecuteAndReturnListAsync<Artwork?>(insertArtworkTagQuery, cancellationToken);
-        
-        return artworks;
     }
 }
 

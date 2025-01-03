@@ -6,5 +6,4 @@ public class UserModel
     public string? Password { get; set; }
     public string? ProfileName { get; set; }
     public string? Country { get; set; }
-    public string? AvatarPath { get; set; }
 }

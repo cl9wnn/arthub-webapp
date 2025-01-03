@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using BusinessLogic.Models;
 using FluentValidation;
-using WebAPI.Models;
 
 namespace BusinessLogic.Validators;
 

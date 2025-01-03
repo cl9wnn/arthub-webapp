@@ -78,9 +78,11 @@ async function loadArtworkList() {
     }
 }
 
-function createArtworkComponent({ title, profileName, artworkPath, avatarPath }) {
+function createArtworkComponent({artworkId, title, profileName, artworkPath, avatarPath }) {
     const artworkDiv = document.createElement("div");
     artworkDiv.classList.add("artwork");
+
+    artworkDiv.dataset.id = artworkId;
 
     const img = document.createElement("img");
     img.src = `${artFolderPath}${artworkPath}`;
@@ -102,6 +104,11 @@ function createArtworkComponent({ title, profileName, artworkPath, avatarPath })
 
     artworkDiv.appendChild(img);
     artworkDiv.appendChild(infoDiv);
+
+    artworkDiv.addEventListener("click", () => {
+        sessionStorage.setItem('artworkId', artworkId);
+        window.location.href = `/artwork`;
+    });
 
     return artworkDiv;
 }

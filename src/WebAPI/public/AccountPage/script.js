@@ -1,5 +1,4 @@
 import {createLoginForm, showForm, tokenStorage} from "../Auth/auth.js";
-
 const avatarFolderPath = 'http://localhost:9000/image-bucket/avatars/';
 // для апгрейда и для добавления работы в зависимости от роли
 const addArtworkBtn = document.getElementById('addArtBtn'); 

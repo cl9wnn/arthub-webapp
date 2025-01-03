@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Security.Cryptography;
 using BusinessLogic.Models;
 using BusinessLogic.Services;
 using MyFramework;
@@ -16,6 +17,24 @@ public class ArtworkController(ArtworkService artworkService): MyBaseController
     {
         const string path = "public/AddArtworkPage/index.html";
         return new ResourceResult(path);
+    }
+
+    [HttpGet($"/artwork")]
+    public IMyActionResult ShowArtworkPage()
+    {
+        const string path = "public/ArtworkPage/index.html";
+        return new ResourceResult(path);
+    }
+    
+    
+    [HttpGet("/api/artwork/{id}")]
+    public async Task<IMyActionResult> ShowArtworkPage(int id, CancellationToken cancellationToken)
+    {
+        var artworkResult = await artworkService.GetArtworkPostAsync(id,  cancellationToken);
+        
+        return artworkResult.IsSuccess
+            ? new JsonResult<ArtworkPostModel>(artworkResult.Data)
+            : new ErrorResult(artworkResult.StatusCode, artworkResult.ErrorMessage!);
     }
     
     
@@ -46,4 +65,5 @@ public class ArtworkController(ArtworkService artworkService): MyBaseController
             ? new Ok()
             : new ErrorResult(artResult.StatusCode, artResult.ErrorMessage!);
     }
+    
 }

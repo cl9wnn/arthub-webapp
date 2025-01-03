@@ -46,7 +46,7 @@ public class RouteHandler
 
     try
     {
-        var route = GetRoute(context);
+        var route = GetRoute(context, out var parameters);
         if (route == null)
         {
             await WebHelper.ShowError(404, "Page not found", context, ctx.Token);
@@ -64,8 +64,7 @@ public class RouteHandler
         if (!await AuthorizeRequest(context, route, ctx.Token))
             return;
 
-        var args = await GetActionArguments(context, route, ctx.Token);
-
+        var args = await GetActionArguments(context, route, parameters, ctx.Token);
         await ExecuteAction(route, controller, args, context, ctx.Token);
     }
     catch (Exception ex)
@@ -74,18 +73,26 @@ public class RouteHandler
     }
 }
 
-private Route? GetRoute(HttpListenerContext context)
+private Route? GetRoute(HttpListenerContext context, out Dictionary<string, string> parameters)
 {
     var path = context.Request.Url?.LocalPath;
     var method = context.Request.HttpMethod;
+    parameters = new Dictionary<string, string>();
+
 
     if (path == null)
         return null;
 
-    return _routes.Select(r => new Route(r.Path, r.Method, r.Action))
-                  .FirstOrDefault(r =>
-                      r.Method.Equals(method, StringComparison.OrdinalIgnoreCase) &&
-                      MatchRoute(path, r.Path));
+    foreach (var route in _routes)
+    {
+        if (route.Method.Equals(method, StringComparison.OrdinalIgnoreCase) &&
+            MatchRoute(path, route.Path, out parameters))
+        {
+            return route;
+        }
+    }
+
+    return null;
 }
 
 private async Task<bool> AuthorizeRequest(HttpListenerContext context, Route route, CancellationToken cancellationToken)
@@ -115,24 +122,36 @@ private async Task<bool> AuthorizeRequest(HttpListenerContext context, Route rou
     return true;
 }
 
-private async Task<object?[]> GetActionArguments(HttpListenerContext context, Route route, CancellationToken cancellationToken)
+private async Task<object?[]> GetActionArguments(HttpListenerContext context, Route route, 
+    Dictionary<string, string> parameters, CancellationToken cancellationToken)
 {
-    var parameters = route.Action.GetParameters();
-    var args = new object?[parameters.Length];
+    var routeParams = parameters;
+    var methodParams = route.Action.GetParameters();
+    var args = new object?[methodParams.Length];
 
-    for (var i = 0; i < parameters.Length; i++)
+    for (var i = 0; i < methodParams.Length; i++)
     {
-        var parameter = parameters[i];
+        var parameter = methodParams[i];
+        var paramName = parameter.Name;
 
-        args[i] = parameter.ParameterType switch
+        if (routeParams.ContainsKey(paramName!))
         {
-            Type type when parameter.GetCustomAttribute<FromBodyAttribute>() != null => await WebHelper.ReadBodyAsync(
-                context, cancellationToken, parameter.ParameterType),
-            Type type when type == typeof(CancellationToken) => cancellationToken,
-            Type type when type == typeof(HttpListenerContext) => context,
-            _ => null
-        };
+            args[i] = Convert.ChangeType(routeParams[paramName!], parameter.ParameterType);
+        }
+        else if (parameter.ParameterType == typeof(CancellationToken))
+        {
+            args[i] = cancellationToken;
+        }
+        else if (parameter.ParameterType == typeof(HttpListenerContext))
+        {
+            args[i] = context;
+        }
+        else if (parameter.GetCustomAttribute<FromBodyAttribute>() != null)
+        {
+            args[i] = await WebHelper.ReadBodyAsync(context, cancellationToken, parameter.ParameterType);
+        }
     }
+
     return args;
 }
 
@@ -173,12 +192,41 @@ private async Task ExecuteAction(Route route, object controller, object?[] args,
     
     private static bool MatchRoute(string path, string template)
     {
+       
+
+        return string.Equals(path, template);
+    }
+    
+    private static bool MatchRoute(string path, string template, out Dictionary<string, string> parameters)
+    {
+        
+        parameters = new Dictionary<string, string>();
+        
         if (template.EndsWith("/*"))
         {
             var basePath = template[..^2];
             return path.StartsWith(basePath);
         }
 
-        return string.Equals(path, template);
+        var pathSegments = path.Trim('/').Split('/');
+        var templateSegments = template.Trim('/').Split('/');
+
+        if (pathSegments.Length != templateSegments.Length)
+            return false;
+
+        for (var i = 0; i < pathSegments.Length; i++)
+        {
+            if (templateSegments[i].StartsWith("{") && templateSegments[i].EndsWith("}"))
+            {
+                var paramName = templateSegments[i].Trim('{', '}');
+                parameters[paramName] = pathSegments[i];
+            }
+            else if (!string.Equals(pathSegments[i], templateSegments[i], StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

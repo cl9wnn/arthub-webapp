@@ -1,6 +1,4 @@
-﻿using MyORM;
-
-namespace WebAPI.Models;
+﻿namespace BusinessLogic.Models;
 
 public class UserProfileModel
 {

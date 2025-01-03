@@ -1,6 +1,6 @@
 ﻿using BusinessLogic.Interfaces;
+using BusinessLogic.Models;
 using Persistence.Repositories;
-using WebAPI.Models;
 
 namespace BusinessLogic.Services;
 

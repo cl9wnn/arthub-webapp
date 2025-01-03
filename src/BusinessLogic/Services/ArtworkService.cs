@@ -2,7 +2,6 @@
 using BusinessLogic.Validators;
 using Persistence.Entities;
 using Persistence.Repositories;
-using WebAPI.Models;
 
 namespace BusinessLogic.Services;
 
@@ -41,21 +40,22 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
             : Result<Artwork>.Success(createdArt);
     }
 
-    public async Task<Result<List<GalleryArtwork>>> GetArtworksInfoAsync(CancellationToken cancellationToken)
+    public async Task<Result<List<GalleryArtworkModel>>> GetArtworksInfoAsync(CancellationToken cancellationToken)
     {
-        var responseArtworks = new List<GalleryArtwork>();
+        var responseArtworks = new List<GalleryArtworkModel>();
         
-        var artworks = await artworkRepository.GetArtworksWithUserDetailsAsync(cancellationToken);
+        var artworks = await artworkRepository.GetGalleryArtworksAsync(cancellationToken);
         
         if (artworks == null)
-            return Result<List<GalleryArtwork>>.Failure(400, "Could not retrieve artworks")!;
+            return Result<List<GalleryArtworkModel>>.Failure(400, "Could not retrieve artworks")!;
         
         foreach (var artwork in artworks)
         {
             var author = await userRepository.GetUserAsyncById(artwork.UserId, cancellationToken);
 
-            var artModel = new GalleryArtwork
+            var artModel = new GalleryArtworkModel
             {
+                ArtworkId = artwork.ArtworkId,
                 Title = artwork.Title,
                 ArtworkPath = artwork.ArtworkPath,
                 ProfileName = author!.ProfileName,
@@ -64,7 +64,40 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
             responseArtworks.Add(artModel);
         }
         
-        return Result<List<GalleryArtwork>>.Success(responseArtworks)!;
+        return Result<List<GalleryArtworkModel>>.Success(responseArtworks)!;
+    }
+
+    public async Task<Result<ArtworkPostModel>> GetArtworkPostAsync(int artworkId, CancellationToken cancellationToken)
+    {
+        var artwork = await artworkRepository.GetArtworkByIdAsync(artworkId, cancellationToken);
+        
+        if (artwork == null)
+            return Result<ArtworkPostModel>.Failure(400, "Could not retrieve artwork")!;
+
+        var tags = await artworkRepository.GetTagsByIdAsync(artworkId, cancellationToken);
+        
+        if (tags == null)
+            return Result<ArtworkPostModel>.Failure(400, "Could not retrieve tags")!;
+        
+        var author = await userRepository.GetUpgradeUserAsyncById(artwork.UserId, cancellationToken);
+        
+        if (author == null)
+            return Result<ArtworkPostModel>.Failure(400, "Could not retrieve author")!;
+
+        var artworkPost = new ArtworkPostModel
+        {
+            ArtworkId = artwork.ArtworkId,
+            Title = artwork.Title,
+            Category = artwork.Category,
+            Description = artwork.Description,
+            ArtworkPath = artwork.ArtworkPath,
+            Tags = tags.Select(t => t.Name).ToList()!,
+            ProfileName = author.ProfileName,
+            Fullname = author.Fullname,
+            AvatarPath = author.AvatarPath,
+        };
+        
+        return Result<ArtworkPostModel>.Success(artworkPost);
     }
 }
     

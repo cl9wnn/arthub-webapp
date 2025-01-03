@@ -1,7 +1,6 @@
 ﻿using BusinessLogic.Models;
 using FluentValidation;
 using Persistence.Entities;
-using WebAPI.Models;
 
 namespace BusinessLogic.Validators;
 

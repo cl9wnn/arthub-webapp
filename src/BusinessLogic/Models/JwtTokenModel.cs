@@ -1,4 +1,4 @@
-﻿namespace WebAPI.Models;
+﻿namespace BusinessLogic.Models;
 
 public class JwtTokenModel
 {

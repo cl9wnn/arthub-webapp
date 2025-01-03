@@ -1,4 +1,5 @@
-﻿using BusinessLogic.Services;
+﻿using BusinessLogic.Models;
+using BusinessLogic.Services;
 using MyFramework;
 using MyFramework.Attributes;
 using MyFramework.Contracts;
@@ -22,7 +23,7 @@ public class MainController(ArtworkService artworkService): MyBaseController
         var artworksResult = await artworkService.GetArtworksInfoAsync(cancellationToken);
 
         return artworksResult.IsSuccess
-            ? new JsonResult<List<GalleryArtwork>>(artworksResult.Data)
+            ? new JsonResult<List<GalleryArtworkModel>>(artworksResult.Data)
             : new ErrorResult(artworksResult.StatusCode, artworksResult.ErrorMessage!);
     }
 }
