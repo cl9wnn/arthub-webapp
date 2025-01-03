@@ -67,7 +67,7 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
         return Result<List<GalleryArtworkModel>>.Success(responseArtworks)!;
     }
 
-    public async Task<Result<ArtworkPostModel>> GetArtworkPostAsync(int artworkId, CancellationToken cancellationToken)
+    public async Task<Result<ArtworkPostModel>> GetArtworkPostAsync(int artworkId, int visitorId, CancellationToken cancellationToken)
     {
         var artwork = await artworkRepository.GetArtworkByIdAsync(artworkId, cancellationToken);
         
@@ -83,7 +83,9 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
         
         if (author == null)
             return Result<ArtworkPostModel>.Failure(400, "Could not retrieve author")!;
-
+        
+        var isLikedByUser = await artworkRepository.IsArtworkLikedByUserAsync(artworkId, visitorId, cancellationToken);
+        
         var artworkPost = new ArtworkPostModel
         {
             ArtworkId = artwork.ArtworkId,
@@ -95,9 +97,34 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
             ProfileName = author.ProfileName,
             Fullname = author.Fullname,
             AvatarPath = author.AvatarPath,
+            LikeCount = artwork.LikeCount,
+            IsLiked = isLikedByUser
         };
         
         return Result<ArtworkPostModel>.Success(artworkPost);
     }
+
+    
+    public async Task<Result<int>> LikeArtworkAsync(int artworkId, int userId, CancellationToken cancellationToken)
+    {
+        if (artworkId == 0 || userId == 0)
+            return Result<int>.Failure(400, "Not found art or user");
+        
+        var isUserLiked = await artworkRepository.IsArtworkLikedByUserAsync(artworkId, userId, cancellationToken);
+
+        if (isUserLiked)
+        {
+            var countAfterRemove = await artworkRepository.RemoveLikeAsync(artworkId, userId, cancellationToken);
+            return countAfterRemove == -1
+                ? Result<int>.Failure(400, "Could not like artwork")
+                : Result<int>.Success(countAfterRemove);
+        }
+        
+        var countAfterAdd = await artworkRepository.AddLikeAsync(artworkId, userId, cancellationToken);
+        return countAfterAdd == -1
+            ? Result<int>.Failure(400, "Could not like artwork")
+            : Result<int>.Success(countAfterAdd);
+    }
+    
 }
     

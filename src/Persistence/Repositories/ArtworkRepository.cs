@@ -40,7 +40,7 @@ public class ArtworkRepository(QueryMapper queryMapper)
     public async Task<Artwork?> GetArtworkByIdAsync(int artworkId, CancellationToken cancellationToken)
     {
         FormattableString sqlQuery = $"""
-                                        SELECT artwork_id, title, category, description, artwork_path, user_id
+                                        SELECT artwork_id, title, category, description, artwork_path, user_id, like_count
                                         FROM artworks
                                         WHERE artwork_id = {artworkId};
                                       """;
@@ -83,6 +83,65 @@ public class ArtworkRepository(QueryMapper queryMapper)
 
             await queryMapper.ExecuteAsync(insertArtworkTagQuery, cancellationToken);
         }
+    }
+
+    public async Task<int> AddLikeAsync(int artworkId, int userId, CancellationToken cancellationToken)
+    {
+        FormattableString addLike = $"""
+                                      INSERT INTO likes (artwork_id, user_id)
+                                      VALUES ({artworkId}, {userId})
+                                      RETURNING artwork_id, user_id;
+                                      """;
+        
+        FormattableString incrementLikeCount = $"""
+                                                    UPDATE artworks
+                                                    SET like_count = like_count + 1
+                                                    WHERE artwork_id = {artworkId}
+                                                    RETURNING like_count;
+                                                """;
+        
+        var like = await queryMapper.ExecuteAndReturnAsync<Like>(addLike, cancellationToken);
+        
+        if (like == null)
+            return -1;
+        
+        return await queryMapper.ExecuteAndReturnAsync<int>(incrementLikeCount, cancellationToken);
+    }
+
+    public async Task<int> RemoveLikeAsync(int artworkId, int userId, CancellationToken cancellationToken)
+    {
+        FormattableString removeLike = $"""
+                                        DELETE FROM likes
+                                        WHERE artwork_id = {artworkId} AND user_id = {userId}
+                                        RETURNING artwork_id, user_id;
+                                      """;
+        
+        FormattableString decrementLikeCount = $"""
+                                                    UPDATE artworks
+                                                    SET like_count = like_count - 1
+                                                    WHERE artwork_id = {artworkId}
+                                                    RETURNING like_count;
+                                                """;
+        
+        var like = await queryMapper.ExecuteAndReturnAsync<Like>(removeLike, cancellationToken);
+        
+        if (like == null)
+            return -1;
+        
+        return await queryMapper.ExecuteAndReturnAsync<int>(decrementLikeCount, cancellationToken);
+    }
+    
+    public async Task<bool> IsArtworkLikedByUserAsync(int artworkId, int userId, CancellationToken cancellationToken)
+    {
+        FormattableString sqlQuery = $"""
+                                        SELECT COUNT(*) FROM likes
+                                        WHERE artwork_id = {artworkId} AND user_id = {userId};
+                                      """;
+
+        var count = await queryMapper.ExecuteAndReturnAsync<int>(sqlQuery, cancellationToken);
+        return count > 0
+            ? true
+            : false;
     }
 }
 

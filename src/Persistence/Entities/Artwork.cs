@@ -13,4 +13,7 @@ public class Artwork
     public string? ArtworkPath { get; set; }
     [ColumnName("user_id")]
     public int UserId { get; set; }
+    [ColumnName("like_count")]
+    public int LikeCount { get; set; }
+
 }

@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Runtime.Loader;
 using System.Security.Cryptography;
 using BusinessLogic.Models;
 using BusinessLogic.Services;
@@ -27,16 +28,35 @@ public class ArtworkController(ArtworkService artworkService): MyBaseController
     }
     
     
+    [Authorize("user","artist")]
     [HttpGet("/api/artwork/{id}")]
-    public async Task<IMyActionResult> ShowArtworkPage(int id, CancellationToken cancellationToken)
+    public async Task<IMyActionResult> ShowArtworkPage(int id, HttpListenerContext context, CancellationToken cancellationToken)
     {
-        var artworkResult = await artworkService.GetArtworkPostAsync(id,  cancellationToken);
+        if (!context.TryGetItem<int>("userId", out var visitorId))
+            return new ErrorResult(400, "Not authorized");
+        
+        var artworkResult = await artworkService.GetArtworkPostAsync(id, visitorId, cancellationToken);
         
         return artworkResult.IsSuccess
             ? new JsonResult<ArtworkPostModel>(artworkResult.Data)
             : new ErrorResult(artworkResult.StatusCode, artworkResult.ErrorMessage!);
     }
     
+    
+    
+    [Authorize("user","artist")]
+    [HttpGet("/api/like-artwork/{id}")]
+    public async Task<IMyActionResult> LikeArtworkPost(int id, HttpListenerContext context, CancellationToken cancellationToken)
+    {
+        if (!context.TryGetItem<int>("userId", out var userId))
+            return new ErrorResult(400, "Not authorized");
+        
+        var artworkResult = await artworkService.LikeArtworkAsync(id,  userId, cancellationToken);
+        
+        return artworkResult.IsSuccess
+            ? new JsonResult<int>(artworkResult.Data)
+            : new ErrorResult(artworkResult.StatusCode, artworkResult.ErrorMessage!);
+    }
     
     [Authorize("artist")]
     [HttpPost("/api/add-artwork")]
