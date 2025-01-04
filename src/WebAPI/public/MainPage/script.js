@@ -1,5 +1,5 @@
 import { tokenStorage } from '../Auth/auth.js';
-import { showForm, createLoginForm } from '../Auth/auth.js';
+import { showForm, createLoginForm, parseJwtToSub } from '../Auth/auth.js';
 const artFolderPath = 'http://localhost:9000/image-bucket/arts/';
 const avatarFolderPath = 'http://localhost:9000/image-bucket/avatars/';
 
@@ -11,17 +11,20 @@ const marketSection = document.getElementById("marketBtn");
 
 document.addEventListener('DOMContentLoaded', async () => {
     const setupButton = (id, createFormMethod, path, buttonText) => {
-        document.getElementById(id).addEventListener('click', (event) => {
+        document.getElementById(id).addEventListener('click', async (event) => {
             event.preventDefault();
-            showForm(createFormMethod, path, buttonText);
+            const success = await showForm(createFormMethod, path, buttonText);
+            if (success) {
+                toggleVisibility(tokenStorage.get());
+                await loadArtworkList();
+            }
         });
     };
-
+    
     setupButton('signinBtn', createLoginForm, '/auth/signin', 'Sign in');
     toggleVisibility(tokenStorage.get());
     await loadArtworkList();
 });
-
 document.getElementById('signupBtn').addEventListener('click', async (event) => {
     event.preventDefault();
     window.location.href = '/register-account';
@@ -34,7 +37,8 @@ document.getElementById('marketBtn').addEventListener('click', async (event) => 
 
 document.getElementById('accountBtn').addEventListener('click', async (event) => {
     event.preventDefault();
-    window.location.href = '/account';
+    const userId = parseJwtToSub(tokenStorage.get());
+    window.location.href = `/account/${userId}`;
 });
 
 function toggleVisibility(token) {
@@ -106,13 +110,10 @@ function createArtworkComponent({artworkId, title, profileName, artworkPath, ava
     artworkDiv.appendChild(infoDiv);
 
     artworkDiv.addEventListener("click", () => {
-        sessionStorage.setItem('artworkId', artworkId);
-        window.location.href = `/artwork`;
+        window.location.href = `/artwork/${artworkId}`;
     });
 
     return artworkDiv;
 }
-
-
 
 

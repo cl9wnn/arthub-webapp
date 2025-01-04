@@ -37,6 +37,14 @@ public class UserRepository(QueryMapper queryMapper)
        
         return queryResult;
     }
+
+    public async Task<string?> GetUserRoleAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        FormattableString sqlQuery = $"SELECT role FROM users WHERE user_id = {userId};";
+        
+        return await queryMapper.ExecuteAndReturnAsync<string?>(sqlQuery, cancellationToken);
+        
+    }
     
     public async Task<UpgradeUser?> GetUpgradeUserAsyncById(int id, CancellationToken cancellationToken = default)
     {

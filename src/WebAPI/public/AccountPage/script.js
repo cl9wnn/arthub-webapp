@@ -1,42 +1,71 @@
-import {createLoginForm, showForm, tokenStorage} from "../Auth/auth.js";
+import {createLoginForm, showForm, tokenStorage, parseJwtToSub} from "../Auth/auth.js";
 const avatarFolderPath = 'http://localhost:9000/image-bucket/avatars/';
-// для апгрейда и для добавления работы в зависимости от роли
-const addArtworkBtn = document.getElementById('addArtBtn'); 
-const portfolioText = document.getElementById('portfolio-text');
 
 let avatarImg, profileName, country;
+let userId;
 let isArtist = false;
 
 document.addEventListener('DOMContentLoaded', async() => {
     avatarImg = document.getElementById('avatarImg');
     profileName = document.getElementById('profileName');
     country = document.getElementById('country');
+
+    const pathname = window.location.pathname;
+    const pathSegments = pathname.split("/");
+    userId = pathSegments[pathSegments.length - 1];
     
-    await loadAccountData();
-});
+    const userTokenId = parseJwtToSub(tokenStorage.get());
 
-// Обработчик кнопки Upgrade и Add Artwork (для художников)
-document.getElementById('addArtBtn').addEventListener('click', () => {
-    if (isArtist) {
-        window.location.href = '/new/artwork';
+    if (userId === userTokenId) {
+        await createMyAccount();
     }
-    else{
-        window.location.href = '/register-artist';
+    
+    if (userId){
+        await loadAccountData(userId);
     }
 });
 
+let addArtworkBtn;  
+let portfolioText;
 
+async function createMyAccount() {
+    const container = document.querySelector('.portfolio-container');
+
+    addArtworkBtn = document.createElement('button');  
+    addArtworkBtn.classList.add('profile-button');
+    addArtworkBtn.id = 'addArtBtn';
+
+    addArtworkBtn.addEventListener('click', () => {
+        if (isArtist) {
+            window.location.href = '/new/artwork';
+        } else {
+            window.location.href = '/register-artist';
+        }
+    });
+
+    portfolioText = document.createElement('p');
+    portfolioText.id = 'portfolio-text';
+
+    container.appendChild(portfolioText);
+    container.appendChild(addArtworkBtn);
+
+
+}
 async function renderAccountData(data) {
-    addArtworkBtn.textContent = 'Upgrade';
-    portfolioText.innerText = 'Improve your account by filling additional information to add own artworks';
+    if (addArtworkBtn){
+        addArtworkBtn.textContent = 'Upgrade';
+        portfolioText.innerText = 'Improve your account by filling additional information to add own artworks';
+    }
     profileName.innerText = data.profileName;
     avatarImg.src = `${avatarFolderPath}${data.avatarPath}`;
     country.innerText = data.country;
 }
 
 function addUpgradeAccountData(data) {
-    addArtworkBtn.textContent = 'Add artwork';
-    portfolioText.textContent = 'Add your own artworks so that others can rate and promote you';
+    if (addArtworkBtn){
+        addArtworkBtn.textContent = 'Add artwork';
+        portfolioText.textContent = 'Add your own artworks so that others can rate and promote you';
+    }
 
     const nameInfo = document.querySelector('.name-info');
     const contactInfoContainer = document.querySelector('.contact-info');
@@ -58,21 +87,13 @@ function addUpgradeAccountData(data) {
     nameContainer.appendChild(badgeArtistElement);
     
 }
-async function handleGuestView() {
-
-    const loginSuccessful = await showForm(createLoginForm, '/auth/signin', 'Sign In');
-
-    if (loginSuccessful) {
-        await loadAccountData();
-    }
-}
 
 // загружаем данные аккаунта
-async function loadAccountData() {
-    const token = tokenStorage.get();
+async function loadAccountData(userId) {
+    let token = tokenStorage.get();
 
     try {
-        const response = await fetch('/api/get-account', {
+        const response = await fetch(`/api/account/${userId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -81,7 +102,8 @@ async function loadAccountData() {
         });
 
         const data = await response.json();
-
+        console.log(data);
+        
         if (response.ok) {
             await renderAccountData(data);
 
@@ -89,8 +111,18 @@ async function loadAccountData() {
                 isArtist = true;
                 await addUpgradeAccountData(data);
             }
-        } else {
-            await handleGuestView();
+        } 
+        else if (response.status === 401) {
+            const loginSuccessful = await showForm(createLoginForm, '/auth/signin', 'Sign In');
+
+            if (loginSuccessful) {
+                token = tokenStorage.get();
+                await loadAccountData(userId);
+            }
+        }
+        else 
+        {
+           alert(data);
         }
     } catch (error) {
         alert(error.message);

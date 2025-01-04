@@ -1,4 +1,4 @@
-﻿import {createLoginForm, showForm, tokenStorage} from "../Auth/auth.js";
+﻿import {createLoginForm, parseJwtToSub, showForm, tokenStorage} from "../Auth/auth.js";
 
 
 const maxTags = 3;
@@ -143,16 +143,14 @@ document.getElementById('sendBtn').addEventListener('click', async () => {
             });
             
             if (response.ok) {
-                alert("Отправлено успешно!");
-                window.location.href = '/account';
-            } else {
-                const data = await response.json();
-                if (data == 'Not authorized') {
-                    await showForm(createLoginForm, '/auth/signin', 'Sign In');
+                const userId = parseJwtToSub(token);
+                window.location.href = `/account/${userId}`;
+            }
+            else if (response.status === 401) {
+                 await showForm(createLoginForm, '/auth/signin', 'Sign In');
                 }
-                else{
+            else{
                     throw new Error(data || 'Ошибка на сервере!');
-                }
             }
         } catch (error) {
             alert(error);

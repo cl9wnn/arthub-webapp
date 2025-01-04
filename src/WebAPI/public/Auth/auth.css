@@ -59,6 +59,30 @@
     transition: border-color 0.3s ease;
 }
 
+.register-text {
+    margin-top: 1rem;
+    font-size: 14px;
+    color: #666; 
+    text-align: center;
+}
+
+.register-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.5rem;
+    font-size: 14px;
+    color: #007bff; 
+    text-align: center;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.register-link:hover {
+    color: #0056b3; 
+    text-decoration: underline; /
+}
+
 .input-field:focus {
     border-color: #007bff;
     outline: none;

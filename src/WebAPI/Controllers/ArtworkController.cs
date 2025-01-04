@@ -20,7 +20,7 @@ public class ArtworkController(ArtworkService artworkService): MyBaseController
         return new ResourceResult(path);
     }
 
-    [HttpGet($"/artwork")]
+    [HttpGet("/artwork/{id}")]
     public IMyActionResult ShowArtworkPage()
     {
         const string path = "public/ArtworkPage/index.html";
@@ -29,13 +29,18 @@ public class ArtworkController(ArtworkService artworkService): MyBaseController
     
     
     [Authorize("user","artist")]
-    [HttpGet("/api/artwork/{id}")]
-    public async Task<IMyActionResult> ShowArtworkPage(int id, HttpListenerContext context, CancellationToken cancellationToken)
+    [HttpGet("/api/artwork/{artworkId}")]
+    public async Task<IMyActionResult> ShowArtworkPage(int artworkId, HttpListenerContext context, CancellationToken cancellationToken)
     {
+        var isArtworkExistResult = await artworkService.CheckArtworkForExist(artworkId, cancellationToken);
+        
+        if (!isArtworkExistResult.IsSuccess)
+            return new ErrorResult(isArtworkExistResult.StatusCode, isArtworkExistResult.ErrorMessage!);
+
         if (!context.TryGetItem<int>("userId", out var visitorId))
             return new ErrorResult(400, "Not authorized");
         
-        var artworkResult = await artworkService.GetArtworkPostAsync(id, visitorId, cancellationToken);
+        var artworkResult = await artworkService.GetArtworkPostAsync(artworkId, visitorId, cancellationToken);
         
         return artworkResult.IsSuccess
             ? new JsonResult<ArtworkPostModel>(artworkResult.Data)
@@ -45,13 +50,13 @@ public class ArtworkController(ArtworkService artworkService): MyBaseController
     
     
     [Authorize("user","artist")]
-    [HttpGet("/api/like-artwork/{id}")]
-    public async Task<IMyActionResult> LikeArtworkPost(int id, HttpListenerContext context, CancellationToken cancellationToken)
+    [HttpGet("/api/like-artwork/{artworkId}")]
+    public async Task<IMyActionResult> LikeArtworkPost(int artworkId, HttpListenerContext context, CancellationToken cancellationToken)
     {
         if (!context.TryGetItem<int>("userId", out var userId))
             return new ErrorResult(400, "Not authorized");
         
-        var artworkResult = await artworkService.LikeArtworkAsync(id,  userId, cancellationToken);
+        var artworkResult = await artworkService.LikeArtworkAsync(artworkId,  userId, cancellationToken);
         
         return artworkResult.IsSuccess
             ? new JsonResult<int>(artworkResult.Data)

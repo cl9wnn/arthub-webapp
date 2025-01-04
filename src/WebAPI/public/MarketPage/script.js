@@ -19,13 +19,12 @@ testBtn.addEventListener('click', async () => {
 
             if (response.ok) {
                 alert(data);
-            } else {
-                if (data == 'Not authorized') {
-                    showForm(createLoginForm, '/auth/signin', 'Sign In');
-                }
-                else{
+            } 
+            else if (response.status === 401){
+                showForm(createLoginForm, '/auth/signin', 'Sign In');
+            }
+            else{
                     alert (data || 'Ошибка на сервере!');
-                }
             }
         } catch (error) {
             alert(error.message);

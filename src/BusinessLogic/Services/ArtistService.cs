@@ -26,4 +26,13 @@ public class ArtistService(ArtistRepository repository)
         };
         return Result<JwtTokenModel>.Success(authResult);
     }
+
+    public async Task<Result<bool>> CheckProfileForUpgrade(int userId, CancellationToken cancellationToken)
+    {
+        var artist = await repository.SelectArtistByIdAsync(userId, cancellationToken);
+        
+        return artist != null
+            ? Result<bool>.Success(true)
+            : Result<bool>.Success(false);
+    }
 }

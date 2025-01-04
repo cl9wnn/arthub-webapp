@@ -11,7 +11,7 @@ namespace WebAPI.Controllers;
 public class AccountController(AccountService accountService): MyBaseController
 {
     
-    [HttpGet("/account")]
+    [HttpGet("/account/{userId}")]
     public IMyActionResult ShowAccountPageAsync()
     {
         const string path = "public/AccountPage/index.html";
@@ -33,16 +33,20 @@ public class AccountController(AccountService accountService): MyBaseController
     }
     
     [Authorize("user", "artist")]
-    [HttpGet("/api/get-account")]
-    public async Task<IMyActionResult> ShowAccountInfoAsync(HttpListenerContext context, CancellationToken cancellationToken)
+    [HttpGet("/api/account/{userId}")]
+    public async Task<IMyActionResult> ShowAccountInfoAsync(int userId, HttpListenerContext context, CancellationToken cancellationToken)
     {
-        if (!context.TryGetItem<int>("userId", out var userId))
-            return new ErrorResult(400, "Not authorized");
+        var isAccountExistResult = await accountService.CheckProfileForExist(userId, cancellationToken);
+        
+        if (!isAccountExistResult.IsSuccess)
+            return new ErrorResult(isAccountExistResult.StatusCode, isAccountExistResult.ErrorMessage!);
+        
+        var accountRoleResult = await accountService.GetAccountRoleAsync(userId, cancellationToken);
 
-        if (!context.TryGetItem<string>("userRole", out var userRole))
-            return new ErrorResult(400, "User role not provided");
-
-        switch (userRole)
+        if (!accountRoleResult.IsSuccess)
+            return new ErrorResult(accountRoleResult.StatusCode, accountRoleResult.ErrorMessage!);
+        
+        switch (accountRoleResult.Data)
         {
             case "user":
             {

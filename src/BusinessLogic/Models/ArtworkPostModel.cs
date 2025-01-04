@@ -11,7 +11,7 @@ public class ArtworkPostModel
     public string? ProfileName { get; set; }
     public string? Fullname { get; set; }
     public string? AvatarPath { get; set; }
+    public int AuthorId { get; set; }
     public int LikeCount { get; set; }
-    
     public bool IsLiked { get; set; }
 }

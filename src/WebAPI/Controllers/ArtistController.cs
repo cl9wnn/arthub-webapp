@@ -17,6 +17,11 @@ public class ArtistController(ArtistService artistService) : MyBaseController
         if (!context.TryGetItem<int>("userId", out var userId))
             return new ErrorResult(400, "Not authorized");
         
+        var isUserUpgraded = await artistService.CheckProfileForUpgrade(userId, cancellationToken);
+        
+        if (isUserUpgraded.Data)
+            return new ErrorResult(400, "User already upgraded");
+        
         if (artistRequest == null)
             return new ErrorResult(400, "Invalid request");
 

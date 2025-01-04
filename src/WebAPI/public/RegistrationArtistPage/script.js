@@ -1,4 +1,4 @@
-﻿import {tokenStorage, showForm, createLoginForm } from '../Auth/auth.js';
+﻿import {tokenStorage, showForm, createLoginForm, parseJwtToSub} from '../Auth/auth.js';
 
 
 const sendBtn = document.getElementById('sendBtn');
@@ -76,15 +76,16 @@ sendBtn.addEventListener('click', async () => {
 
             if (response.ok) {
                 tokenStorage.save(data.token);
-                window.location.href = '/account';
-            } else {
-                if (data == 'Not authorized') {
-                    showForm(createLoginForm, '/auth/signin', 'Sign In');
-                }
-                else{
-                    alert (data || 'Ошибка на сервере!');
-                }
+                const userId = parseJwtToSub(data.token);
+                window.location.href = `/account/${userId}`;
+            } 
+            else if (response.status === 401){
+                     await showForm(createLoginForm, '/auth/signin', 'Sign In');
             }
+            else{
+                    alert (data || 'Ошибка на сервере!');
+            }
+            
         } catch (error) {
             alert(error.message);
         }

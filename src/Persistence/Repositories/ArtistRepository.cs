@@ -29,4 +29,15 @@ public class ArtistRepository(QueryMapper queryMapper)
         var newUser = await queryMapper.ExecuteAndReturnAsync<User>(sqlQuery, cancellationToken);
         return newUser;
     }
+
+    public async Task<UpgradeUser?> SelectArtistByIdAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        FormattableString sqlQuery = $"""
+                                        SELECT * 
+                                        FROM artists
+                                        WHERE user_id = {userId};
+                                      """;
+        
+        return await queryMapper.ExecuteAndReturnAsync<UpgradeUser>(sqlQuery, cancellationToken);
+    }
 }

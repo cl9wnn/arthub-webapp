@@ -94,6 +94,7 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
             Description = artwork.Description,
             ArtworkPath = artwork.ArtworkPath,
             Tags = tags.Select(t => t.Name).ToList()!,
+            AuthorId = artwork.UserId,
             ProfileName = author.ProfileName,
             Fullname = author.Fullname,
             AvatarPath = author.AvatarPath,
@@ -126,5 +127,13 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
             : Result<int>.Success(countAfterAdd);
     }
     
+    public async Task<Result<bool>> CheckArtworkForExist(int userId, CancellationToken cancellationToken)
+    {
+        var artwork = await artworkRepository.GetArtworkByIdAsync(userId, cancellationToken);
+        
+        return artwork != null
+            ? Result<bool>.Success(true)
+            : Result<bool>.Failure(400, "Artwork does not exist");
+    }
 }
     

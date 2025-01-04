@@ -2,19 +2,22 @@
 const artFolderPath = 'http://localhost:9000/image-bucket/arts/';
 import {createLoginForm, showForm, tokenStorage} from "../Auth/auth.js";
 
-
+let artworkId;
+let authorId;
 document.addEventListener('DOMContentLoaded', async() => {
-    const artworkId = sessionStorage.getItem('artworkId');
+    const pathname = window.location.pathname;
+    const pathSegments = pathname.split("/");
+    artworkId = pathSegments[pathSegments.length - 1];
+
     if (artworkId) {
         await loadArtworkData(artworkId);
-    } else {
-        alert("Artwork ID not found in localStorage!");
-    }});
+    }
+});
 
 let isLiked = false; 
 const likeBtn = document.getElementById('like-btn');
 likeBtn.addEventListener('click', async () => {
-    const artworkId = sessionStorage.getItem('artworkId');
+    
     if (artworkId) {
         await likeArtwork(artworkId);
     } else {
@@ -22,8 +25,14 @@ likeBtn.addEventListener('click', async () => {
     }
 });
 
+
+document.querySelector('.author-area').addEventListener('click', function() {
+    
+    window.location.href = `/account/${authorId}`;
+});
+
 async function loadArtworkData(artworkId) {
-    const token = tokenStorage.get();
+    let token = tokenStorage.get();
 
     try {
         const response = await fetch(`/api/artwork/${artworkId}`, {
@@ -38,16 +47,19 @@ async function loadArtworkData(artworkId) {
         
         if (response.ok) {
             isLiked = data.isLiked;
+            authorId = data.authorId;
             await updateLikeButton();
             await renderArtInfo(data);
         } 
-        else {
-            if (data == 'Not authorized') {
-                await showForm(createLoginForm, '/auth/signin', 'Sign In');
-            }
-            else{
+        else if(response.status === 401) {
+                const success = await showForm(createLoginForm, '/auth/signin', 'Sign In');
+                if (success) {
+                    token = tokenStorage.get(); 
+                    await loadArtworkData(artworkId);
+                }           
+        }
+        else{
                 throw new Error(data || 'Ошибка на сервере!');
-            }
         }
     } catch (error) {
         alert(error);
@@ -71,13 +83,11 @@ async function likeArtwork(artworkId) {
             await updateLikeButton();
             await updateLikeCount(data);
         }
+        else if (response.status === 401) {
+            await showForm(createLoginForm, '/auth/signin', 'Sign In');
+        }
         else {
-            if (data == 'Not authorized') {
-                await showForm(createLoginForm, '/auth/signin', 'Sign In');
-            }
-            else{
                 throw new Error(data || 'Ошибка на сервере!');
-            }
         }
     } catch (error) {
         alert(error);

@@ -1,4 +1,4 @@
-import {tokenStorage, createElement} from '../Auth/auth.js';
+import {tokenStorage, createElement, parseJwtToSub} from '../Auth/auth.js';
 
 const uploadBtn = document.getElementById('uploadBtn');
 const avatarInput = document.getElementById('avatarInput');
@@ -121,7 +121,8 @@ sendBtn.addEventListener('click', async () => {
             
             if (response.ok) {
                 tokenStorage.save(data.token);
-                window.location.href = '/account';
+                const userId = parseJwtToSub(data.token);
+                window.location.href = `/account/${userId}`;
             } else {
                 alert(data || 'Ошибка при выполнении запроса');
             }

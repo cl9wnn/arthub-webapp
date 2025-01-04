@@ -44,4 +44,22 @@ public class AccountService(UserRepository userRepository)
         
         return Result<ArtistProfileModel>.Success(profileData);
     }
+    
+    public async Task<Result<bool>> CheckProfileForExist(int userId, CancellationToken cancellationToken)
+    {
+        var account = await userRepository.GetUserAsyncById(userId, cancellationToken);
+        
+        return account != null
+            ? Result<bool>.Success(true)
+            : Result<bool>.Failure(400, "Account does not exist");
+    }
+    
+    public async Task<Result<string?>> GetAccountRoleAsync(int userId, CancellationToken cancellationToken)
+    {
+        var accountRole = await userRepository.GetUserRoleAsync(userId, cancellationToken);
+        
+        return (accountRole == null
+            ? Result<string?>.Failure(404, "User dont found")!
+            : Result<string>.Success(accountRole))!;
+    }
 }
