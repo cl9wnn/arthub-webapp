@@ -79,9 +79,11 @@ header h1 {
 }
 #marketBtn{
     background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Ic_shopping_cart_48px.svg/1200px-Ic_shopping_cart_48px.svg.png");
+    display: none;
+
 }
 
-#marketBtn:hover{
+.btnImg:hover{
     background-color: #313131;
 }
 
@@ -89,10 +91,11 @@ header h1 {
     background-image: url("https://tyumenczevskij-r22.gosweb.gosuslugi.ru/netcat_files/8/110/img_243887_13.png");
     display: none; 
 }
-#accountBtn:hover{
-    background-color: #313131;
-}
 
+#savingsBtn{
+    background-image: url("https://vapeartshop.by/upload/medialibrary/351/351cb7045dcc171aeae906a042af33de.png");
+    display: none;
+}
 
 
 /*  --------------------------------  MAIN -------------------------------- */

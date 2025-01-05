@@ -66,6 +66,40 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
         
         return Result<List<GalleryArtworkModel>>.Success(responseArtworks)!;
     }
+    
+    public async Task<Result<List<SavingArtModel>>> GetSavingArtworksAsync(int userId, CancellationToken cancellationToken)
+    {
+        var responseSavings = new List<SavingArtModel>();
+        
+        var artworks = await artworkRepository.GetSavingArtworksAsync(userId, cancellationToken);
+        
+        if (artworks == null)
+            return Result<List<SavingArtModel>>.Failure(400, "Could not retrieve artworks")!;
+        
+        foreach (var artwork in artworks)
+        {
+            var artModel = new SavingArtModel
+            {
+                ArtworkId = artwork!.ArtworkId,
+                Title = artwork.Title,
+                ArtworkPath = artwork.ArtworkPath,
+            };
+            responseSavings.Add(artModel);
+        }
+        
+        return Result<List<SavingArtModel>>.Success(responseSavings)!;
+    }
+    
+    public async Task<Result<bool>> DeleteSavingArt(int userId, int artworkId, CancellationToken cancellationToken)
+    {
+        var deletedArtwork = await artworkRepository.DeleteSavingArtworkAsync(userId, artworkId, cancellationToken);
+        
+        return deletedArtwork == null
+             ? Result<bool>.Failure(400, "Could not retrieve artworks")!
+             : Result<bool>.Success(true);
+    }
+    
+    
 
     public async Task<Result<ArtworkPostModel>> GetArtworkPostAsync(int artworkId, int visitorId, CancellationToken cancellationToken)
     {
@@ -85,6 +119,7 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
             return Result<ArtworkPostModel>.Failure(400, "Could not retrieve author")!;
         
         var isLikedByUser = await artworkRepository.IsArtworkLikedByUserAsync(artworkId, visitorId, cancellationToken);
+        var isSavedByUser = await artworkRepository.IsArtworkSavedByUserAsync(artworkId, visitorId, cancellationToken);
         
         var artworkPost = new ArtworkPostModel
         {
@@ -99,7 +134,8 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
             Fullname = author.Fullname,
             AvatarPath = author.AvatarPath,
             LikeCount = artwork.LikeCount,
-            IsLiked = isLikedByUser
+            IsLiked = isLikedByUser,
+            IsSaved = isSavedByUser
         };
         
         return Result<ArtworkPostModel>.Success(artworkPost);
@@ -125,6 +161,27 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
         return countAfterAdd == -1
             ? Result<int>.Failure(400, "Could not like artwork")
             : Result<int>.Success(countAfterAdd);
+    }
+    
+    public async Task<Result<SavingArt>> SaveArtworkAsync(int artworkId, int userId, CancellationToken cancellationToken)
+    {
+        if (artworkId == 0 || userId == 0)
+            return Result<SavingArt>.Failure(400, "Not found art or user")!;
+        
+        var isUserSaved = await artworkRepository.IsArtworkSavedByUserAsync(artworkId, userId, cancellationToken);
+
+        if (isUserSaved)
+        {
+            var removedSavingArt = await artworkRepository.RemoveSavingAsync(artworkId, userId, cancellationToken);
+            return removedSavingArt == null
+                ? Result<SavingArt>.Failure(400, "Could not like artwork")!
+                : Result<SavingArt>.Success(removedSavingArt);
+        }
+        
+        var addSavingArt = await artworkRepository.AddSavingAsync(artworkId, userId, cancellationToken);
+        return addSavingArt == null
+            ? Result<SavingArt>.Failure(400, "Could not like artwork")!
+            : Result<SavingArt>.Success(addSavingArt);
     }
     
     public async Task<Result<bool>> CheckArtworkForExist(int userId, CancellationToken cancellationToken)

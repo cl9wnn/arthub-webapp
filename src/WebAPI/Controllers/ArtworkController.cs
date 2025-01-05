@@ -7,6 +7,7 @@ using MyFramework;
 using MyFramework.Attributes;
 using MyFramework.Contracts;
 using MyFramework.Views;
+using Persistence.Entities;
 using WebAPI.Models;
 
 namespace WebAPI.Controllers;
@@ -56,11 +57,26 @@ public class ArtworkController(ArtworkService artworkService): MyBaseController
         if (!context.TryGetItem<int>("userId", out var userId))
             return new ErrorResult(400, "Not authorized");
         
-        var artworkResult = await artworkService.LikeArtworkAsync(artworkId,  userId, cancellationToken);
+        var likeResult = await artworkService.LikeArtworkAsync(artworkId,  userId, cancellationToken);
         
-        return artworkResult.IsSuccess
-            ? new JsonResult<int>(artworkResult.Data)
-            : new ErrorResult(artworkResult.StatusCode, artworkResult.ErrorMessage!);
+        return likeResult.IsSuccess
+            ? new JsonResult<int>(likeResult.Data)
+            : new ErrorResult(likeResult.StatusCode, likeResult.ErrorMessage!);
+    }
+    
+    
+    [Authorize("user","artist")]
+    [HttpGet("/api/save-artwork/{artworkId}")]
+    public async Task<IMyActionResult> SaveArtworkPost(int artworkId, HttpListenerContext context, CancellationToken cancellationToken)
+    {
+        if (!context.TryGetItem<int>("userId", out var userId))
+            return new ErrorResult(400, "Not authorized");
+        
+        var saveResult = await artworkService.SaveArtworkAsync(artworkId, userId, cancellationToken);
+        
+        return saveResult.IsSuccess
+            ? new JsonResult<SavingArt>(saveResult.Data)
+            : new ErrorResult(saveResult.StatusCode, saveResult.ErrorMessage!);
     }
     
     [Authorize("artist")]

@@ -5,9 +5,10 @@ const avatarFolderPath = 'http://localhost:9000/image-bucket/avatars/';
 
 
 const accountSection = document.getElementById("accountBtn");
+const marketSection = document.getElementById("marketBtn");
+const savingSection = document.getElementById("savingsBtn");
 const signupSection = document.getElementById("signupBtn");
 const signinSection = document.getElementById("signinBtn");
-const marketSection = document.getElementById("marketBtn");
 
 document.addEventListener('DOMContentLoaded', async () => {
     const setupButton = (id, createFormMethod, path, buttonText) => {
@@ -35,6 +36,11 @@ document.getElementById('marketBtn').addEventListener('click', async (event) => 
     window.location.href = '/market'; 
 });
 
+document.getElementById('savingsBtn').addEventListener('click', async (event) => {
+    event.preventDefault();
+    window.location.href = '/savings';
+});
+
 document.getElementById('accountBtn').addEventListener('click', async (event) => {
     event.preventDefault();
     const userId = parseJwtToSub(tokenStorage.get());
@@ -44,11 +50,13 @@ document.getElementById('accountBtn').addEventListener('click', async (event) =>
 function toggleVisibility(token) {
     if (token) {
         accountSection.style.display = "block";
+        savingSection.style.display = 'block';
         marketSection.style.display = "block";
         signupSection.style.display = "none";
         signinSection.style.display = "none";
     } else {
         marketSection.style.display = "none";
+        savingSection.style.display = "none";
         accountSection.style.display = "none";
         signupSection.style.display = "block";
         signinSection.style.display = "block";

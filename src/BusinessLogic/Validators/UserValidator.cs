@@ -18,7 +18,7 @@ public class UserValidator:AbstractValidator<UserModel>
             .WithMessage("Password must be between 8 and 20 characters, at least one digit, special symbol, and upper case letter.");
         RuleFor(user => user.ProfileName)
             .NotEmpty()
-            .Matches("^[a-zA-Z0-9_.]{3,15}$")
+            .Matches("^[a-zA-Z0-9_. ]{3,15}$")
             .WithMessage("The profile name must be between 3 and 15 characters long and contain only Latin letters," +
                          " numbers, dots, or underscores.");
     }

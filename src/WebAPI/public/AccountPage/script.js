@@ -132,31 +132,63 @@ async function renderAccountData(data) {
     country.innerText = data.country;
 }
 
-function addUpgradeAccountData(data) {
+async function createArtistSummary(data) {
+    const summaryDiv = document.createElement('div');
+    summaryDiv.className = 'Summary';
+
+    const summaryContainer = document.createElement('div');
+    summaryContainer.className = 'summary-container';
+
+    const heading = document.createElement('h1');
+    heading.id = 'summary';
+    heading.textContent = 'About artist';
+
+    const summaryTextContainer = document.createElement('div');
+    summaryTextContainer.className = 'summary-text-container';
+
+    const contactParagraph = document.createElement('p');
+    contactParagraph.id = 'contact';
+    contactParagraph.textContent = `Contact: ${data.contactInfo}`;
+
+    const experienceParagraph = document.createElement('p');
+    experienceParagraph.id = 'experience';
+    experienceParagraph.textContent = `Experience: ${data.summary}`;
+
+    summaryTextContainer.appendChild(contactParagraph);
+    summaryTextContainer.appendChild(experienceParagraph);
+
+    summaryContainer.appendChild(heading);
+    summaryContainer.appendChild(summaryTextContainer);
+
+    summaryDiv.appendChild(summaryContainer);
+    
+    return summaryDiv;
+}
+
+async function addUpgradeAccountData(data) {
+    const wrapper = document.querySelector('.wrapper');
+    
     if (addArtworkBtn){
         addArtworkBtn.textContent = '+';
         portfolioText.textContent = 'Add your own artworks so that others can rate and promote you';
     }
 
     const nameInfo = document.querySelector('.name-info');
-    const contactInfoContainer = document.querySelector('.contact-info');
     const nameContainer = document.querySelector('.name-container');
 
     const fullnameElement = document.createElement('h1');
     fullnameElement.id = 'fullname';
     fullnameElement.innerText = data.fullname;
     nameInfo.appendChild(fullnameElement);
-
-    const contactInfoElement = document.createElement('p');
-    contactInfoElement.id = 'contact-info';
-    contactInfoElement.innerText = data.contactInfo;
-    contactInfoContainer.appendChild(contactInfoElement);
     
     const badgeArtistElement = document.createElement('span');
     badgeArtistElement.id = 'badge';
     badgeArtistElement.innerText = 'artist';
     nameContainer.appendChild(badgeArtistElement);
     
+    const portfolio = wrapper.querySelector('.Portfolio');
+    const summaryContainer = await createArtistSummary(data);
+    wrapper.insertBefore(summaryContainer, portfolio);
 }
 
 // загружаем данные аккаунта

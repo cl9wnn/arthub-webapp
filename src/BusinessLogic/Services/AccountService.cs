@@ -27,9 +27,9 @@ public class AccountService(UserRepository userRepository, ArtworkRepository art
     
     public async Task<Result<ArtistProfileModel>> GetUpgradeUserDataAsync(int id, CancellationToken cancellationToken)
     {
-        var user = await userRepository.GetUpgradeUserAsyncById(id, cancellationToken);
+        var artist = await userRepository.GetUpgradeUserAsyncById(id, cancellationToken);
 
-        if (user == null)
+        if (artist == null)
             return Result<ArtistProfileModel>.Failure(404, "User dont found")!;
 
         var userArts = await artworkRepository.GetProfileArtworksAsync(id, cancellationToken);
@@ -43,11 +43,12 @@ public class AccountService(UserRepository userRepository, ArtworkRepository art
         
         var profileData = new ArtistProfileModel
         {
-            ProfileName = user.ProfileName,
-            Fullname = user.Fullname,
-            ContactInfo = user.ContactInfo,
-            AvatarPath = user.AvatarPath,
-            Country = user.Country,
+            ProfileName = artist.ProfileName,
+            Fullname = artist.Fullname,
+            ContactInfo = artist.ContactInfo,
+            AvatarPath = artist.AvatarPath,
+            Country = artist.Country,
+            Summary = artist.Summary,
             Role = "artist",
             ProfileArts = profileArts
         };

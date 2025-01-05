@@ -14,4 +14,5 @@ public class ArtworkPostModel
     public int AuthorId { get; set; }
     public int LikeCount { get; set; }
     public bool IsLiked { get; set; }
+    public bool IsSaved  { get; set; }
 }

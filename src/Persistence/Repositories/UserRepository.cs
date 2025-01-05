@@ -49,7 +49,7 @@ public class UserRepository(QueryMapper queryMapper)
     public async Task<UpgradeUser?> GetUpgradeUserAsyncById(int id, CancellationToken cancellationToken = default)
     {
         FormattableString sqlQuery = $"""
-                                      SELECT profile_name, fullname, contact_info, country, avatar_path 
+                                      SELECT profile_name, fullname, contact_info, country, avatar_path, summary
                                       FROM users 
                                       INNER JOIN artists ON users.user_id = artists.user_id
                                       WHERE users.user_id = {id};

@@ -15,13 +15,25 @@ document.addEventListener('DOMContentLoaded', async() => {
 });
 
 let isLiked = false; 
+let isSaved = false;
 const likeBtn = document.getElementById('like-btn');
+const saveBtn = document.getElementById('save-btn');
+
 likeBtn.addEventListener('click', async () => {
     
     if (artworkId) {
         await likeArtwork(artworkId);
     } else {
-        alert("Artwork ID not found in localStorage!");
+        alert("ошибка");
+    }
+});
+
+saveBtn.addEventListener('click', async () => {
+
+    if (artworkId) {
+        await saveArtwork(artworkId);
+    } else {
+        alert("ошибка");
     }
 });
 
@@ -47,8 +59,10 @@ async function loadArtworkData(artworkId) {
         
         if (response.ok) {
             isLiked = data.isLiked;
+            isSaved = data.isSaved;
             authorId = data.authorId;
-            await updateLikeButton();
+            await updateButton(isLiked, 'Liked', 'Like', likeBtn);
+            await updateButton(isSaved, 'Saved', 'Save', saveBtn);
             await renderArtInfo(data);
         } 
         else if(response.status === 401) {
@@ -80,7 +94,7 @@ async function likeArtwork(artworkId) {
 
         if (response.ok) {
             isLiked = !isLiked; 
-            await updateLikeButton();
+            await updateButton(isLiked, 'Liked', 'Like', likeBtn);
             await updateLikeCount(data);
         }
         else if (response.status === 401) {
@@ -94,17 +108,45 @@ async function likeArtwork(artworkId) {
     }
 }
 
-function updateLikeButton() {
-    if (isLiked) {
-        likeBtn.innerText = 'Liked';
-        likeBtn.style.backgroundColor = '#e0e0e0';
-        likeBtn.style.color = '#333333';
-    } else {
-        likeBtn.innerText = 'Like';
-        likeBtn.style.backgroundColor = '#333333';
-        likeBtn.style.color = '#e0e0e0';
+async function saveArtwork(artworkId) {
+    const token = tokenStorage.get();
+    try {
+        const response = await fetch(`/api/save-artwork/${artworkId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const data = await response.json();
+
+        if (response.ok) {
+            isSaved = !isSaved;
+            await updateButton(isSaved, 'Saved', 'Save', saveBtn);
+        }
+        else if (response.status === 401) {
+            await showForm(createLoginForm, '/auth/signin', 'Sign In');
+        }
+        else {
+            throw new Error(data || 'Ошибка на сервере!');
+        }
+    } catch (error) {
+        alert(error);
     }
 }
+
+function updateButton(flag, enableText, disableText, button) {
+    if (flag) {
+        button.innerText = enableText;
+        button.style.backgroundColor = '#e0e0e0';
+        button.style.color = '#333333';
+    } else {
+        button.innerText = disableText;
+        button.style.backgroundColor = '#333333';
+        button.style.color = '#e0e0e0';
+    }
+}
+
 async function renderArtInfo(data){
     document.getElementById('artImg').src = `${artFolderPath}${data.artworkPath}`;
     document.getElementById('title').innerHTML = data.title;
