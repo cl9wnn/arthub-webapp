@@ -4,7 +4,7 @@ using Persistence.Repositories;
 
 namespace BusinessLogic.Services;
 
-public class AccountService(UserRepository userRepository)
+public class AccountService(UserRepository userRepository, ArtworkRepository artworkRepository)
 {
     
     public async Task<Result<UserProfileModel>> GetUserDataAsync(int id, CancellationToken cancellationToken)
@@ -31,15 +31,25 @@ public class AccountService(UserRepository userRepository)
 
         if (user == null)
             return Result<ArtistProfileModel>.Failure(404, "User dont found")!;
+
+        var userArts = await artworkRepository.GetProfileArtworksAsync(id, cancellationToken);
         
-        var profileData = new ArtistProfileModel()
+        var profileArts = userArts!.Select(artwork => new ProfileArtworkModel
+            {
+                ArtworkId = artwork.ArtworkId,
+                ArtworkPath = artwork.ArtworkPath,
+                LikeCount = artwork.LikeCount
+            }).ToList();
+        
+        var profileData = new ArtistProfileModel
         {
             ProfileName = user.ProfileName,
             Fullname = user.Fullname,
             ContactInfo = user.ContactInfo,
             AvatarPath = user.AvatarPath,
             Country = user.Country,
-            Role = "artist"
+            Role = "artist",
+            ProfileArts = profileArts
         };
         
         return Result<ArtistProfileModel>.Success(profileData);

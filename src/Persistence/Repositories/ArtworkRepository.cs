@@ -26,13 +26,26 @@ public class ArtworkRepository(QueryMapper queryMapper)
 
     public async Task<List<Artwork>?> GetGalleryArtworksAsync(CancellationToken cancellationToken)
     {
-        FormattableString insertArtworkTagQuery = $"""
+        FormattableString sqlQuery = $"""
                                                      SELECT artwork_id, title, artwork_path, artworks.user_id, users.profile_name 
                                                      FROM artworks
                                                      JOIN users ON artworks.user_id = users.user_id
                                                      """;
         var artworks = 
-            await queryMapper.ExecuteAndReturnListAsync<Artwork?>(insertArtworkTagQuery, cancellationToken);
+            await queryMapper.ExecuteAndReturnListAsync<Artwork?>(sqlQuery, cancellationToken);
+        
+        return artworks;
+    }
+
+    public async Task<List<Artwork>?> GetProfileArtworksAsync(int userId, CancellationToken cancellationToken)
+    {
+        FormattableString sqlQuery = $"""
+                                                   SELECT artwork_id, artwork_path, like_count
+                                                   FROM artworks        
+                                                   WHERE user_id = {userId};
+                                                   """;
+        var artworks = 
+            await queryMapper.ExecuteAndReturnListAsync<Artwork?>(sqlQuery, cancellationToken);
         
         return artworks;
     }

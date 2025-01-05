@@ -1,5 +1,6 @@
 import {createLoginForm, showForm, tokenStorage, parseJwtToSub} from "../Auth/auth.js";
 const avatarFolderPath = 'http://localhost:9000/image-bucket/avatars/';
+const artFolderPath = 'http://localhost:9000/image-bucket/arts/';
 
 let avatarImg, profileName, country;
 let userId;
@@ -29,7 +30,8 @@ let addArtworkBtn;
 let portfolioText;
 
 async function createMyAccount() {
-    const container = document.querySelector('.portfolio-container');
+    const portfolioHeader = document.querySelector('.portfolio-header');
+    const portfolioTextContainer = document.querySelector('.portfolio-text-container');
 
     addArtworkBtn = document.createElement('button');  
     addArtworkBtn.classList.add('profile-button');
@@ -46,11 +48,80 @@ async function createMyAccount() {
     portfolioText = document.createElement('p');
     portfolioText.id = 'portfolio-text';
 
-    container.appendChild(portfolioText);
-    container.appendChild(addArtworkBtn);
-
-
+    portfolioTextContainer.appendChild(addArtworkBtn);
+    portfolioHeader.appendChild(portfolioText);
 }
+
+const portfolio = document.querySelector('.Portfolio');
+async function generateArtsContainer(profileArts) {
+    const portfolioContainer = document.createElement('div');
+    portfolioContainer.classList.add('portfolio-container');
+
+    const artsContainer = document.createElement('div');
+    artsContainer.classList.add('arts-container');
+
+    const prevButton = document.createElement('button');
+    prevButton.classList.add('slider-btn', 'prev-btn');
+    prevButton.innerText = '‹';
+    artsContainer.appendChild(prevButton);
+
+    const artSlider = document.createElement('div');
+    artSlider.classList.add('art-slider');
+    artsContainer.appendChild(artSlider);
+
+    const nextButton = document.createElement('button');
+    nextButton.classList.add('slider-btn', 'next-btn');
+    nextButton.innerText = '›';
+    artsContainer.appendChild(nextButton);
+
+    profileArts.forEach(artwork => {
+        const artItem = document.createElement('div');
+        artItem.classList.add('art-item');
+        artItem.addEventListener("click", () => {
+            window.location.href = `/artwork/${artwork.artworkId}`;
+        });
+
+        const img = document.createElement('img');
+        img.classList.add('art-img');
+        img.src = `${artFolderPath}${artwork.artworkPath}`;
+        artItem.appendChild(img);
+
+        const likeCountText = document.createElement('div');
+        likeCountText.classList.add('like-count');
+        likeCountText.textContent = `likes: ${artwork.likeCount}`;
+        artItem.appendChild(likeCountText);
+
+        artSlider.appendChild(artItem);
+    });
+
+    let currentIndex = 0;
+    const itemsToShow = 3;
+    const itemWidth = 275;
+    const maxIndex = Math.max(0, profileArts.length - itemsToShow);
+
+    function updateSliderPosition() {
+        const offset = -currentIndex * itemWidth;
+        artSlider.style.transform = `translateX(${offset}px)`;
+    }
+
+    prevButton.addEventListener('click', () => {
+        if (currentIndex > 0) {
+            currentIndex--;
+            updateSliderPosition();
+        }
+    });
+
+    nextButton.addEventListener('click', () => {
+        if (currentIndex < maxIndex) {
+            currentIndex++;
+            updateSliderPosition();
+        }
+    });
+
+    portfolioContainer.appendChild(artsContainer);
+    return portfolioContainer;
+}
+
 async function renderAccountData(data) {
     if (addArtworkBtn){
         addArtworkBtn.textContent = 'Upgrade';
@@ -63,7 +134,7 @@ async function renderAccountData(data) {
 
 function addUpgradeAccountData(data) {
     if (addArtworkBtn){
-        addArtworkBtn.textContent = 'Add artwork';
+        addArtworkBtn.textContent = '+';
         portfolioText.textContent = 'Add your own artworks so that others can rate and promote you';
     }
 
@@ -102,13 +173,16 @@ async function loadAccountData(userId) {
         });
 
         const data = await response.json();
-        console.log(data);
         
         if (response.ok) {
             await renderAccountData(data);
 
             if (data.role === 'artist') { 
                 isArtist = true;
+                if (data.profileArts.length > 0) {
+                    const portfolioContainer = await generateArtsContainer(data.profileArts);
+                    portfolio.appendChild(portfolioContainer);
+                }
                 await addUpgradeAccountData(data);
             }
         } 
@@ -116,7 +190,6 @@ async function loadAccountData(userId) {
             const loginSuccessful = await showForm(createLoginForm, '/auth/signin', 'Sign In');
 
             if (loginSuccessful) {
-                token = tokenStorage.get();
                 await loadAccountData(userId);
             }
         }
