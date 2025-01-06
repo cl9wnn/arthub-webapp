@@ -16,12 +16,13 @@ serviceProvider.AddSingleton<QueryMapper>();
 serviceProvider.AddSingleton<UserRepository>();
 serviceProvider.AddSingleton<ArtistRepository>();
 serviceProvider.AddSingleton<ArtworkRepository>();
+serviceProvider.AddSingleton<SavingFavouriteRepository>();
 serviceProvider.AddSingleton<UserService>();
 serviceProvider.AddSingleton<AccountService>();
 serviceProvider.AddSingleton<FileService>();
 serviceProvider.AddSingleton<ArtistService>();
 serviceProvider.AddSingleton<ArtworkService>();
-serviceProvider.AddSingleton<ArtistRepository>();
+serviceProvider.AddSingleton<SavingFavouriteService>();
 serviceProvider.AddSingleton<IS3Storage<string>,MinioService>();
 serviceProvider.AddSingleton<IPasswordHasher, PasswordHasher>();
 

@@ -54,6 +54,8 @@ async function createMyAccount() {
 
 const portfolio = document.querySelector('.Portfolio');
 async function generateArtsContainer(profileArts) {
+    const userTokenId = parseJwtToSub(tokenStorage.get());
+
     const portfolioContainer = document.createElement('div');
     portfolioContainer.classList.add('portfolio-container');
 
@@ -91,6 +93,17 @@ async function generateArtsContainer(profileArts) {
         likeCountText.textContent = `likes: ${artwork.likeCount}`;
         artItem.appendChild(likeCountText);
 
+        if (userTokenId === userId){
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'deleteBtn';
+            deleteButton.textContent = '✖';
+
+            deleteButton.addEventListener('click', async (event) => {
+                event.stopPropagation();
+                await createConfirmationModal(artwork.artworkId, artItem);
+            });
+            artItem.appendChild(deleteButton);
+        }
         artSlider.appendChild(artItem);
     });
 
@@ -167,8 +180,8 @@ async function createArtistSummary(data) {
 
 async function addUpgradeAccountData(data) {
     const wrapper = document.querySelector('.wrapper');
-    
-    if (addArtworkBtn){
+
+    if (addArtworkBtn) {
         addArtworkBtn.textContent = '+';
         portfolioText.textContent = 'Add your own artworks so that others can rate and promote you';
     }
@@ -176,18 +189,31 @@ async function addUpgradeAccountData(data) {
     const nameInfo = document.querySelector('.name-info');
     const nameContainer = document.querySelector('.name-container');
 
-    const fullnameElement = document.createElement('h1');
-    fullnameElement.id = 'fullname';
+    let fullnameElement = document.getElementById('fullname');
+    if (!fullnameElement) {
+        fullnameElement = document.createElement('h1');
+        fullnameElement.id = 'fullname';
+        nameInfo.appendChild(fullnameElement);
+    }
     fullnameElement.innerText = data.fullname;
-    nameInfo.appendChild(fullnameElement);
-    
-    const badgeArtistElement = document.createElement('span');
-    badgeArtistElement.id = 'badge';
+
+    let badgeArtistElement = document.getElementById('badge');
+    if (!badgeArtistElement) {
+        badgeArtistElement = document.createElement('span');
+        badgeArtistElement.id = 'badge';
+        nameContainer.appendChild(badgeArtistElement);
+    }
     badgeArtistElement.innerText = 'artist';
-    nameContainer.appendChild(badgeArtistElement);
-    
+
     const portfolio = wrapper.querySelector('.Portfolio');
+
+    const existingSummary = wrapper.querySelector('.artist-summary');
+    if (existingSummary) {
+        existingSummary.remove();
+    }
+
     const summaryContainer = await createArtistSummary(data);
+    summaryContainer.classList.add('artist-summary');
     wrapper.insertBefore(summaryContainer, portfolio);
 }
 
@@ -211,6 +237,11 @@ async function loadAccountData(userId) {
 
             if (data.role === 'artist') { 
                 isArtist = true;
+                let portfolioContainer = portfolio.querySelector('.portfolio-container');
+                if (portfolioContainer) {
+                    portfolioContainer.remove(); 
+                }
+                
                 if (data.profileArts.length > 0) {
                     const portfolioContainer = await generateArtsContainer(data.profileArts);
                     portfolio.appendChild(portfolioContainer);
@@ -232,4 +263,81 @@ async function loadAccountData(userId) {
     } catch (error) {
         alert(error.message);
     }
+}
+
+async function deleteOwnArtwork(artworkId, art) {
+    let token = tokenStorage.get();
+    const userId = parseJwtToSub(tokenStorage.get());
+
+    try {
+        const response = await fetch('/api/delete-own-artwork', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(artworkId )
+        });
+
+        if (response.ok) {
+            art.remove();
+            await loadAccountData(userId);
+        }
+        else if (response.status === 401) {
+            const loginSuccessful = await showForm(createLoginForm, '/auth/signin', 'Sign In');
+
+            if (loginSuccessful) {
+                await loadAccountData(userId);
+            }
+        }
+        else
+        {
+            alert("error");
+        }
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+async function createConfirmationModal(artworkId, artItem) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+
+    const modalContent = document.createElement('div');
+    modalContent.className = 'modal-content';
+
+    const message = document.createElement('p');
+    message.textContent = 'Вы уверены, что хотите безвозвратно удалить это?';
+
+    const actions = document.createElement('div');
+    actions.className = 'modal-actions';
+
+    const confirmButton = document.createElement('button');
+    confirmButton.className = 'button button-confirm';
+    confirmButton.textContent = 'Yes';
+
+    const cancelButton = document.createElement('button');
+    cancelButton.className = 'button button-cancel';
+    cancelButton.textContent = 'Cancel';
+
+    confirmButton.addEventListener('click', async () => {
+        await deleteOwnArtwork(artworkId, artItem);
+        document.body.removeChild(modal);
+    });
+
+    cancelButton.addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+
+    actions.appendChild(confirmButton);
+    actions.appendChild(cancelButton);
+
+    modalContent.appendChild(message);
+    modalContent.appendChild(actions);
+
+    modal.appendChild(modalContent);
+
+    document.body.appendChild(modal);
+
+    modal.style.display = 'flex';
 }

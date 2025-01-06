@@ -64,24 +64,9 @@ public class ArtworkController(ArtworkService artworkService): MyBaseController
             : new ErrorResult(likeResult.StatusCode, likeResult.ErrorMessage!);
     }
     
-    
-    [Authorize("user","artist")]
-    [HttpGet("/api/save-artwork/{artworkId}")]
-    public async Task<IMyActionResult> SaveArtworkPost(int artworkId, HttpListenerContext context, CancellationToken cancellationToken)
-    {
-        if (!context.TryGetItem<int>("userId", out var userId))
-            return new ErrorResult(400, "Not authorized");
-        
-        var saveResult = await artworkService.SaveArtworkAsync(artworkId, userId, cancellationToken);
-        
-        return saveResult.IsSuccess
-            ? new JsonResult<SavingArt>(saveResult.Data)
-            : new ErrorResult(saveResult.StatusCode, saveResult.ErrorMessage!);
-    }
-    
     [Authorize("artist")]
     [HttpPost("/api/add-artwork")]
-    public async Task<IMyActionResult> AddArtworkAsync([FromBody] ArtworkRequest? artworkRequest,
+    public async Task<IMyActionResult> AddArtwork([FromBody] ArtworkRequest? artworkRequest,
         HttpListenerContext context, CancellationToken cancellationToken)
     {
         if (!context.TryGetItem<int>("userId", out var userId))
@@ -106,5 +91,19 @@ public class ArtworkController(ArtworkService artworkService): MyBaseController
             ? new Ok()
             : new ErrorResult(artResult.StatusCode, artResult.ErrorMessage!);
     }
+   
     
+    [Authorize("artist")]
+    [HttpDelete("api/delete-own-artwork")]
+    public async Task<IMyActionResult> DeleteOwnArtwork([FromBody] int artworkId, HttpListenerContext context, CancellationToken cancellationToken)
+    {
+        if (!context.TryGetItem<int>("userId", out var userId))
+            return new ErrorResult(400, "Not authorized");
+        
+        var deletedResult  = await artworkService.DeleteOwnArtworkAsync(userId, artworkId, cancellationToken);
+        
+        return deletedResult.IsSuccess
+            ? new Ok()
+            : new ErrorResult(deletedResult.StatusCode, deletedResult.ErrorMessage!);
+    }
 }
