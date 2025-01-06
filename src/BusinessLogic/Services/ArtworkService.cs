@@ -53,14 +53,20 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
         foreach (var artwork in artworks)
         {
             var author = await userRepository.GetUserAsyncById(artwork.UserId, cancellationToken);
+            var artMetrics = await artworkRepository.GetMetricsByIdAsync(artwork.ArtworkId, cancellationToken);
+            var tags = await artworkRepository.GetTagsByIdAsync(artwork.ArtworkId, cancellationToken);
 
             var artModel = new GalleryArtworkModel
             {
                 ArtworkId = artwork.ArtworkId,
+                Category = artwork.Category,
                 Title = artwork.Title,
                 ArtworkPath = artwork.ArtworkPath,
+                Tags = tags.Select(t => t.Name).ToList(),
                 ProfileName = author!.ProfileName,
                 AvatarPath = author.AvatarPath,
+                LikesCount = artMetrics!.LikesCount,
+                ViewsCount = artMetrics.ViewsCount 
             };
             responseArtworks.Add(artModel);
         }

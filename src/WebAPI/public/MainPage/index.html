@@ -18,8 +18,35 @@
             <button class="btnImg" id="savingsBtn"></button>
         </div>
     </header>
-
-    <div class="artwork-container"></div>
+    <div class="main-container">
+        <div class="parameters-container">
+            <input type="text" id="searchInput" class="search-bar" placeholder="Search artworks by title or author"/>
+            <select id="sortSelect" class="sort-dropdown">
+                <option value="none">Sort by</option>
+                <option value="likes-desc">Likes: High to Low</option>
+                <option value="likes-asc">Likes: Low to High</option>
+                <option value="views-desc">Views: High to Low</option>
+                <option value="views-asc">Views: Low to High</option>
+            </select>
+            <select id="category" name="category" required>
+                <option value="">Select category</option>
+                <option value="portrait">portrait</option>
+                <option value="landscape">landscape</option>
+                <option value="abstraction">abstraction</option>
+                <option value="anime">anime</option>
+            </select>
+        </div>
+        <div class="tag-container">
+            <button type="button" class="tag" data-tag="creative">creative</button>
+            <button type="button" class="tag" data-tag="colorful">colorful</button>
+            <button type="button" class="tag" data-tag="minimal">minimal</button>
+            <button type="button" class="tag" data-tag="modern">modern</button>
+            <button type="button" class="tag" data-tag="traditional">traditional</button>
+        </div>
+      
+        <div class="artwork-container"></div>
+    </div>
     <script type="module" src="/static/MainPage/script.js"></script>
 </body>
 </html>
+

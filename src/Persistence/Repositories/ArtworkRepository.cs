@@ -52,7 +52,7 @@ public class ArtworkRepository(QueryMapper queryMapper)
     public async Task<List<Artwork>?> GetGalleryArtworksAsync(CancellationToken cancellationToken)
     {
         FormattableString sqlQuery = $"""
-                                                     SELECT artwork_id, title, artwork_path, artworks.user_id, users.profile_name 
+                                                     SELECT artwork_id, title, artwork_path, category, artworks.user_id, users.profile_name 
                                                      FROM artworks
                                                      JOIN users ON artworks.user_id = users.user_id
                                                      """;

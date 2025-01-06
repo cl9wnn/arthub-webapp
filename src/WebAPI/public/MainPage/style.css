@@ -100,6 +100,15 @@ header h1 {
 
 /*  --------------------------------  MAIN -------------------------------- */
 
+.main-container {
+    margin-top: 80px;
+    display: flex;
+    background-color: #121212;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
 .artwork-container {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -184,4 +193,78 @@ header h1 {
     .artwork-container {
         grid-template-columns: 1fr;
     }
+}
+
+
+/*  --------------------------------  SEARCH -------------------------------- */
+
+
+.parameters-container {
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.search-bar {
+    width: 500px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+    transition: box-shadow 0.2s ease;
+}
+
+/*  --------------------------------  SORT -------------------------------- */
+
+
+.search-bar:focus {
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    border-color: rgba(0, 123, 255, 0.5);
+}
+
+.sort-dropdown {
+    margin-left: 10px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+}
+
+/*  --------------------------------  TAGS -------------------------------- */
+
+
+.tag-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.tag {
+    padding: 8px 16px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    color: #333;
+    background-color: #f9f9f9;
+    border: 2px solid #ddd;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.tag:hover {
+    background-color: #e0e0e0;
+    border-color: #bbb;
+}
+
+.tag.selected {
+    background-color: #007bff;
+    color: white;
+    border-color: #0056b3;
+    font-weight: bold;
 }
