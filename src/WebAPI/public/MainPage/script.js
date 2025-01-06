@@ -65,6 +65,7 @@ function toggleVisibility(token) {
 
 async function loadArtworkList() {
     const container = document.querySelector(".artwork-container");
+    container.innerHTML = '';  
     try {
         const response = await fetch('/api/get-artworks', {
             method: 'GET',
@@ -74,7 +75,6 @@ async function loadArtworkList() {
         });
 
         const artworkArray = await response.json();
-        console.log(artworkArray);
         
         artworkArray.forEach(art => {
             const artworkComponent = createArtworkComponent(art);

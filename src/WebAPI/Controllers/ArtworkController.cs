@@ -31,12 +31,12 @@ public class ArtworkController(ArtworkService artworkService): MyBaseController
     
     [Authorize("user","artist")]
     [HttpGet("/api/artwork/{artworkId}")]
-    public async Task<IMyActionResult> ShowArtworkPage(int artworkId, HttpListenerContext context, CancellationToken cancellationToken)
+    public async Task<IMyActionResult> GetArtworkData(int artworkId, HttpListenerContext context, CancellationToken cancellationToken)
     {
-        var isArtworkExistResult = await artworkService.CheckArtworkForExist(artworkId, cancellationToken);
+        var isArtworkExistsResult = await artworkService.IsArtworkExistsAsync(artworkId, cancellationToken);
         
-        if (!isArtworkExistResult.IsSuccess)
-            return new ErrorResult(isArtworkExistResult.StatusCode, isArtworkExistResult.ErrorMessage!);
+        if (!isArtworkExistsResult.IsSuccess)
+            return new ErrorResult(isArtworkExistsResult.StatusCode, isArtworkExistsResult.ErrorMessage!);
 
         if (!context.TryGetItem<int>("userId", out var visitorId))
             return new ErrorResult(400, "Not authorized");
@@ -47,8 +47,6 @@ public class ArtworkController(ArtworkService artworkService): MyBaseController
             ? new JsonResult<ArtworkPostModel>(artworkResult.Data)
             : new ErrorResult(artworkResult.StatusCode, artworkResult.ErrorMessage!);
     }
-    
-    
     
     [Authorize("user","artist")]
     [HttpGet("/api/like-artwork/{artworkId}")]
@@ -99,6 +97,11 @@ public class ArtworkController(ArtworkService artworkService): MyBaseController
     {
         if (!context.TryGetItem<int>("userId", out var userId))
             return new ErrorResult(400, "Not authorized");
+        
+        var isArtworkOwnedResult = await artworkService.IsArtworkOwnedByUserAsync(artworkId,  userId, cancellationToken);
+        
+        if (!isArtworkOwnedResult.IsSuccess)
+            return new ErrorResult(isArtworkOwnedResult.StatusCode, isArtworkOwnedResult.ErrorMessage!);
         
         var deletedResult  = await artworkService.DeleteOwnArtworkAsync(userId, artworkId, cancellationToken);
         

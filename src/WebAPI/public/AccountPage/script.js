@@ -88,10 +88,21 @@ async function generateArtsContainer(profileArts) {
         img.src = `${artFolderPath}${artwork.artworkPath}`;
         artItem.appendChild(img);
 
-        const likeCountText = document.createElement('div');
-        likeCountText.classList.add('like-count');
-        likeCountText.textContent = `likes: ${artwork.likeCount}`;
-        artItem.appendChild(likeCountText);
+        const metricsContainer = document.createElement('div');
+        metricsContainer.classList.add('metrics-container');
+
+        const likesCountText = document.createElement('p');
+        likesCountText.classList.add('info-count');
+        likesCountText.textContent = `likes: ${artwork.likesCount}`;
+
+        const viewsCountText = document.createElement('p');
+        viewsCountText.classList.add('info-count');
+        viewsCountText.textContent = `views: ${artwork.viewsCount}`;
+
+        metricsContainer.appendChild(likesCountText);
+        metricsContainer.appendChild(viewsCountText);
+
+        artItem.appendChild(metricsContainer);
 
         if (userTokenId === userId){
             const deleteButton = document.createElement('button');

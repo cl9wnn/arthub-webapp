@@ -19,8 +19,23 @@ public class ArtworkRepository(QueryMapper queryMapper)
         if (queryResult == null)
             return null;
         
+        var metrics = await CreateArtMetricsAsync(queryResult.ArtworkId, cancellationToken);
+        
+        if (metrics == null)
+            return null;
+        
         await SaveTagsAsync(tags, queryResult!.ArtworkId, cancellationToken);
         return queryResult;
+    }
+    
+    public async Task<ArtMetrics?> CreateArtMetricsAsync(int artworkId, CancellationToken cancellationToken)
+    {
+        FormattableString insertQuery = $"""
+                                                INSERT INTO artmetrics (artwork_id)
+                                                VALUES ({artworkId})
+                                                RETURNING artwork_id, likes_count, views_count;
+                                                """;
+        return await queryMapper.ExecuteAndReturnAsync<ArtMetrics?>(insertQuery, cancellationToken);
     }
     
     public async Task<Artwork?> DeleteOwnArtworkAsync(int userId, int artworkId, CancellationToken cancellationToken)
@@ -50,7 +65,7 @@ public class ArtworkRepository(QueryMapper queryMapper)
     public async Task<List<Artwork>?> GetProfileArtworksAsync(int userId, CancellationToken cancellationToken)
     {
         FormattableString sqlQuery = $"""
-                                                   SELECT artwork_id, artwork_path, like_count
+                                                   SELECT artwork_id, artwork_path
                                                    FROM artworks        
                                                    WHERE user_id = {userId};
                                                    """;
@@ -59,11 +74,30 @@ public class ArtworkRepository(QueryMapper queryMapper)
         
         return artworks;
     }
+    
+    public async Task<List<ArtMetrics>?> GetProfileArtMetricsAsync(List<int> artworksId, CancellationToken cancellationToken)
+    {
+        var artMetrics = new List<ArtMetrics>();
+        
+        foreach (var artworkId in artworksId)
+        {
+            FormattableString sqlQuery = $"""
+                                          SELECT artwork_id, likes_count, views_count
+                                          FROM artMetrics        
+                                          WHERE artwork_id = {artworkId};
+                                          """;
+            var artMetric = await queryMapper.ExecuteAndReturnAsync<ArtMetrics?>(sqlQuery, cancellationToken);   
+            
+            if (artMetric != null)
+                artMetrics.Add(artMetric);
+        }
+        return artMetrics;
+    }
 
     public async Task<Artwork?> GetArtworkByIdAsync(int artworkId, CancellationToken cancellationToken)
     {
         FormattableString sqlQuery = $"""
-                                        SELECT artwork_id, title, category, description, artwork_path, user_id, like_count
+                                        SELECT artwork_id, title, category, description, artwork_path, user_id
                                         FROM artworks
                                         WHERE artwork_id = {artworkId};
                                       """;
@@ -117,10 +151,10 @@ public class ArtworkRepository(QueryMapper queryMapper)
                                       """;
         
         FormattableString incrementLikeCount = $"""
-                                                    UPDATE artworks
-                                                    SET like_count = like_count + 1
+                                                    UPDATE artMetrics
+                                                    SET likes_count = likes_count + 1
                                                     WHERE artwork_id = {artworkId}
-                                                    RETURNING like_count;
+                                                    RETURNING likes_count;
                                                 """;
         
         var like = await queryMapper.ExecuteAndReturnAsync<Like>(addLike, cancellationToken);
@@ -140,10 +174,10 @@ public class ArtworkRepository(QueryMapper queryMapper)
                                       """;
         
         FormattableString decrementLikeCount = $"""
-                                                    UPDATE artworks
-                                                    SET like_count = like_count - 1
+                                                    UPDATE artMetrics
+                                                    SET likes_count = likes_count - 1
                                                     WHERE artwork_id = {artworkId}
-                                                    RETURNING like_count;
+                                                    RETURNING likes_count;
                                                 """;
         
         var like = await queryMapper.ExecuteAndReturnAsync<Like>(removeLike, cancellationToken);
@@ -165,6 +199,28 @@ public class ArtworkRepository(QueryMapper queryMapper)
         return count > 0
             ? true
             : false;
+    }
+
+    public async Task<ArtMetrics?> UpdateViewCounterAsync(int artworkId, CancellationToken cancellationToken)
+    {
+        FormattableString sqlQuery = $"""
+                                      UPDATE artMetrics
+                                      SET views_count = views_count + 1
+                                      WHERE artwork_id = {artworkId}
+                                      RETURNING likes_count;
+                                      """;
+        return  await queryMapper.ExecuteAndReturnAsync<ArtMetrics?>(sqlQuery, cancellationToken);
+    }
+    
+    public async Task<ArtMetrics?> GetMetricsByIdAsync(int artworkId, CancellationToken cancellationToken = default)
+    {
+        FormattableString sqlQuery = $"""
+                                         SELECT likes_count, views_count
+                                         FROM artMetrics
+                                         WHERE artwork_id = {artworkId};
+                                      """;
+        
+        return await queryMapper.ExecuteAndReturnAsync<ArtMetrics?>(sqlQuery, cancellationToken);
     }
 }
 

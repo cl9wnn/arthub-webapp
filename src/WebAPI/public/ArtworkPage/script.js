@@ -56,6 +56,7 @@ async function loadArtworkData(artworkId) {
         });
 
         const data = await response.json();
+        console.log(data);
         
         if (response.ok) {
             isLiked = data.isLiked;
@@ -64,6 +65,7 @@ async function loadArtworkData(artworkId) {
             await updateButton(isLiked, 'Liked', 'Like', likeBtn);
             await updateButton(isSaved, 'Saved', 'Save', saveBtn);
             await renderArtInfo(data);
+            await renderTags(data.tags);
         } 
         else if(response.status === 401) {
                 const success = await showForm(createLoginForm, '/auth/signin', 'Sign In');
@@ -155,8 +157,28 @@ async function renderArtInfo(data){
     document.getElementById('profileName').innerHTML = data.profileName;
     document.getElementById('fullname').innerHTML = data.fullname;
     document.getElementById('avatarImg').src = `${avatarFolderPath}${data.avatarPath}`;
-    document.getElementById('like-text').innerHTML = `likes:${data.likeCount}`;
+    document.getElementById('like-text').innerHTML = `likes:${data.likesCount}`;
+    document.getElementById('view-text').innerHTML = `views:${data.viewsCount}`;
 }
 async function updateLikeCount(likeCount) {
     document.getElementById('like-text').innerHTML = `likes: ${likeCount}`;
+}
+
+function renderTags(tags) {
+    const tagsContainer = document.querySelector('.tags');
+
+    if (!tagsContainer) {
+        console.error("Контейнер с классом 'tags' не найден.");
+        return;
+    }
+
+    tagsContainer.innerHTML = '';
+
+    tags.forEach(tag => {
+        const button = document.createElement('button');
+        button.classList.add('tag'); 
+        button.textContent = tag; 
+        button.disabled = true;
+        tagsContainer.appendChild(button); 
+    });
 }

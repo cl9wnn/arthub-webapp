@@ -27,19 +27,28 @@ public class AccountService(UserRepository userRepository, ArtworkRepository art
     
     public async Task<Result<ArtistProfileModel>> GetUpgradeUserDataAsync(int id, CancellationToken cancellationToken)
     {
-        var artist = await userRepository.GetUpgradeUserAsyncById(id, cancellationToken);
+        var artist = await userRepository.GetUpgradeUserByIdAsync(id, cancellationToken);
 
         if (artist == null)
             return Result<ArtistProfileModel>.Failure(404, "User dont found")!;
 
         var userArts = await artworkRepository.GetProfileArtworksAsync(id, cancellationToken);
         
-        var profileArts = userArts!.Select(artwork => new ProfileArtworkModel
+        var artsMetrics = await artworkRepository.GetProfileArtMetricsAsync(
+            userArts!.Select(u => u.ArtworkId).ToList(), cancellationToken);
+        
+        var profileArts = userArts!.Join(
+            artsMetrics!, 
+            userArt => userArt.ArtworkId, 
+            artMetric => artMetric.ArtworkId, 
+            (userArt, artMetric) => new ProfileArtworkModel 
             {
-                ArtworkId = artwork.ArtworkId,
-                ArtworkPath = artwork.ArtworkPath,
-                LikeCount = artwork.LikeCount
-            }).ToList();
+                ArtworkId = userArt.ArtworkId,
+                ArtworkPath = userArt.ArtworkPath,
+                LikesCount = artMetric.LikesCount,
+                ViewsCount = artMetric.ViewsCount
+            }
+        ).ToList();
         
         var profileData = new ArtistProfileModel
         {

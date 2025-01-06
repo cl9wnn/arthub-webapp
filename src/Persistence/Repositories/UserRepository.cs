@@ -46,7 +46,7 @@ public class UserRepository(QueryMapper queryMapper)
         
     }
     
-    public async Task<UpgradeUser?> GetUpgradeUserAsyncById(int id, CancellationToken cancellationToken = default)
+    public async Task<UpgradeUser?> GetUpgradeUserByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         FormattableString sqlQuery = $"""
                                       SELECT profile_name, fullname, contact_info, country, avatar_path, summary
@@ -58,12 +58,5 @@ public class UserRepository(QueryMapper queryMapper)
         var queryResult = await queryMapper.ExecuteAndReturnAsync<UpgradeUser>(sqlQuery, cancellationToken);
        
         return queryResult;
-    }
-    
-    public async Task DeleteUserAsync(int id, CancellationToken cancellationToken = default)
-    {
-        FormattableString sqlQuery = $"DELETE FROM users WHERE user_id = {id};";
-        
-        await queryMapper.ExecuteAsync(sqlQuery, cancellationToken);
     }
 }

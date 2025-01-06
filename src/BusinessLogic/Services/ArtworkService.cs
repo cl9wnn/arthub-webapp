@@ -89,11 +89,16 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
         if (tags == null)
             return Result<ArtworkPostModel>.Failure(400, "Could not retrieve tags")!;
         
-        var author = await userRepository.GetUpgradeUserAsyncById(artwork.UserId, cancellationToken);
+        var author = await userRepository.GetUpgradeUserByIdAsync(artwork.UserId, cancellationToken);
         
         if (author == null)
             return Result<ArtworkPostModel>.Failure(400, "Could not retrieve author")!;
         
+        var artMetrics = await artworkRepository.GetMetricsByIdAsync(artworkId, cancellationToken);
+        
+        if (artMetrics == null)
+            return Result<ArtworkPostModel>.Failure(400, "Could not retrieve metrics")!;
+
         var isLikedByUser = await artworkRepository.IsArtworkLikedByUserAsync(artworkId, visitorId, cancellationToken);
         var isSavedByUser = await savingFavouriteRepository.IsArtworkSavedByUserAsync(artworkId, visitorId, cancellationToken);
         
@@ -109,10 +114,15 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
             ProfileName = author.ProfileName,
             Fullname = author.Fullname,
             AvatarPath = author.AvatarPath,
-            LikeCount = artwork.LikeCount,
+            LikesCount = artMetrics.LikesCount,
+            ViewsCount = artMetrics.ViewsCount,
             IsLiked = isLikedByUser,
             IsSaved = isSavedByUser
         };
+
+        var visitorView = artworkRepository.UpdateViewCounterAsync(artworkId, cancellationToken);
+        if (visitorView == null)
+            return Result<ArtworkPostModel>.Failure(400, "Could not update view counter")!;
         
         return Result<ArtworkPostModel>.Success(artworkPost);
     }
@@ -139,13 +149,25 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
             : Result<int>.Success(countAfterAdd);
     }
     
-    public async Task<Result<bool>> CheckArtworkForExist(int userId, CancellationToken cancellationToken)
+    public async Task<Result<bool>> IsArtworkExistsAsync(int artworkId, CancellationToken cancellationToken)
     {
-        var artwork = await artworkRepository.GetArtworkByIdAsync(userId, cancellationToken);
+        var artwork = await artworkRepository.GetArtworkByIdAsync(artworkId, cancellationToken);
         
         return artwork != null
             ? Result<bool>.Success(true)
             : Result<bool>.Failure(400, "Artwork does not exist");
+    }
+    
+    public async Task<Result<bool>> IsArtworkOwnedByUserAsync(int artworkId, int userId, CancellationToken cancellationToken)
+    {
+        var artwork = await artworkRepository.GetArtworkByIdAsync(artworkId, cancellationToken);
+        
+        if (artwork == null)
+            return Result<bool>.Failure(400, "Artwork does not exist");
+        
+        return artwork!.UserId == userId
+            ? Result<bool>.Success(true)
+            : Result<bool>.Failure(400, "This art is not yours!");
     }
 }
     
