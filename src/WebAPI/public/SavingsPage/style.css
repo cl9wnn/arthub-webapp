@@ -1,16 +1,18 @@
-﻿body {
+﻿* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+body {
     font-family: Arial, sans-serif;
-    background: rgba(0, 0, 0, 0.9);
-    background-size: cover;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    height: 100vh;
+    background-color: #121212;
+    color: #fff;
+    margin: 0;
 }
 
 .savings-container{
+    margin-top:100px;
     display: flex;
     flex-direction: column;
     align-items: center;

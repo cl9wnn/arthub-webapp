@@ -4,11 +4,13 @@ import {createLoginForm, showForm, tokenStorage} from "../Auth/auth.js";
 
 let artworkId;
 let authorId;
+let artList = [];
+
 document.addEventListener('DOMContentLoaded', async() => {
     const pathname = window.location.pathname;
     const pathSegments = pathname.split("/");
     artworkId = pathSegments[pathSegments.length - 1];
-
+    await getArtworkList();
     if (artworkId) {
         await loadArtworkData(artworkId);
     }
@@ -56,7 +58,6 @@ async function loadArtworkData(artworkId) {
         });
 
         const data = await response.json();
-        console.log(data);
         
         if (response.ok) {
             isLiked = data.isLiked;
@@ -181,4 +182,56 @@ function renderTags(tags) {
         button.disabled = true;
         tagsContainer.appendChild(button); 
     });
+}
+
+
+let currentArtIndex = 0;
+
+async function getArtworkList() {
+    try {
+        const response = await fetch('/api/get-artworks', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        artList = await response.json();
+
+        if (response.ok) {
+        } else {
+            alert("ЧТо то не так");
+        }
+    } catch (error) {
+        alert(error.message);
+    }
+}
+document.getElementById('nextImgBtn').addEventListener('click', loadNextArtwork);
+document.getElementById('prevImgBtn').addEventListener('click', loadPreviousArtwork);
+
+function findCurrentArtIndex() {
+    console.log(artList);
+    return artList.findIndex(art => art.artworkId == artworkId);
+}
+
+async function loadNextArtwork() {
+    const currentIndex = findCurrentArtIndex();
+    if (currentIndex >= 0 && currentIndex < artList.length - 1) {
+        const nextArt = artList[currentIndex + 1];
+        artworkId = nextArt.artworkId; 
+        await loadArtworkData(nextArt.artworkId);
+    } else {
+        alert("Это последний арт.");
+    }
+}
+
+async function loadPreviousArtwork() {
+    const currentIndex = findCurrentArtIndex();
+    if (currentIndex > 0) {
+        const prevArt = artList[currentIndex - 1];
+        artworkId = prevArt.artworkId;
+        await loadArtworkData(prevArt.artworkId);
+    } else {
+        alert("Это первый арт.");
+    }
 }
