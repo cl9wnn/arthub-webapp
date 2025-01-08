@@ -6,7 +6,7 @@ using Persistence.Repositories;
 namespace BusinessLogic.Services;
 
 public class ArtworkService(FileService fileService, ArtworkRepository artworkRepository, 
-   SavingFavouriteRepository savingFavouriteRepository, UserRepository userRepository)
+   SavingFavouriteRepository savingFavouriteRepository, UserRepository userRepository, MarketRepository marketRepository)
 {
     public async Task<Result<Artwork>> SaveArtAsync(ArtworkModel artworkModel,  string fileData, string contentType,
         CancellationToken cancellationToken)
@@ -136,6 +136,9 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
     
     public async Task<Result<int>> LikeArtworkAsync(int artworkId, int userId, CancellationToken cancellationToken)
     {
+        const int likeReward = 10;
+        const int likesLimitForReward = 5;
+        
         if (artworkId == 0 || userId == 0)
             return Result<int>.Failure(400, "Not found art or user");
         
@@ -144,16 +147,25 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
         if (isUserLiked)
         {
             var countAfterRemove = await artworkRepository.RemoveLikeAsync(artworkId, userId, cancellationToken);
+            await marketRepository.RemovePointsToBalanceAsync(userId, likeReward, cancellationToken);
+            
             return countAfterRemove == -1
                 ? Result<int>.Failure(400, "Could not like artwork")
                 : Result<int>.Success(countAfterRemove);
         }
         
         var countAfterAdd = await artworkRepository.AddLikeAsync(artworkId, userId, cancellationToken);
+
+        var todayLikeCount = await marketRepository.ReturnDailyLikeCountAsync(userId, cancellationToken);
+        
+        if (todayLikeCount <= likesLimitForReward)
+            await marketRepository.AddPointsToBalanceAsync(userId, likeReward, cancellationToken);
+        
         return countAfterAdd == -1
             ? Result<int>.Failure(400, "Could not like artwork")
             : Result<int>.Success(countAfterAdd);
     }
+    
     
     public async Task<Result<bool>> IsArtworkExistsAsync(int artworkId, CancellationToken cancellationToken)
     {

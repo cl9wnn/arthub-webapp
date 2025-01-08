@@ -8,4 +8,6 @@ public class Like
     public int UserId { get; set; }
     [ColumnName("artwork_id")]
     public int ArtworkId { get; set; }
+    [ColumnName("created_at")]
+    public DateTime CreatedAt { get; set; }
 }

@@ -19,7 +19,6 @@ async function loadArtworkList() {
         });
 
         artworkData = await response.json();
-        console.log(artworkData);
         
         artworkData.forEach(art => {
             const artworkComponent = createArtworkComponent(art);

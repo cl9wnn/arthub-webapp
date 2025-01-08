@@ -3,6 +3,7 @@ using System.Data;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Transactions;
 using Npgsql;
 namespace MyORM;
 
@@ -14,6 +15,8 @@ public class QueryMapper
 
     private static readonly MethodInfo GetStringMethod = typeof(DataReaderExtensions).GetMethod("GetStringOrDefault")!;
     private static readonly MethodInfo GetIntMethod = typeof(DataReaderExtensions).GetMethod("GetIntOrDefault")!;
+    private static readonly MethodInfo GetDateMethod = typeof(DataReaderExtensions).GetMethod("GetDateOrDefault")!;
+
 
     private static readonly ConcurrentDictionary<Type, Delegate> MapperFuncs = new();
     
@@ -104,6 +107,47 @@ public class QueryMapper
             await _connection.CloseAsync();
         }
     }
+    
+    public async Task ExecuteTransactionAsync(Func<NpgsqlTransaction, Task> transactionalWork, CancellationToken cancellationToken = default)
+    {
+        await _connection.OpenAsync(cancellationToken);
+    
+        await using var transaction = await _connection.BeginTransactionAsync(cancellationToken);
+
+        try
+        {
+            await transactionalWork(transaction);
+            await transaction.CommitAsync(cancellationToken);
+        }
+        catch
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw new TransactionAbortedException();
+        }
+        finally
+        {
+            await _connection.CloseAsync();
+        }
+    }
+    public async Task ExecuteWithTransactionAsync(FormattableString sql, NpgsqlTransaction transaction, CancellationToken cancellationToken)
+    {
+        if (transaction.Connection == null)
+        {
+            throw new InvalidOperationException("Transaction must be associated with an open connection.");
+        }
+
+        await using var command = transaction.Connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = ReplaceParameters(sql.Format);
+
+        for (var i = 0; i < sql.ArgumentCount; i++)
+        {
+            command.Parameters.AddWithValue($"@p{i}", sql.GetArgument(i)!);
+        }
+
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+    
     private static Func<IDataReader, T> Build<T>()
     {
         var readerParam = Expression.Parameter(typeof(IDataReader));
@@ -122,6 +166,8 @@ public class QueryMapper
             return Expression.Call(null, GetStringMethod, reader, Expression.Constant(columnName));
         else if (prop.PropertyType == typeof(int) || (prop.PropertyType == typeof(long)))
             return Expression.Call(null, GetIntMethod, reader, Expression.Constant(columnName));
+        else if (prop.PropertyType == typeof(DateTime))
+            return Expression.Call(null, GetDateMethod, reader, Expression.Constant(columnName));
         throw new InvalidOperationException();
     }
     private static string ReplaceParameters(string query)

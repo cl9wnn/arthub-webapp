@@ -27,8 +27,8 @@ public class ArtworkRepository(QueryMapper queryMapper)
         await SaveTagsAsync(tags, queryResult!.ArtworkId, cancellationToken);
         return queryResult;
     }
-    
-    public async Task<ArtMetrics?> CreateArtMetricsAsync(int artworkId, CancellationToken cancellationToken)
+
+    private async Task<ArtMetrics?> CreateArtMetricsAsync(int artworkId, CancellationToken cancellationToken)
     {
         FormattableString insertQuery = $"""
                                                 INSERT INTO artmetrics (artwork_id)
@@ -144,10 +144,12 @@ public class ArtworkRepository(QueryMapper queryMapper)
 
     public async Task<int> AddLikeAsync(int artworkId, int userId, CancellationToken cancellationToken)
     {
+        var currentDate = DateTime.UtcNow.Date;
+        
         FormattableString addLike = $"""
-                                      INSERT INTO likes (artwork_id, user_id)
-                                      VALUES ({artworkId}, {userId})
-                                      RETURNING artwork_id, user_id;
+                                      INSERT INTO likes (artwork_id, user_id, created_at)
+                                      VALUES ({artworkId}, {userId}, {currentDate})
+                                      RETURNING artwork_id, user_id, created_at;
                                       """;
         
         FormattableString incrementLikeCount = $"""

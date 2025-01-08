@@ -13,7 +13,22 @@ public class UserRepository(QueryMapper queryMapper)
                                       """;
         
           var queryResult =await queryMapper.ExecuteAndReturnAsync<User>(sqlQuery, cancellationToken);
-          return queryResult;
+
+          if (queryResult == null)
+              return null;
+          
+          var userBalance = await CreateUserBalanceAsync(queryResult.UserId, cancellationToken);
+          return userBalance == null ? null : queryResult;
+    }
+    
+    private async Task<UserBalance?> CreateUserBalanceAsync(int userId, CancellationToken cancellationToken)
+    {
+        FormattableString insertQuery = $"""
+                                         INSERT INTO userBalance (user_id)
+                                         VALUES ({userId})
+                                         RETURNING user_id, balance;
+                                         """;
+        return await queryMapper.ExecuteAndReturnAsync<UserBalance?>(insertQuery, cancellationToken);
     }
     
     public async Task<User?> GetUserAsyncByLogin(string login, CancellationToken cancellationToken = default)

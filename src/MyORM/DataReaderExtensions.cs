@@ -36,4 +36,14 @@ public static class DataReaderExtensions
         }
         return -1;
     }
+    
+    public static DateTime GetDateOrDefault(this IDataReader reader, string columnName)
+    {
+        if (reader.TryGetOrdinal(columnName, out int order) && !reader.IsDBNull(order))
+        {
+            var date = reader.GetDateTime(order); 
+            return date.Date; 
+        }
+        return default(DateTime); 
+    }
 }
