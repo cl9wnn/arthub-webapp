@@ -4,6 +4,7 @@ import {createLoginForm, showForm, tokenStorage} from "../Auth/auth.js";
 
 let artworkId;
 let authorId;
+let balance;
 
 document.addEventListener('DOMContentLoaded', async() => {
     const pathname = window.location.pathname;
@@ -12,6 +13,7 @@ document.addEventListener('DOMContentLoaded', async() => {
     await getArtworkList();
     if (artworkId) {
         await loadArtworkData(artworkId);
+        await loadArtworkRewardsData(artworkId);
     }
     await loadRewardList();
 });
@@ -21,7 +23,6 @@ let isSaved = false;
 const likeBtn = document.getElementById('like-btn');
 const saveBtn = document.getElementById('save-btn');
 const rewardBtn = document.getElementById('reward-btn');
-
 likeBtn.addEventListener('click', async () => {
     
     if (artworkId) {
@@ -45,7 +46,8 @@ rewardBtn.addEventListener('click', async () => {
     if (modal) {
         modal.remove();
     }
-    modal = createModal(rewardList, 1500); 
+    await loadBalance();
+    modal = createModal(rewardList, balance); 
     document.body.appendChild(modal);
 });
 
@@ -53,6 +55,38 @@ document.querySelector('.author-area').addEventListener('click', function() {
     
     window.location.href = `/account/${authorId}`;
 });
+
+async function loadBalance() {
+    let token = tokenStorage.get();
+
+    try {
+        const response = await fetch('/api/get-balance', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          balance = data;
+        }
+        else if(response.status === 401) {
+            const success = await showForm(createLoginForm, '/auth/signin', 'Sign In');
+            if (success) {
+                token = tokenStorage.get();
+                await loadBalance();
+            }
+        }
+        else{
+            throw new Error(data || 'Ошибка на сервере!');
+        }
+    } catch (error) {
+        alert(error);
+    }
+}
 
 async function loadArtworkData(artworkId) {
     let token = tokenStorage.get();
@@ -86,6 +120,37 @@ async function loadArtworkData(artworkId) {
         }
         else{
                 throw new Error(data || 'Ошибка на сервере!');
+        }
+    } catch (error) {
+        alert(error);
+    }
+}
+
+async function loadArtworkRewardsData(artworkId) {
+    let token = tokenStorage.get();
+
+    try {
+        const response = await fetch(`/api/artwork-rewards/${artworkId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const artworkRewards = await response.json();
+
+        if (response.ok) {
+            const container = document.querySelector('.rewards-container');
+            await renderRewards(rewardImages, artworkRewards, container);
+        }
+        else if(response.status === 401) {
+            const success = await showForm(createLoginForm, '/auth/signin', 'Sign In');
+            if (success) {
+            }
+        }
+        else{
+            throw new Error(data || 'Ошибка на сервере!');
         }
     } catch (error) {
         alert(error);
@@ -245,17 +310,6 @@ async function loadPreviousArtwork() {
     }
 }
 
-
-const rewards = [
-    { name: "Умно", cost: 2400, img: "https://via.placeholder.com/60" },
-    { name: "Тёплое одеяльце", cost: 600, img: "https://via.placeholder.com/60" },
-    { name: "Пикантно", cost: 1200, img: "https://via.placeholder.com/60" },
-    { name: "Медленные аплодисменты", cost: 600, img: "https://via.placeholder.com/60" },
-    { name: "Возьми мои очки", cost: 4800, img: "https://via.placeholder.com/60" },
-    { name: "Душевно", cost: 300, img: "https://via.placeholder.com/60" },
-];
-
-
 let rewardList = [];
 async function loadRewardList() {
     try {
@@ -295,8 +349,16 @@ async function GiveReward(rewardId, artworkId) {
         const responseData = await response.json();
 
         if (response.ok) {
-             console.log(responseData);
-        } else {
+            await loadArtworkRewardsData(artworkId);
+        }
+        else if (response.status === 401) {
+            const loginSuccessful = await showForm(createLoginForm, '/auth/signin', 'Sign In');
+
+            if (loginSuccessful) {
+                await loadArtworkData(artworkId);
+                await loadArtworkRewardsData(artworkId);
+            }
+        }else {
             alert(responseData);
         }
     } catch (error) {
@@ -308,13 +370,13 @@ async function GiveReward(rewardId, artworkId) {
 //модальное окно для награды
 
 let artList = [];
-let rewardImages = [
-    { rewardId: 1, img: "/public/favicon.png" },
-    { rewardId: 2, img: "https://via.placeholder.com" },
-    { rewardId: 3, img: "https://via.placeholder.com" },
-    { rewardId: 4, img: "https://via.placeholder.com" },
-    { rewardId: 5, img: "https://via.placeholder.com" },
-    { rewardId: 6, img: "https://via.placeholder.com" }
+const rewardImages = [
+    { rewardId: 1, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png"  },
+    { rewardId: 2, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png" },
+    { rewardId: 3, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png"},
+    { rewardId: 4, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png" },
+    { rewardId: 5, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png" },
+    { rewardId: 6, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png" }
 ];
 
 function createModal(rewardList, userBalance) {
@@ -338,7 +400,7 @@ function createModal(rewardList, userBalance) {
     let selectedReward = null;
 
     rewardList.forEach((reward) => {
-        const rewardImage = rewardImages.find(img => img.rewardId === reward.id)?.img || "";
+        const rewardImage = rewardImages.find(img => img.rewardId === reward.rewardId)?.img || "";
 
         const rewardDiv = document.createElement("div");
         rewardDiv.classList.add("reward");
@@ -386,6 +448,43 @@ function createModal(rewardList, userBalance) {
     });
 
     return modal;
+}
+
+export function renderRewards(rewardImages, rewards, container) {
+
+    container.innerHTML = '';
+
+    if (rewards.length === 0) {
+        const noRewardsMessage = document.createElement('div');
+        noRewardsMessage.textContent = 'Пока наград нет';
+        noRewardsMessage.classList.add('no-rewards-message');
+        container.appendChild(noRewardsMessage);
+        return;
+    }
+
+    rewards.forEach(reward => {
+        const rewardImage = rewardImages.find(img => img.rewardId === reward.rewardId);
+
+        if (rewardImage) {
+            const rewardElement = document.createElement('div');
+            rewardElement.classList.add('reward-item');
+
+            const imgElement = document.createElement('img');
+            imgElement.src = rewardImage.img;
+            imgElement.alt = `Reward ${reward.rewardId}`;
+            imgElement.classList.add('reward-img');
+            rewardElement.appendChild(imgElement);
+
+            const countElement = document.createElement('span');
+            countElement.textContent = `x${reward.rewardCount}`;
+            countElement.classList.add('reward-count');
+            rewardElement.appendChild(countElement);
+
+            container.appendChild(rewardElement);
+        } else {
+            console.warn(`Изображение для rewardId ${reward.rewardId} не найдено.`);
+        }
+    });
 }
 
 

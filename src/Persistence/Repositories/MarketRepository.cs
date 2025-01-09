@@ -41,6 +41,40 @@ public class MarketRepository(QueryMapper queryMapper)
         return await queryMapper.ExecuteAndReturnAsync<Reward?>(getReward, cancellationToken);
     }
 
+    public async Task<ArtworkReward?> GetArtworkRewardAsync(int rewardId, int artworkId,
+        CancellationToken cancellationToken = default)
+    {
+        FormattableString selectRewardQuery = $"""
+                                                   SELECT *
+                                                   FROM artworkRewards
+                                                   WHERE artwork_id = {artworkId} AND reward_id = {rewardId};
+                                               """;
+        
+        return await queryMapper.ExecuteAndReturnAsync<ArtworkReward?>(selectRewardQuery, cancellationToken);
+    }
+    
+    public async Task<ArtworkReward?> AddArtworkRewardAsync(int rewardId, int artworkId, CancellationToken cancellationToken = default)
+    {
+         FormattableString addFirstRewardToArtworkQuery = $"""
+                                                              INSERT INTO artworkRewards
+                                                              VALUES ({rewardId}, {artworkId}, 1)
+                                                              RETURNING *;
+                                                              """;
+         FormattableString updateRewardCountQuery = $"""
+                                                        UPDATE artworkRewards
+                                                        SET reward_count = reward_count + 1
+                                                        WHERE artwork_id = {artworkId} and reward_id = {rewardId}
+                                                        RETURNING *;
+                                                     """;
+
+        if (await GetArtworkRewardAsync(rewardId, artworkId, cancellationToken) == null)
+        {
+           return await queryMapper.ExecuteAndReturnAsync<ArtworkReward?>(addFirstRewardToArtworkQuery, cancellationToken);
+        }
+
+        return await queryMapper.ExecuteAndReturnAsync<ArtworkReward?>(updateRewardCountQuery, cancellationToken);
+    }
+
     public async Task<List<Reward?>?> GetRewardsAsync(CancellationToken cancellationToken = default)
     {
         FormattableString selectRewardList = $"""
@@ -91,4 +125,16 @@ public class MarketRepository(QueryMapper queryMapper)
 
         return await queryMapper.ExecuteAndReturnAsync<int>(selectCountQuery, cancellationToken);
     }
+
+    public async Task<UserBalance?> ReturnUserBalanceAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        FormattableString selectBalanceQuery = $"""
+                                                  SELECT *
+                                                  FROM userBalance 
+                                                  WHERE user_id = {userId};
+                                              """;
+
+        return await queryMapper.ExecuteAndReturnAsync<UserBalance?>(selectBalanceQuery, cancellationToken);
+    }
 }
+

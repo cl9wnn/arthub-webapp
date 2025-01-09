@@ -32,6 +32,7 @@ public class AccountController(AccountService accountService): MyBaseController
         return new ResourceResult(path);
     }
     
+    
     [Authorize("user", "artist")]
     [HttpGet("/api/account/{userId}")]
     public async Task<IMyActionResult> ShowAccountInfoAsync(int userId, HttpListenerContext context, CancellationToken cancellationToken)

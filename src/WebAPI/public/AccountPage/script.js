@@ -1,10 +1,21 @@
 import {createLoginForm, showForm, tokenStorage, parseJwtToSub} from "../Auth/auth.js";
+
 const avatarFolderPath = 'http://localhost:9000/image-bucket/avatars/';
 const artFolderPath = 'http://localhost:9000/image-bucket/arts/';
 
 let avatarImg, profileName, country;
 let userId;
 let isArtist = false;
+
+const rewardImages = [
+    { rewardId: 1, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png"  },
+    { rewardId: 2, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png" },
+    { rewardId: 3, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png"},
+    { rewardId: 4, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png" },
+    { rewardId: 5, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png" },
+    { rewardId: 6, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png" }
+];
+
 
 document.addEventListener('DOMContentLoaded', async() => {
     avatarImg = document.getElementById('avatarImg');
@@ -226,6 +237,10 @@ async function addUpgradeAccountData(data) {
     const summaryContainer = await createArtistSummary(data);
     summaryContainer.classList.add('artist-summary');
     wrapper.insertBefore(summaryContainer, portfolio);
+
+    const rewardContainer = await renderRewards(rewardImages, data.rewards);
+    wrapper.appendChild(rewardContainer);
+
 }
 
 // загружаем данные аккаунта
@@ -242,6 +257,7 @@ async function loadAccountData(userId) {
         });
 
         const data = await response.json();
+        console.log(data);
         
         if (response.ok) {
             await renderAccountData(data);
@@ -351,4 +367,52 @@ async function createConfirmationModal(artworkId, artItem) {
     document.body.appendChild(modal);
 
     modal.style.display = 'flex';
+}
+
+function renderRewards(rewardImages, rewards) {
+    const mainContainer = document.createElement('div');
+    mainContainer.classList.add('rewards');
+
+    const title = document.createElement('h1');
+    title.textContent = 'Rewards';
+    mainContainer.appendChild(title);
+
+    const container = document.createElement('div');
+    container.classList.add('rewards-container');
+    mainContainer.appendChild(container);
+
+    container.innerHTML = '';
+
+    if (rewards.length === 0) {
+        const noRewardsMessage = document.createElement('div');
+        noRewardsMessage.textContent = 'Пока наград нет';
+        noRewardsMessage.classList.add('no-rewards-message');
+        container.appendChild(noRewardsMessage);
+    } else {
+        rewards.forEach(reward => {
+            const rewardImage = rewardImages.find(img => img.rewardId === reward.rewardId);
+
+            if (rewardImage) {
+                const rewardElement = document.createElement('div');
+                rewardElement.classList.add('reward-item');
+
+                const imgElement = document.createElement('img');
+                imgElement.src = rewardImage.img;
+                imgElement.alt = `Reward ${reward.rewardId}`;
+                imgElement.classList.add('reward-img');
+                rewardElement.appendChild(imgElement);
+
+                const countElement = document.createElement('span');
+                countElement.textContent = `x${reward.rewardCount}`;
+                countElement.classList.add('reward-count');
+                rewardElement.appendChild(countElement);
+
+                container.appendChild(rewardElement);
+            } else {
+                console.warn(`Изображение для rewardId ${reward.rewardId} не найдено.`);
+            }
+        });
+    }
+
+    return mainContainer;
 }

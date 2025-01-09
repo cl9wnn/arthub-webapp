@@ -1,4 +1,6 @@
-﻿namespace BusinessLogic.Models;
+﻿using Persistence.Entities;
+
+namespace BusinessLogic.Models;
 
 public class ArtworkPostModel
 {
@@ -16,4 +18,6 @@ public class ArtworkPostModel
     public int ViewsCount { get; set; }
     public bool IsLiked { get; set; }
     public bool IsSaved  { get; set; }
+    
+    public List<ArtworkReward>? Rewards { get; set; }
 }

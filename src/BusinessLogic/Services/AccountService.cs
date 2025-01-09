@@ -32,10 +32,11 @@ public class AccountService(UserRepository userRepository, ArtworkRepository art
         if (artist == null)
             return Result<ArtistProfileModel>.Failure(404, "User dont found")!;
 
+        var rewards = await artworkRepository.GetAccountRewardListAsync(id, cancellationToken);
         var userArts = await artworkRepository.GetProfileArtworksAsync(id, cancellationToken);
-        
         var artsMetrics = await artworkRepository.GetProfileArtMetricsAsync(
             userArts!.Select(u => u.ArtworkId).ToList(), cancellationToken);
+        
         
         var profileArts = userArts!.Join(
             artsMetrics!, 
@@ -59,7 +60,8 @@ public class AccountService(UserRepository userRepository, ArtworkRepository art
             Country = artist.Country,
             Summary = artist.Summary,
             Role = "artist",
-            ProfileArts = profileArts
+            ProfileArts = profileArts,
+            Rewards = rewards
         };
         
         return Result<ArtistProfileModel>.Success(profileData);

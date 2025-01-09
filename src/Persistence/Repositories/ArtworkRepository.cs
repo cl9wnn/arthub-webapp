@@ -224,5 +224,33 @@ public class ArtworkRepository(QueryMapper queryMapper)
         
         return await queryMapper.ExecuteAndReturnAsync<ArtMetrics?>(sqlQuery, cancellationToken);
     }
+    
+    public async Task<List<ArtworkReward>?> GetArtworkRewardListAsync(int artworkId, CancellationToken cancellationToken = default)
+    {
+        FormattableString selectRewardsQuery = $"""
+                                                    SELECT *
+                                                    FROM artworkRewards
+                                                    WHERE artwork_id = {artworkId}
+                                                """;
+        return await queryMapper.ExecuteAndReturnListAsync<ArtworkReward>(selectRewardsQuery, cancellationToken);
+    }
+
+    public async Task<List<AccountReward>> GetAccountRewardListAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        FormattableString selectRewardsQuery = $"""
+                                                SELECT 
+                                                    ar.reward_id,
+                                                    SUM(ar.reward_count) AS reward_count
+                                                FROM 
+                                                    artworkRewards ar
+                                                JOIN 
+                                                    artworks a ON ar.artwork_id  = a.artwork_id
+                                                WHERE 
+                                                    a.user_id  = {userId}
+                                                GROUP BY 
+                                                    ar.reward_id;
+                                                """;
+        return await queryMapper.ExecuteAndReturnListAsync<AccountReward>(selectRewardsQuery, cancellationToken);
+    }
 }
 

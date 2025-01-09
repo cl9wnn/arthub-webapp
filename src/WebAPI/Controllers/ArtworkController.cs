@@ -30,6 +30,25 @@ public class ArtworkController(ArtworkService artworkService): MyBaseController
     
     
     [Authorize("user","artist")]
+    [HttpGet("/api/artwork-rewards/{artworkId}")]
+    public async Task<IMyActionResult> GetArtworkRewardsAsync(int artworkId, HttpListenerContext context, CancellationToken cancellationToken)
+    {
+        var isArtworkExistsResult = await artworkService.IsArtworkExistsAsync(artworkId, cancellationToken);
+        
+        if (!isArtworkExistsResult.IsSuccess)
+            return new ErrorResult(isArtworkExistsResult.StatusCode, isArtworkExistsResult.ErrorMessage!);
+
+        if (!context.TryGetItem<int>("userId", out var visitorId))
+            return new ErrorResult(400, "Not authorized");
+        
+        var artworkRewardsResult = await artworkService.GetArtworkRewardsAsync(artworkId, cancellationToken);
+        
+        return artworkRewardsResult.IsSuccess
+            ? new JsonResult<List<ArtworkReward>>(artworkRewardsResult.Data)
+            : new ErrorResult(artworkRewardsResult.StatusCode, artworkRewardsResult.ErrorMessage!);
+    }
+    
+    [Authorize("user","artist")]
     [HttpGet("/api/artwork/{artworkId}")]
     public async Task<IMyActionResult> GetArtworkData(int artworkId, HttpListenerContext context, CancellationToken cancellationToken)
     {

@@ -31,11 +31,10 @@ public class MarketController(MarketService marketService): MyBaseController
         var boughtRewardResult = await marketService.GiveRewardAsync(reward.RewardId, reward.ArtworkId,  userId, cancellationToken); 
        
         return boughtRewardResult.IsSuccess 
-            ? new JsonResult<Reward>(boughtRewardResult.Data)
+            ? new JsonResult<ArtworkReward>(boughtRewardResult.Data)
             : new ErrorResult(boughtRewardResult.StatusCode, boughtRewardResult.ErrorMessage!);
 
     }
-    
     
     [HttpGet("/api/get-rewards")]
     public async Task<IMyActionResult> GetAllRewardsAsync(CancellationToken cancellationToken)
@@ -45,5 +44,19 @@ public class MarketController(MarketService marketService): MyBaseController
         return rewardsResult.IsSuccess
             ? new JsonResult<List<Reward>>(rewardsResult.Data)
             : new ErrorResult(rewardsResult.StatusCode, rewardsResult.ErrorMessage!);
+    }
+    
+    [Authorize("user", "artist")]
+    [HttpGet("/api/get-balance")]
+    public async Task<IMyActionResult> GetUserBalanceAsync(HttpListenerContext context, CancellationToken cancellationToken)
+    {
+        if (!context.TryGetItem<int>("userId", out var userId))
+            return new ErrorResult(400, "Not authorized");
+        
+        var balanceResult = await marketService.GetUserBalanceByIdAsync(userId, cancellationToken);
+
+        return balanceResult.IsSuccess
+            ? new JsonResult<int>(balanceResult.Data)
+            : new ErrorResult(balanceResult.StatusCode, balanceResult.ErrorMessage!);
     }
 }

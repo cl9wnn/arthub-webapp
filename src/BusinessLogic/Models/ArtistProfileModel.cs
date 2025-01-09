@@ -1,4 +1,6 @@
-﻿namespace BusinessLogic.Models;
+﻿using Persistence.Entities;
+
+namespace BusinessLogic.Models;
 
 public class ArtistProfileModel: UserProfileModel
 {
@@ -6,4 +8,5 @@ public class ArtistProfileModel: UserProfileModel
     public string? ContactInfo { get; init; }
     public string? Summary { get; init; }
     public List<ProfileArtworkModel>? ProfileArts { get; init; }
+    public List<AccountReward>? Rewards { get; init; }
 }

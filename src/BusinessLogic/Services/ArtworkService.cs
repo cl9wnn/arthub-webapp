@@ -82,6 +82,15 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
             ? Result<bool>.Failure(400, "Could not retrieve artworks")!
             : Result<bool>.Success(true);
     }
+
+    public async Task<Result<List<ArtworkReward>>> GetArtworkRewardsAsync(int artworkId, CancellationToken cancellationToken)
+    {
+        var artRewards = await artworkRepository.GetArtworkRewardListAsync(artworkId, cancellationToken);
+        
+        return artRewards == null
+            ? Result<List<ArtworkReward>>.Failure(400, "Could not retrieve rewards")!
+            : Result<List<ArtworkReward>>.Success(artRewards);
+    }
   
     public async Task<Result<ArtworkPostModel>> GetArtworkPostAsync(int artworkId, int visitorId, CancellationToken cancellationToken)
     {
@@ -104,7 +113,7 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
         
         if (artMetrics == null)
             return Result<ArtworkPostModel>.Failure(400, "Could not retrieve metrics")!;
-
+        
         var isLikedByUser = await artworkRepository.IsArtworkLikedByUserAsync(artworkId, visitorId, cancellationToken);
         var isSavedByUser = await savingFavouriteRepository.IsArtworkSavedByUserAsync(artworkId, visitorId, cancellationToken);
         
