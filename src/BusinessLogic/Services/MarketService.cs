@@ -37,6 +37,25 @@ public class MarketService(MarketRepository marketRepository, ArtworkRepository 
             : Result<ArtworkReward>.Failure(400, "Artwork id is invalid")!;
 
     }
+    
+    public async Task<Result<ArtistDecoration>> BuyDecorationAsync(int decorationId, int userId,
+        CancellationToken cancellationToken)
+    {
+        var decoration = await marketRepository.GetDecorationByIdAsync(decorationId, cancellationToken);
+            
+        if (decoration == null)
+            return Result<ArtistDecoration>.Failure(400, "Decoration id is invalid")!;
+        
+        var isBought = await marketRepository.RemovePointsFromBalanceAsync(userId, decoration.Cost, cancellationToken);
+        
+        if (!isBought) return Result<ArtistDecoration>.Failure(400, "Not enough money")!;
+        
+        var artistDecoration =  await marketRepository.AddDecorationAsync(decorationId, userId, cancellationToken);
+        
+        return artistDecoration != null
+            ? Result<ArtistDecoration>.Success(artistDecoration)
+            : Result<ArtistDecoration>.Failure(400, "Decoration id is invalid")!;
+    }
 
     public async Task<Result<int>> GetUserBalanceByIdAsync(int userId, CancellationToken cancellationToken)
     {
@@ -45,5 +64,25 @@ public class MarketService(MarketRepository marketRepository, ArtworkRepository 
         return userBalance == null
             ? Result<int>.Failure(400, "User balance is invalid")
             : Result<int>.Success(userBalance.Balance);
+    }
+
+    public async Task<Result<List<Decoration>>> GetDecorationListAsync(CancellationToken cancellationToken)
+    {
+        var decorationList = await marketRepository.GetDecorationsAsync(cancellationToken);
+        
+        if (decorationList == null || decorationList.Count == 0)
+            return Result<List<Decoration>>.Failure(400, "Decoration list is empty")!;
+        
+        return Result<List<Decoration>>.Success(decorationList!);
+    }
+
+    public async Task<Result<bool>> CheckDecorationExistenceAsync(int decorationId, int userId,
+        CancellationToken cancellationToken)
+    {
+        var userDecoration = await marketRepository.GetUserDecorationAsync(decorationId, userId,cancellationToken);
+
+        return userDecoration != null
+            ? Result<bool>.Failure(400, "You are already have this decoration!")
+            : Result<bool>.Success(true);
     }
 }

@@ -1,5 +1,5 @@
 ﻿import { tokenStorage } from '../Auth/auth.js';
-import { showForm, createLoginForm, parseJwtToSub } from '../Auth/auth.js';
+import { showForm, createLoginForm, parseJwtToSub, parseJwtToRole} from '../Auth/auth.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     setupHeaderButtons();
@@ -19,10 +19,23 @@ function setupHeaderButtons() {
 
 function createLoggedInButtons(container) {
     const accountButton = createButton('btnImg', 'accountBtn');
-    const marketButton = createButton('btnImg', 'marketBtn');
     const savingsButton = createButton('btnImg', 'savingsBtn');
 
-    container.append(accountButton, marketButton, savingsButton);
+    const token = tokenStorage.get();
+    if (token) {
+        const userRole = parseJwtToRole(token);
+        console.log(userRole);
+        
+        if (userRole === 'artist') {
+            const marketButton = createButton('btnImg', 'marketBtn');
+            container.append(marketButton);
+            marketButton.addEventListener('click', () => {
+                window.location.href = '/market';
+            });
+        }
+    }
+
+    container.append(accountButton, savingsButton);
 
     const dropdownMenu = document.createElement('div');
     dropdownMenu.classList.add('dropdown-menu');
@@ -32,7 +45,7 @@ function createLoggedInButtons(container) {
     logoutLink.addEventListener('click', () => {
         tokenStorage.remove();
         setupHeaderButtons();
-        window.location.href = '/'; 
+        window.location.href = '/';
     });
 
     const switchAccountLink = document.createElement('a');
@@ -40,24 +53,19 @@ function createLoggedInButtons(container) {
     switchAccountLink.textContent = 'Switch Account';
     switchAccountLink.addEventListener('click', async () => {
         tokenStorage.remove();
-        await handleSignIn(); 
+        await handleSignIn();
     });
 
     dropdownMenu.append(logoutLink, switchAccountLink);
     accountButton.append(dropdownMenu);
 
     accountButton.addEventListener('click', () => {
-        const token = tokenStorage.get();
-        if (token) { 
-            const userId = parseJwtToSub(token);
+        if (token) {
+            const userId = parseJwtToSub(token); 
             window.location.href = `/account/${userId}`;
         } else {
             console.error('User is not logged in.');
         }
-    });
-
-    marketButton.addEventListener('click', () => {
-        window.location.href = '/market';
     });
 
     savingsButton.addEventListener('click', () => {

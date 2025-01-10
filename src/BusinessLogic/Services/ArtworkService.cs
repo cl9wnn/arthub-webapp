@@ -156,7 +156,10 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
         if (isUserLiked)
         {
             var countAfterRemove = await artworkRepository.RemoveLikeAsync(artworkId, userId, cancellationToken);
-            await marketRepository.RemovePointsToBalanceAsync(userId, likeReward, cancellationToken);
+            var isPointsRemoved = await marketRepository.RemovePointsFromBalanceAsync(userId, likeReward, cancellationToken);
+            
+            if (!isPointsRemoved)
+                return Result<int>.Failure(400,"You dont have money!");
             
             return countAfterRemove == -1
                 ? Result<int>.Failure(400, "Could not like artwork")

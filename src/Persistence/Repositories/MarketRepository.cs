@@ -18,16 +18,25 @@ public class MarketRepository(QueryMapper queryMapper)
          await queryMapper.ExecuteAndReturnAsync<UserBalance?>(addPointsQuery, cancellationToken);
     }
     
-    public async Task RemovePointsToBalanceAsync(int userId, int pointsCount, CancellationToken cancellationToken = default)
+    public async Task<bool> RemovePointsFromBalanceAsync(int userId, int pointsCount, CancellationToken cancellationToken = default)
     {
-        FormattableString removePointsQuery = $"""
-                                                UPDATE userBalance
-                                                SET balance = balance - {pointsCount}
-                                                WHERE user_id = {userId} AND balance >= {pointsCount}
-                                                RETURNING user_id, balance;
-                                            """;
-        
-        await queryMapper.ExecuteAndReturnAsync<UserBalance?>(removePointsQuery, cancellationToken);
+        try
+        {
+            FormattableString removePointsQuery = $"""
+                                                       UPDATE userBalance
+                                                       SET balance = balance - {pointsCount}
+                                                       WHERE user_id = {userId}
+                                                       RETURNING user_id, balance;
+                                                   """;
+
+            await queryMapper.ExecuteAndReturnAsync<UserBalance?>(removePointsQuery, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     public async Task<Reward?> GetRewardByIdAsync(int rewardId, CancellationToken cancellationToken = default)
@@ -135,6 +144,53 @@ public class MarketRepository(QueryMapper queryMapper)
                                               """;
 
         return await queryMapper.ExecuteAndReturnAsync<UserBalance?>(selectBalanceQuery, cancellationToken);
+    }
+
+    public async Task<List<Decoration?>?> GetDecorationsAsync(CancellationToken cancellationToken = default)
+    {
+        FormattableString selectDecorationsQuery = $"""
+                                                        SELECT decoration_id, name, cost, type_name
+                                                        FROM decorations
+                                                        INNER JOIN decorationTypes
+                                                        ON decorations.type_id = decorationTypes.type_id
+                                                        
+                                                    """;
+        return await queryMapper.ExecuteAndReturnListAsync<Decoration?>(selectDecorationsQuery, cancellationToken);
+    }
+    
+    public async Task<Decoration?> GetDecorationByIdAsync(int decorationId, CancellationToken cancellationToken = default)
+    {
+        FormattableString selectDecorationsQuery = $"""
+                                                        SELECT decoration_id, name, cost
+                                                        FROM decorations
+                                                        WHERE decorations.decoration_id = {decorationId};
+                                                    """;
+        
+        return await queryMapper.ExecuteAndReturnAsync<Decoration?>(selectDecorationsQuery, cancellationToken);
+    }
+
+    public async Task<ArtistDecoration?> AddDecorationAsync(int decorationId, int userId,
+        CancellationToken cancellationToken = default)
+    {
+        FormattableString insertQuery = $"""
+                                            INSERT INTO userDecorations 
+                                            VALUES ({decorationId}, {userId})
+                                            RETURNING *;
+                                         """;
+        
+        return await queryMapper.ExecuteAndReturnAsync<ArtistDecoration?>(insertQuery, cancellationToken);
+    }
+
+    public async Task<ArtistDecoration?> GetUserDecorationAsync(int decorationId, int userId,
+        CancellationToken cancellationToken = default)
+    {
+        FormattableString selectDecorationsQuery = $"""
+                                                        SELECT *
+                                                        FROM userDecorations
+                                                        WHERE decoration_id = {decorationId} AND user_id = {userId};
+                                                    """;
+        
+        return await queryMapper.ExecuteAndReturnAsync<ArtistDecoration?>(selectDecorationsQuery, cancellationToken);
     }
 }
 
