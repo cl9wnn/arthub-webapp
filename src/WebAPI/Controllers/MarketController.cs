@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using BusinessLogic.Models;
 using MyFramework;
 using MyFramework.Attributes;
 using MyFramework.Contracts;
@@ -84,13 +85,15 @@ public class MarketController(MarketService marketService): MyBaseController
     
     [Authorize("artist")]
     [HttpGet("/api/give-decorations")]
-    public async Task<IMyActionResult> GetDecorationsAsync(CancellationToken cancellationToken)
+    public async Task<IMyActionResult> GetDecorationsAsync(HttpListenerContext context, CancellationToken cancellationToken)
     {
-        var decorationsResult = await marketService.GetDecorationListAsync(cancellationToken);
+        if (!context.TryGetItem<int>("userId", out var userId))
+            return new ErrorResult(400, "Not authorized");
+        
+        var decorationsResult = await marketService.GetDecorationListAsync(userId, cancellationToken);
         
         return decorationsResult.IsSuccess
-            ? new JsonResult<List<Decoration>>(decorationsResult.Data)
+            ? new JsonResult<List<MarketDecoration>>(decorationsResult.Data)
             : new ErrorResult(decorationsResult.StatusCode, decorationsResult.ErrorMessage!);
     }
-    
 }

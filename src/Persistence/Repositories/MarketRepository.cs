@@ -192,5 +192,17 @@ public class MarketRepository(QueryMapper queryMapper)
         
         return await queryMapper.ExecuteAndReturnAsync<ArtistDecoration?>(selectDecorationsQuery, cancellationToken);
     }
+    
+    public async Task<List<ArtistDecoration?>> GetUserDecorationsAsync(int userId,
+        CancellationToken cancellationToken = default)
+    {
+        FormattableString selectDecorationsQuery = $"""
+                                                        SELECT *
+                                                        FROM userDecorations
+                                                        WHERE user_id = {userId};
+                                                    """;
+        
+        return await queryMapper.ExecuteAndReturnListAsync<ArtistDecoration?>(selectDecorationsQuery, cancellationToken);
+    }
 }
 

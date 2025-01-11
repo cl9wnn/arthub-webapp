@@ -69,4 +69,13 @@ public class AccountController(AccountService accountService): MyBaseController
                 return new ErrorResult(403, "Invalid user role");
         }
     }
+
+
+    /*
+    public async Task<IMyActionResult> LoadProfileDecoration(int userId, HttpListenerContext context,
+        CancellationToken cancellationToken)
+    {
+        
+    }
+    */
 }

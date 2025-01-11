@@ -1,4 +1,5 @@
-﻿using Persistence.Entities;
+﻿using BusinessLogic.Models;
+using Persistence.Entities;
 using Persistence.Repositories;
 
 namespace BusinessLogic.Services;
@@ -66,14 +67,25 @@ public class MarketService(MarketRepository marketRepository, ArtworkRepository 
             : Result<int>.Success(userBalance.Balance);
     }
 
-    public async Task<Result<List<Decoration>>> GetDecorationListAsync(CancellationToken cancellationToken)
+    public async Task<Result<List<MarketDecoration>>> GetDecorationListAsync(int userId, CancellationToken cancellationToken)
     {
         var decorationList = await marketRepository.GetDecorationsAsync(cancellationToken);
+        var boughtDecorationList = await marketRepository.GetUserDecorationsAsync(userId, cancellationToken);
         
         if (decorationList == null || decorationList.Count == 0)
-            return Result<List<Decoration>>.Failure(400, "Decoration list is empty")!;
+            return Result<List<MarketDecoration>>.Failure(400, "Decoration list is empty")!;
         
-        return Result<List<Decoration>>.Success(decorationList!);
+        if (boughtDecorationList == null)
+            return Result<List<MarketDecoration>>.Failure(400, "user's decoration list is empty")!;
+
+        var marketDecorations = decorationList!.Select(decoration => new MarketDecoration
+        {
+            Decoration = decoration!,
+            IsBought = boughtDecorationList.Any(b => b!.DecorationId == decoration!.DecorationId)
+        }).ToList();
+        
+        
+        return Result<List<MarketDecoration>>.Success(marketDecorations);
     }
 
     public async Task<Result<bool>> CheckDecorationExistenceAsync(int decorationId, int userId,

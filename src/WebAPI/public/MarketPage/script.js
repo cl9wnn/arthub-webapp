@@ -2,15 +2,12 @@
 
 
 let balanceText = document.getElementById('balance-text');
-
+let backgroundContainer = document.getElementById('backgrounds-container');
+let frameContainer = document.getElementById('art-frames-container');
 document.addEventListener('DOMContentLoaded', async () => {
     await updateBalance();
     
     await loadDecorationList();
-
-    const backgroundContainer = document.getElementById('backgrounds-container');
-    const frameContainer = document.getElementById('art-frames-container');
-
     await generateCards(decorationList, frameContainer, backgroundContainer);
 });
 
@@ -37,7 +34,6 @@ async function loadDecorationList() {
 
         if (response.ok) {
             decorationList = await response.json();
-            console.log(decorationList);
         }
         else if (response.status === 401) {
             const success = await showForm(createLoginForm, '/auth/signin', 'Sign In');
@@ -47,7 +43,8 @@ async function loadDecorationList() {
             }
         }
         else {
-            alert("ЧТо то не так");
+            const data = await response.json();
+            alert(data);
         }
     } catch (error) {
         alert(error.message);
@@ -104,6 +101,12 @@ async function buyDecoration(decorationId) {
             await showInfoModal();
             await updateBalance();
             
+            await loadDecorationList();
+
+            frameContainer.innerHTML = '';
+            backgroundContainer.innerHTML = '';
+
+            await generateCards(decorationList, frameContainer, backgroundContainer);
         } else if (response.status === 401) {
             const success = await showForm(createLoginForm, '/auth/signin', 'Sign In');
             if (success) {
@@ -135,42 +138,49 @@ const decorateImages = [
 ];
 
 function generateCards(cardsData, container1, container2) {
-    const type1Cards = cardsData.filter(card => card.typeName === 'frame').slice(0, 6);
-    const type2Cards = cardsData.filter(card => card.typeName === 'background').slice(0, 6);
+    const type1Cards = cardsData
+        .filter(card => card.decoration.typeName === 'frame')
+        .slice(0, 6);
+    const type2Cards = cardsData
+        .filter(card => card.decoration.typeName === 'background')
+        .slice(0, 6);
 
-    type1Cards.forEach(cardData => {
-        const card = createCardElement(cardData);
+    type1Cards.forEach(({ decoration, isBought }) => {
+        const card = createCardElement(decoration, isBought);
         container1.appendChild(card);
     });
 
-    type2Cards.forEach(cardData => {
-        const card = createCardElement(cardData);
+    type2Cards.forEach(({ decoration, isBought }) => {
+        const card = createCardElement(decoration, isBought);
         container2.appendChild(card);
     });
 }
 
-function createCardElement(cardData) {
+function createCardElement(decoration, isBought) {
+    console.log(decoration);
+
     const card = document.createElement('div');
     card.className = 'card';
 
     const image = document.createElement('img');
-    const decorationImage = decorateImages.find(img => img.decorationId === cardData.decorationId);
+    const decorationImage = decorateImages.find(img => img.decorationId === decoration.decorationId);
     image.src = decorationImage ? decorationImage.image : 'https://via.placeholder.com/150';
-    image.alt = cardData.name;
+    image.alt = decoration.name;
 
     const title = document.createElement('div');
     title.className = 'title';
-    title.textContent = cardData.name;
+    title.textContent = decoration.name;
 
     const price = document.createElement('div');
     price.className = 'price';
-    price.textContent = `Цена: ${cardData.cost}`;
+
+    price.textContent = isBought ? 'Куплено' : `Цена: ${decoration.cost}`;
 
     card.appendChild(image);
     card.appendChild(title);
     card.appendChild(price);
 
-    card.addEventListener('click', () => showBuyModal(cardData.decorationId));
+    card.addEventListener('click', () => showBuyModal(decoration.decorationId));
 
     return card;
 }

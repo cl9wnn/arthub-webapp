@@ -16,7 +16,6 @@ const rewardImages = [
     { rewardId: 6, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png" }
 ];
 
-
 document.addEventListener('DOMContentLoaded', async() => {
     avatarImg = document.getElementById('avatarImg');
     profileName = document.getElementById('profileName');
