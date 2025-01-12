@@ -1,6 +1,7 @@
 ﻿const avatarFolderPath = 'http://localhost:9000/image-bucket/avatars/';
 const artFolderPath = 'http://localhost:9000/image-bucket/arts/';
 import {createLoginForm, showForm, tokenStorage} from "../Auth/auth.js";
+import {rewardImages} from "../MarketPage/rewardImages.js";
 
 let artworkId;
 let authorId;
@@ -370,14 +371,6 @@ async function GiveReward(rewardId, artworkId) {
 //модальное окно для награды
 
 let artList = [];
-const rewardImages = [
-    { rewardId: 1, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png"  },
-    { rewardId: 2, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png" },
-    { rewardId: 3, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png"},
-    { rewardId: 4, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png" },
-    { rewardId: 5, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png" },
-    { rewardId: 6, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png" }
-];
 
 function createModal(rewardList, userBalance) {
     let modal = document.createElement("div");

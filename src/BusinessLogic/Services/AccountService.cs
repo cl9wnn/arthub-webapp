@@ -1,10 +1,11 @@
 ﻿using BusinessLogic.Interfaces;
 using BusinessLogic.Models;
+using Persistence.Entities;
 using Persistence.Repositories;
 
 namespace BusinessLogic.Services;
 
-public class AccountService(UserRepository userRepository, ArtworkRepository artworkRepository)
+public class AccountService(UserRepository userRepository, ArtworkRepository artworkRepository, MarketRepository marketRepository)
 {
     
     public async Task<Result<UserProfileModel>> GetUserDataAsync(int id, CancellationToken cancellationToken)
@@ -83,5 +84,18 @@ public class AccountService(UserRepository userRepository, ArtworkRepository art
         return (accountRole == null
             ? Result<string?>.Failure(404, "User dont found")!
             : Result<string>.Success(accountRole))!;
+    }
+
+    public async Task<Result<int>> GetProfileDecorationAsync(int userId,
+        CancellationToken cancellationToken)
+    {
+        const string profileDecorationType = "background";
+        
+        var profileDecoration = await marketRepository.GetSelectedDecorationAsync(userId, profileDecorationType, cancellationToken);
+        
+        if (profileDecoration == null)
+            return Result<int>.Success(0);
+        
+        return  Result<int>.Success(profileDecoration.DecorationId);
     }
 }

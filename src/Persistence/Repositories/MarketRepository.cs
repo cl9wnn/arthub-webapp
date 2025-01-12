@@ -220,8 +220,6 @@ public class MarketRepository(QueryMapper queryMapper)
         
         return decoration != null;
     }
-
-
     
     public async Task<bool> SelectMainDecorationAsync(int decorationId, int userId, string typeName,
         CancellationToken cancellationToken)
@@ -260,6 +258,22 @@ public class MarketRepository(QueryMapper queryMapper)
         }
 
         return true;
+    }
+
+    public async Task<ArtistDecoration?> GetSelectedDecorationAsync(int userId, string typeName,
+        CancellationToken cancellationToken)
+    {
+        FormattableString currentDecoration = $"""
+                                                 SELECT *
+                                                FROM userDecorations ud
+                                                INNER JOIN decorations d ON ud.decoration_id = d.decoration_id
+                                                INNER JOIN decorationTypes dt ON d.type_id = dt.type_id
+                                                WHERE ud.user_id = {userId}
+                                                AND dt.type_name = {typeName}
+                                                AND ud.is_selected = true;                      
+                                                
+                                                """;
+        return await queryMapper.ExecuteAndReturnAsync<ArtistDecoration?>(currentDecoration, cancellationToken);
     }
     
     

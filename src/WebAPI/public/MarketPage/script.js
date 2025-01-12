@@ -1,12 +1,11 @@
 ﻿import {tokenStorage, showForm, createLoginForm } from '../Auth/auth.js';
-
+import {decorateImages} from "./decorateImages.js";
 
 let balanceText = document.getElementById('balance-text');
 let backgroundContainer = document.getElementById('backgrounds-container');
 let frameContainer = document.getElementById('art-frames-container');
 document.addEventListener('DOMContentLoaded', async () => {
     await updateBalance();
-    
     await loadDecorationList();
     await generateCards(decorationList, frameContainer, backgroundContainer);
 });
@@ -121,21 +120,6 @@ async function buyDecoration(decorationId) {
         alert(error);
     }
 }
-
-const decorateImages = [
-    { decorationId: 1, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
-    { decorationId: 2, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
-    { decorationId: 3, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
-    { decorationId: 4, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
-    { decorationId: 5, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
-    { decorationId: 6, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
-    { decorationId: 7, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
-    { decorationId: 8, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
-    { decorationId: 9, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
-    { decorationId: 10, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
-    { decorationId: 11, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
-    { decorationId: 12, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
-];
 
 function generateCards(cardsData, container1, container2) {
     const type1Cards = cardsData

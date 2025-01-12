@@ -1,4 +1,6 @@
 import {createLoginForm, showForm, tokenStorage, parseJwtToSub} from "../Auth/auth.js";
+import {decorateImages} from "../MarketPage/decorateImages.js";
+import {rewardImages} from "../MarketPage/rewardImages.js";
 
 const avatarFolderPath = 'http://localhost:9000/image-bucket/avatars/';
 const artFolderPath = 'http://localhost:9000/image-bucket/arts/';
@@ -7,20 +9,11 @@ let avatarImg, profileName, country;
 let userId;
 let isArtist = false;
 
-const rewardImages = [
-    { rewardId: 1, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png"  },
-    { rewardId: 2, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png" },
-    { rewardId: 3, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png"},
-    { rewardId: 4, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png" },
-    { rewardId: 5, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png" },
-    { rewardId: 6, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gnome-applications-graphics.svg/640px-Gnome-applications-graphics.svg.png" }
-];
-
 document.addEventListener('DOMContentLoaded', async() => {
     avatarImg = document.getElementById('avatarImg');
     profileName = document.getElementById('profileName');
     country = document.getElementById('country');
-
+    
     const pathname = window.location.pathname;
     const pathSegments = pathname.split("/");
     userId = pathSegments[pathSegments.length - 1];
@@ -33,6 +26,7 @@ document.addEventListener('DOMContentLoaded', async() => {
     
     if (userId){
         await loadAccountData(userId);
+        await loadAccountDecoration(userId);
     }
 });
 
@@ -280,6 +274,7 @@ async function loadAccountData(userId) {
 
             if (loginSuccessful) {
                 await loadAccountData(userId);
+                await loadAccountDecoration(userId);
             }
         }
         else 
@@ -288,6 +283,41 @@ async function loadAccountData(userId) {
         }
     } catch (error) {
         alert(error.message);
+    }
+}
+
+//загружаем купленный фон
+async function loadAccountDecoration(userId) {
+    let token = tokenStorage.get();
+
+    try {
+        const response = await fetch(`/api/get-decoration/${userId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        const decorationId = await response.json();
+
+        if (response.ok) {
+            const image = decorateImages.find(item => item.decorationId === decorationId);
+            document.body.style.backgroundImage = `url('${image.image}')`;
+        }
+        else if (response.status === 401) {
+            const loginSuccessful = await showForm(createLoginForm, '/auth/signin', 'Sign In');
+
+            if (loginSuccessful) {
+                await loadAccountDecoration(userId);
+            }
+        }
+        else
+        {
+            alert(data);
+        }
+    } catch (error) {
+        alert(error);
     }
 }
 
@@ -308,12 +338,14 @@ async function deleteOwnArtwork(artworkId, art) {
         if (response.ok) {
             art.remove();
             await loadAccountData(userId);
+            await loadAccountDecoration(userId);
         }
         else if (response.status === 401) {
             const loginSuccessful = await showForm(createLoginForm, '/auth/signin', 'Sign In');
 
             if (loginSuccessful) {
                 await loadAccountData(userId);
+                await loadAccountDecoration(userId);
             }
         }
         else

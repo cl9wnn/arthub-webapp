@@ -35,7 +35,7 @@ public class AccountController(AccountService accountService): MyBaseController
     
     [Authorize("user", "artist")]
     [HttpGet("/api/account/{userId}")]
-    public async Task<IMyActionResult> ShowAccountInfoAsync(int userId, HttpListenerContext context, CancellationToken cancellationToken)
+    public async Task<IMyActionResult> ShowAccountInfoAsync(int userId, CancellationToken cancellationToken)
     {
         var isAccountExistResult = await accountService.CheckProfileForExist(userId, cancellationToken);
         
@@ -69,13 +69,19 @@ public class AccountController(AccountService accountService): MyBaseController
                 return new ErrorResult(403, "Invalid user role");
         }
     }
-
-
-    /*
-    public async Task<IMyActionResult> LoadProfileDecoration(int userId, HttpListenerContext context,
+    
+    [Authorize( "user","artist")]
+    [HttpGet("/api/get-decoration/{userId}")]
+    public async Task<IMyActionResult> LoadProfileDecoration(int userId,
         CancellationToken cancellationToken)
     {
+        var isAccountExistResult = await accountService.CheckProfileForExist(userId, cancellationToken);
         
+        if (!isAccountExistResult.IsSuccess)
+            return new ErrorResult(isAccountExistResult.StatusCode, isAccountExistResult.ErrorMessage!);
+
+        var profileDecorationResult = await accountService.GetProfileDecorationAsync(userId, cancellationToken);
+
+        return new JsonResult<int>(profileDecorationResult.Data);
     }
-    */
 }

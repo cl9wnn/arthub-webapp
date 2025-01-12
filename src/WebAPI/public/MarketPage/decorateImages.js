@@ -1,0 +1,15 @@
+﻿export const decorateImages = [
+    { decorationId: 0, image: "https://img.alicdn.com/imgextra/i4/6000000005266/O1CN01jSd8Hp1olsLZAdTLD_!!6000000005266-0-tbvideo.jpg" },
+    { decorationId: 1, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
+    { decorationId: 2, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
+    { decorationId: 3, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
+    { decorationId: 4, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
+    { decorationId: 5, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
+    { decorationId: 6, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
+    { decorationId: 7, image: "https://avatars.mds.yandex.net/i?id=1aaf79f62e18f06dac60a9ed28af7ac8_l-11004153-images-thumbs&n=13" },
+    { decorationId: 8, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
+    { decorationId: 9, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
+    { decorationId: 10, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
+    { decorationId: 11, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
+    { decorationId: 12, image: "https://static13.tgcnt.ru/posts/_0/a7/a7bb86e198b2b690366f24d7a761c4a6.jpg" },
+];
