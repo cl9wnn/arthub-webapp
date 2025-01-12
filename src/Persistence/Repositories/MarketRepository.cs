@@ -161,9 +161,11 @@ public class MarketRepository(QueryMapper queryMapper)
     public async Task<Decoration?> GetDecorationByIdAsync(int decorationId, CancellationToken cancellationToken = default)
     {
         FormattableString selectDecorationsQuery = $"""
-                                                        SELECT decoration_id, name, cost
-                                                        FROM decorations
-                                                        WHERE decorations.decoration_id = {decorationId};
+                                                        SELECT d.decoration_id, d.name, d.cost, dt.type_name
+                                                        FROM decorations d
+                                                        INNER JOIN decorationTypes dt
+                                                        ON d.type_id = dt.type_id
+                                                        WHERE d.decoration_id = {decorationId};
                                                     """;
         
         return await queryMapper.ExecuteAndReturnAsync<Decoration?>(selectDecorationsQuery, cancellationToken);
@@ -204,5 +206,62 @@ public class MarketRepository(QueryMapper queryMapper)
         
         return await queryMapper.ExecuteAndReturnListAsync<ArtistDecoration?>(selectDecorationsQuery, cancellationToken);
     }
+
+    public async Task<bool> CheckSelectedStatusOfDecorationAsync(int decorationId, int userId
+        , CancellationToken cancellationToken = default)
+    {
+        FormattableString selectDecorationQuery = $"""
+                                                        SELECT *
+                                                        FROM userDecorations
+                                                        WHERE user_id = {userId} and decoration_id = {decorationId} and is_selected = true;
+                                                    """;
+
+        var decoration = await queryMapper.ExecuteAndReturnAsync<Decoration?>(selectDecorationQuery, cancellationToken);
+        
+        return decoration != null;
+    }
+
+
+    
+    public async Task<bool> SelectMainDecorationAsync(int decorationId, int userId, string typeName,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            FormattableString updateSelectedFlagsQuery = $"""
+                                                           UPDATE userDecorations
+                                                           SET is_selected = false
+                                                           FROM decorations d
+                                                           INNER JOIN decorationTypes dt ON d.type_id = dt.type_id
+                                                           WHERE userDecorations.decoration_id = d.decoration_id
+                                                             AND userDecorations.user_id = {userId}
+                                                             AND dt.type_name = {typeName};
+                                                           """;
+
+            FormattableString setSelectedFlagQuery = $"""
+                                                      UPDATE userDecorations
+                                                      SET is_selected = true
+                                                      WHERE user_id = {userId} and  decoration_id = {decorationId}; 
+                                                      """; 
+            
+                
+            await queryMapper.ExecuteTransactionAsync(async transaction =>
+            {
+                await queryMapper.ExecuteWithTransactionAsync(updateSelectedFlagsQuery, transaction, cancellationToken);
+
+                await queryMapper.ExecuteWithTransactionAsync(setSelectedFlagQuery, transaction, cancellationToken);
+
+            }, cancellationToken);
+            
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+
+        return true;
+    }
+    
+    
 }
 

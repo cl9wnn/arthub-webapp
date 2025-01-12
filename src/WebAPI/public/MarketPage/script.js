@@ -145,22 +145,25 @@ function generateCards(cardsData, container1, container2) {
         .filter(card => card.decoration.typeName === 'background')
         .slice(0, 6);
 
-    type1Cards.forEach(({ decoration, isBought }) => {
-        const card = createCardElement(decoration, isBought);
+    type1Cards.forEach(({ decoration, isBought, isSelected }) => {
+        const card = createCardElement(decoration, isBought, isSelected);
         container1.appendChild(card);
     });
 
-    type2Cards.forEach(({ decoration, isBought }) => {
-        const card = createCardElement(decoration, isBought);
+    type2Cards.forEach(({ decoration, isBought, isSelected }) => {
+        const card = createCardElement(decoration, isBought, isSelected);
         container2.appendChild(card);
     });
 }
 
-function createCardElement(decoration, isBought) {
-    console.log(decoration);
-
+function createCardElement(decoration, isBought, isSelected) {
     const card = document.createElement('div');
     card.className = 'card';
+
+    if (isBought) {
+        card.style.backgroundColor = '#2D2D40FF'; 
+        card.style.pointerEvents = 'none'; 
+    }
 
     const image = document.createElement('img');
     const decorationImage = decorateImages.find(img => img.decorationId === decoration.decorationId);
@@ -173,17 +176,87 @@ function createCardElement(decoration, isBought) {
 
     const price = document.createElement('div');
     price.className = 'price';
-
     price.textContent = isBought ? 'Куплено' : `Цена: ${decoration.cost}`;
 
     card.appendChild(image);
     card.appendChild(title);
     card.appendChild(price);
 
-    card.addEventListener('click', () => showBuyModal(decoration.decorationId));
+    if (isBought) {
+        const selectButton = document.createElement('button');
+        selectButton.className = 'select-button';
+
+        if (isSelected) {
+            selectButton.textContent = 'Выбрано';
+            selectButton.disabled = true;
+            selectButton.classList.add('disabled');
+        } else {
+            selectButton.textContent = 'Выбрать';
+            selectButton.addEventListener('click', async (event) => {
+                event.stopPropagation();
+                await selectDecoration(decoration.decorationId);
+                selectButton.textContent = 'Выбрано';
+                selectButton.disabled = true;
+                selectButton.classList.add('disabled');
+            });
+        }
+
+        // Enable button interaction even when card clicks are disabled
+        selectButton.style.pointerEvents = 'auto';
+        card.appendChild(selectButton);
+    }
+
+    card.addEventListener('click', () => {
+        if (!isBought) {
+            showBuyModal(decoration.decorationId);
+        }
+    });
 
     return card;
 }
+
+async function selectDecoration(decorationId) {
+    let token = tokenStorage.get();
+
+    try {
+        const response = await fetch('/api/select-decoration', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body:JSON.stringify(
+                parseInt(decorationId, 10),
+            )
+        });
+
+        if (response.ok) {
+            await loadDecorationList();
+
+            frameContainer.innerHTML = '';
+            backgroundContainer.innerHTML = '';
+
+            await generateCards(decorationList, frameContainer, backgroundContainer);
+        } else if (response.status === 401) {
+            const success = await showForm(createLoginForm, '/auth/signin', 'Sign In');
+            if (success) {
+                await updateBalance();
+                await loadDecorationList();
+
+                frameContainer.innerHTML = '';
+                backgroundContainer.innerHTML = '';
+
+                await generateCards(decorationList, frameContainer, backgroundContainer);
+            }
+        } else {
+            const data = await response.json();
+            throw new Error(data || 'Ошибка на сервере!');
+        }
+    } catch (error) {
+        alert(error);
+    }
+}
+
 async function createBuyModal(cardId) {
     const modal = document.createElement('div');
     modal.className = 'modal';

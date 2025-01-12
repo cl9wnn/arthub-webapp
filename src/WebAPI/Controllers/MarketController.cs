@@ -39,7 +39,29 @@ public class MarketController(MarketService marketService): MyBaseController
     
     [Authorize("artist")]
     [HttpPost("/api/buy-decoration")]
-    public async Task<IMyActionResult> BuyItemAsync([FromBody]int decorationId, HttpListenerContext context, CancellationToken cancellationToken)
+    public async Task<IMyActionResult> BuyDecorationAsync([FromBody]int decorationId, HttpListenerContext context, CancellationToken cancellationToken)
+    {
+        if (!context.TryGetItem<int>("userId", out var userId))
+            return new ErrorResult(400, "Not authorized");
+        
+        if (decorationId == 0)
+            return new ErrorResult(400, "Bad request");
+        
+        var isUserHasDecorationResult = await marketService.CheckDecorationExistenceAsync(decorationId, userId, cancellationToken);
+
+        if (isUserHasDecorationResult.Data)
+            return new ErrorResult(400, "You already have this decoration");
+        
+        var boughtDecorationResult = await marketService.BuyDecorationAsync(decorationId,  userId, cancellationToken);
+        
+        return boughtDecorationResult.IsSuccess
+            ? new Ok()
+            : new ErrorResult(boughtDecorationResult.StatusCode, boughtDecorationResult.ErrorMessage!);
+    }
+    
+    [Authorize("artist")]
+    [HttpPost("/api/select-decoration")]
+    public async Task<IMyActionResult> SelectDecorationAsync([FromBody]int decorationId, HttpListenerContext context, CancellationToken cancellationToken)
     {
         if (!context.TryGetItem<int>("userId", out var userId))
             return new ErrorResult(400, "Not authorized");
@@ -50,14 +72,15 @@ public class MarketController(MarketService marketService): MyBaseController
         var isUserHasDecorationResult = await marketService.CheckDecorationExistenceAsync(decorationId, userId, cancellationToken);
 
         if (!isUserHasDecorationResult.Data)
-            return new ErrorResult(isUserHasDecorationResult.StatusCode, isUserHasDecorationResult.ErrorMessage!);
+            return new ErrorResult(400, "You don't have this decoration!");
         
-        var boughtDecorationResult = await marketService.BuyDecorationAsync(decorationId,  userId, cancellationToken);
+        var selectDecorationResult = await marketService.SelectDecorationAsync(decorationId,  userId, cancellationToken);
         
-        return boughtDecorationResult.IsSuccess
+        return selectDecorationResult.IsSuccess
             ? new Ok()
-            : new ErrorResult(boughtDecorationResult.StatusCode, boughtDecorationResult.ErrorMessage!);
+            : new ErrorResult(selectDecorationResult.StatusCode, selectDecorationResult.ErrorMessage!);
     }
+    
     
     [HttpGet("/api/get-rewards")]
     public async Task<IMyActionResult> GetAllRewardsAsync(CancellationToken cancellationToken)

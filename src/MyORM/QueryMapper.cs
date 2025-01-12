@@ -16,7 +16,8 @@ public class QueryMapper
     private static readonly MethodInfo GetStringMethod = typeof(DataReaderExtensions).GetMethod("GetStringOrDefault")!;
     private static readonly MethodInfo GetIntMethod = typeof(DataReaderExtensions).GetMethod("GetIntOrDefault")!;
     private static readonly MethodInfo GetDateMethod = typeof(DataReaderExtensions).GetMethod("GetDateOrDefault")!;
-
+    private static readonly MethodInfo GetBoolMethod = typeof(DataReaderExtensions).GetMethod("GetBoolOrDefault")!;
+    
 
     private static readonly ConcurrentDictionary<Type, Delegate> MapperFuncs = new();
     
@@ -168,6 +169,8 @@ public class QueryMapper
             return Expression.Call(null, GetIntMethod, reader, Expression.Constant(columnName));
         else if (prop.PropertyType == typeof(DateTime))
             return Expression.Call(null, GetDateMethod, reader, Expression.Constant(columnName));
+        else if (prop.PropertyType == typeof(bool))
+            return Expression.Call(null, GetBoolMethod, reader, Expression.Constant(columnName));
         throw new InvalidOperationException();
     }
     private static string ReplaceParameters(string query)

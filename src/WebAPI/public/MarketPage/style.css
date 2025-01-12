@@ -45,7 +45,7 @@ body {
     width: 160px;
     height: 230px;
     margin: 0 15px;
-    background-color: #323246;
+    background-color: #474767;
     border-radius: 10px;
     padding: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -115,4 +115,25 @@ body {
 
 .message-text{
     color: #000000;
+}
+
+.select-button {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.select-button:hover {
+    background-color: #0056b3;
+}
+
+.select-button.disabled {
+    background-color: #082e50;
+    color: white; 
+    cursor: not-allowed; 
 }

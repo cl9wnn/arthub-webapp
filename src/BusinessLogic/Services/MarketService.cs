@@ -58,6 +58,28 @@ public class MarketService(MarketRepository marketRepository, ArtworkRepository 
             : Result<ArtistDecoration>.Failure(400, "Decoration id is invalid")!;
     }
 
+    public async Task<Result<ArtistDecoration>> SelectDecorationAsync(int decorationId, int userId,
+        CancellationToken cancellationToken)
+    {
+        var decoration = await marketRepository.GetDecorationByIdAsync(decorationId, cancellationToken);
+        
+        if (decoration == null)
+            return Result<ArtistDecoration>.Failure(400, "Decoration id is invalid")!;
+        
+        var isSelected = await marketRepository.CheckSelectedStatusOfDecorationAsync(decorationId, userId, cancellationToken);
+
+        if (isSelected)
+            return Result<ArtistDecoration>.Failure(400, "You already select this decoration!")!;
+        
+        var isFlagSet = await marketRepository.SelectMainDecorationAsync(decorationId, userId, 
+            decoration.TypeName!, cancellationToken);
+
+        if (!isFlagSet)
+            return Result<ArtistDecoration>.Failure(400, "Error selecting main decoration!")!;
+        
+        return Result<ArtistDecoration>.Success(new ArtistDecoration());
+    }
+
     public async Task<Result<int>> GetUserBalanceByIdAsync(int userId, CancellationToken cancellationToken)
     {
         var userBalance = await marketRepository.ReturnUserBalanceAsync(userId, cancellationToken);
@@ -81,7 +103,9 @@ public class MarketService(MarketRepository marketRepository, ArtworkRepository 
         var marketDecorations = decorationList!.Select(decoration => new MarketDecoration
         {
             Decoration = decoration!,
-            IsBought = boughtDecorationList.Any(b => b!.DecorationId == decoration!.DecorationId)
+            IsBought = boughtDecorationList.Any(b => b!.DecorationId == decoration!.DecorationId),
+            IsSelected = boughtDecorationList
+                .FirstOrDefault(b => b!.DecorationId == decoration!.DecorationId)?.IsSelected ?? false
         }).ToList();
         
         
@@ -93,8 +117,8 @@ public class MarketService(MarketRepository marketRepository, ArtworkRepository 
     {
         var userDecoration = await marketRepository.GetUserDecorationAsync(decorationId, userId,cancellationToken);
 
-        return userDecoration != null
-            ? Result<bool>.Failure(400, "You are already have this decoration!")
+        return userDecoration == null
+            ? Result<bool>.Success(false)
             : Result<bool>.Success(true);
     }
 }
