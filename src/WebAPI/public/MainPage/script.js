@@ -1,3 +1,5 @@
+import {decorateImages} from "../MarketPage/decorateImages.js";
+
 const artFolderPath = 'http://localhost:9000/image-bucket/arts/';
 const avatarFolderPath = 'http://localhost:9000/image-bucket/avatars/';
 let artworkData = [];
@@ -34,16 +36,20 @@ async function loadArtworkList() {
     }
 }
 
-function createArtworkComponent({artworkId, title, profileName, artworkPath, avatarPath }) {
+function createArtworkComponent({artworkId, title, profileName, artworkPath, avatarPath, decorationId }) {
     const artworkDiv = document.createElement("div");
     artworkDiv.classList.add("artwork");
-
     artworkDiv.dataset.id = artworkId;
 
     const img = document.createElement("img");
     img.src = `${artFolderPath}${artworkPath}`;
     img.alt = title;
 
+    const frameOverlay = document.createElement("div");
+    frameOverlay.classList.add("artwork-frame-overlay");
+    const image = decorateImages.find(item => item.decorationId === decorationId);
+    frameOverlay.style.backgroundImage = `url('${image.image}')`;
+    
     const infoDiv = document.createElement("div");
     infoDiv.classList.add("artwork-info");
 
@@ -59,6 +65,7 @@ function createArtworkComponent({artworkId, title, profileName, artworkPath, ava
     infoDiv.appendChild(textDiv);
 
     artworkDiv.appendChild(img);
+    artworkDiv.appendChild(frameOverlay);
     artworkDiv.appendChild(infoDiv);
 
     artworkDiv.addEventListener("click", () => {

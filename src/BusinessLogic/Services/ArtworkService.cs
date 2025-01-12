@@ -1,5 +1,6 @@
 ﻿using BusinessLogic.Models;
 using BusinessLogic.Validators;
+using Npgsql.Internal.Postgres;
 using Persistence.Entities;
 using Persistence.Repositories;
 
@@ -43,6 +44,8 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
 
     public async Task<Result<List<GalleryArtworkModel>>> GetArtworksInfoAsync(CancellationToken cancellationToken)
     {
+        const string decorationTypeName = "frame";
+        
         var responseArtworks = new List<GalleryArtworkModel>();
         
         var artworks = await artworkRepository.GetGalleryArtworksAsync(cancellationToken);
@@ -55,7 +58,8 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
             var author = await userRepository.GetUserAsyncById(artwork.UserId, cancellationToken);
             var artMetrics = await artworkRepository.GetMetricsByIdAsync(artwork.ArtworkId, cancellationToken);
             var tags = await artworkRepository.GetTagsByIdAsync(artwork.ArtworkId, cancellationToken);
-
+            var decorationId = await artworkRepository.GetArtworkDecorationAsync(decorationTypeName, artwork.UserId, cancellationToken);
+            
             var artModel = new GalleryArtworkModel
             {
                 ArtworkId = artwork.ArtworkId,
@@ -66,7 +70,8 @@ public class ArtworkService(FileService fileService, ArtworkRepository artworkRe
                 ProfileName = author!.ProfileName,
                 AvatarPath = author.AvatarPath,
                 LikesCount = artMetrics!.LikesCount,
-                ViewsCount = artMetrics.ViewsCount 
+                ViewsCount = artMetrics.ViewsCount,
+                DecorationId = decorationId,
             };
             responseArtworks.Add(artModel);
         }

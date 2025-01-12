@@ -252,5 +252,19 @@ public class ArtworkRepository(QueryMapper queryMapper)
                                                 """;
         return await queryMapper.ExecuteAndReturnListAsync<AccountReward>(selectRewardsQuery, cancellationToken);
     }
+
+    public async Task<int> GetArtworkDecorationAsync(string typeName, int userId, CancellationToken cancellationToken = default)
+    {
+        FormattableString selectArtworkDecorationQuery = $"""
+                                                          SELECT ud.decoration_id
+                                                          FROM userDecorations ud
+                                                          JOIN decorations d ON ud.decoration_id = d.decoration_id
+                                                          JOIN decorationTypes dt ON d.type_id = dt.type_id
+                                                          WHERE ud.user_id = {userId}
+                                                          AND dt.type_name = {typeName}
+                                                          AND ud.is_selected = true;
+                                                          """;
+        return await queryMapper.ExecuteAndReturnAsync<int>(selectArtworkDecorationQuery, cancellationToken);
+    }
 }
 
