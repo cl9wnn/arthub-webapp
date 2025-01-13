@@ -6,6 +6,11 @@ const tags = document.querySelectorAll(".tag");
 tags.forEach(tag => {
     tag.addEventListener("click", () => handleTagClick(tag, maxTags));
 });
+const backBtn = document.getElementById('backBtn');
+
+backBtn.addEventListener('click', () => {
+    window.history.back();
+});
 
 function handleTagClick(tag, maxTags) {
     const selectedTags = document.querySelectorAll(".tag.selected");

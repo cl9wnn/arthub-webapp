@@ -11,11 +11,16 @@
     margin: 25px auto;
     padding: 20px;
     height: 100vh;
+    box-sizing: border-box;
 }
 
 h1 {
     font-size: 28px;
     margin-bottom: 10px;
+}
+
+.container-text{
+    padding:0 20px;
 }
 
 h2 {
@@ -25,11 +30,12 @@ h2 {
 }
 
 .form-container {
-    width: 700px;
+    width: 100%;
     background-color: transparent;
     border-radius: 8px;
     overflow: hidden;
     padding: 20px;
+    box-sizing: border-box;
 }
 
 .form-section {
@@ -45,36 +51,41 @@ h2 {
 
 .form-group label {
     display: block;
-    font-size: 14px;
+    font-size: 16px;
     color: #aaa;
     margin-bottom: 10px;
 }
 
 .form-group input,
-.form-group select {
-    width: calc(100% - 60px);
+.form-group select,
+.form-group textarea {
+    width: 92%;
     padding: 10px;
-    font-size: 14px;
+    font-size: 16px;
     background-color: #333;
     border: 1px solid #444;
     border-radius: 4px;
     color: #fff;
+    margin-bottom: 10px;
 }
 
 .form-header {
-    font-size:20px;
+    font-size: 20px;
     margin-bottom: 20px;
 }
 
-
-#summary{
-    width: calc(100% - 60px);
+#summary {
+    width: 92%;
     padding: 10px;
     font-size: 14px;
     background-color: #333;
     border: 1px solid #444;
     border-radius: 4px;
     color: #fff;
+}
+
+#summary-section {
+    margin-bottom: 10px;    
 }
 
 .buttons {
@@ -122,4 +133,64 @@ h2 {
     font-size: 0.9rem;
     margin-top: 0.5rem;
     transition: all 0.3s ease;
+}
+
+/* Медиазапросы для адаптивности */
+
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    h2 {
+        font-size: 14px;
+    }
+
+    .form-container {
+        width: 100%;
+    }
+
+    .form-header {
+        font-size: 18px;
+    }
+    
+
+    .buttons button {
+        font-size: 12px;
+        padding: 8px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 20px;
+    }
+
+    h2 {
+        font-size: 12px;
+    }
+
+    .form-container {
+        padding: 10px;
+    }
+
+    .form-header {
+        font-size: 16px;
+    }
+    
+
+    .buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .buttons button {
+        width: 100%;
+        font-size: 12px;
+        padding: 8px 16px;
+    }
 }

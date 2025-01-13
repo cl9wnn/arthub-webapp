@@ -10,12 +10,12 @@
 </head>
 <body>
 <div class="container">
-    <h1>Create artwork</h1>
-    <h2>Artwork form</h2>
+    <h1 class="container-text">Create artwork</h1>
+    <h2 class="container-text">Artwork form</h2>
     <div class="form-container">
 
         <div class="form-section">
-            <h1 class="form-header">Title</h1>
+            <h1 class="form-header">Main information</h1>
             
             <!-- название работы -->
             <div class="form-group">
@@ -65,15 +65,15 @@
             <h1 class="form-header">Art</h1>
 
             <!-- Арт -->
-            <div class="art" id="artPreview">Artwork</div>
+            <div class="art" id="artPreview">preview image</div>
             <input type="file" id="artInput" style="display: none;">
             <button class="upload-btn" id="uploadBtn">Upload artwork</button>
             <span class="error-message" id="art-error"></span>
         </div>
-    </div>
-    <div class="buttons">
-        <button class="back" id="backBtn">Back</button>
-        <button class="next" type="button" id="sendBtn">Send</button>
+        <div class="buttons">
+            <button class="back" id="backBtn">Back</button>
+            <button class="next" type="button" id="sendBtn">Next</button>
+        </div>
     </div>
 </div>
 <script  type="module" src="/static/AddArtworkPage/script.js"></script>

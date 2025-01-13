@@ -9,8 +9,9 @@ avatarInput.setAttribute('accept', 'image/jpeg, image/png, image/gif, image/webp
 
 
 backBtn.addEventListener('click', () => {
-    window.location.href = '/';
+    window.history.back();
 });
+
 let avatarFile = null;
 
 // загрузка аватарки из директории

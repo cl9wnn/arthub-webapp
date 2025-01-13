@@ -10,12 +10,12 @@
 </head>
 <body>
 <div class="container">
-    <h1>Artist Profile</h1>
-    <h2>Registration</h2>
+    <h1 class="container-text">Artist Profile</h1>
+    <h2 class="container-text">Registration</h2>
     <div class="form-container">
         
         <div class="form-section">
-            <h1 class="form-header">Контактная информация</h1>
+            <h1 class="form-header">Contact information</h1>
 
             <!-- Настоящее имя -->
             <div class="form-group">
@@ -33,7 +33,7 @@
         </div>
 
         <div class="form-section" id="summary-section">
-            <h1 class="form-header">Художественный опыт</h1>
+            <h1 class="form-header">Artist skills</h1>
             
             <!-- Художественный опыт -->
             <div class="form-group">
@@ -42,11 +42,13 @@
                 <span class="error-message" id="summary-error"></span>
             </div>
         </div>
+        
+        <div class="buttons">
+            <button class="back" id="backBtn">Back</button>
+            <button class="next" type="button" id="sendBtn">Next</button>
+        </div>
     </div>
-    <div class="buttons">
-        <button class="back" id="backBtn">Back</button>
-        <button class="next" type="button" id="sendBtn">Send</button>
-    </div>
+  
 </div>
 <script  type="module" src="/static/RegistrationArtistPage/script.js"></script>
 </body>
