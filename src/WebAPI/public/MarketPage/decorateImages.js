@@ -1,5 +1,5 @@
 ﻿export const decorateImages = [
-    { decorationId: 0, image: "https://img.alicdn.com/imgextra/i4/6000000005266/O1CN01jSd8Hp1olsLZAdTLD_!!6000000005266-0-tbvideo.jpg" },
+    { decorationId: 0, image: "/static/resources/transparent.png" },
     { decorationId: 1, image: "https://ramki-photoshop.ru/ramki/grafika_07.png" },
     { decorationId: 2, image: "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/items/322330/61f2f2c6f2c409c0ca2814f24c00efe5d23076b2.png" },
     { decorationId: 3, image: "https://avatanplus.com/files/resources/original/5fd057923574617645d6132b.png" },

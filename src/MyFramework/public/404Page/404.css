@@ -1,0 +1,33 @@
+﻿body {
+    background-color: black;
+    color: white;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    text-align: center;
+}
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+a {
+    font-size: 20px;
+    color: #00bfff;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+#status-code-text{
+    font-size: 200px;
+    margin: 0;
+}
+
+#description{
+    font-size: 45px;
+    margin: 10px;
+}

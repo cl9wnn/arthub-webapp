@@ -4,6 +4,7 @@ using BusinessLogic.Services;
 using MyFramework;
 using MyFramework.Attributes;
 using MyFramework.Contracts;
+using MyFramework.Views;
 using WebAPI.Models;
 
 namespace WebAPI.Controllers;

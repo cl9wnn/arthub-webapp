@@ -1,0 +1,21 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>404 - Page Not Found</title>
+    <link rel="stylesheet" href="/static/404Page/404.css">
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+</head>
+<body>
+<div>
+    <h1 id="status-code-text">{{header code}}</h1>
+    <h1 id="description">{{header message}}</h1>
+    <p>Some useful links:</p>
+    <ul>
+        {{#foreach link in links}}
+        <li><a href="{{link.href}}">{{link.text}}</a></li>
+        {{/foreach}}
+    </ul>
+</div>
+</body>
+</html>

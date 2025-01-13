@@ -1,9 +1,9 @@
 ﻿using System.Net;
 using System.Reflection;
-using System.Reflection.Metadata;
-using System.Text.Json;
+using System.Text;
 using MyFramework.Attributes;
 using MyFramework.Contracts;
+using MyFramework.TemplateGenerator;
 
 namespace MyFramework;
 
@@ -12,11 +12,13 @@ public class RouteHandler
     private readonly List<Route> _routes = [];
     private readonly IMyServiceProvider _serviceProvider;
     private readonly IAuthService _authService;
-    
-    public RouteHandler(IMyServiceProvider serviceProvider, IAuthService authService)
+    private readonly ErrorSender _errorSender;
+    public RouteHandler(IMyServiceProvider serviceProvider, ErrorSender errorSender, IAuthService authService)
     {
         _serviceProvider = serviceProvider;
         _authService = authService;
+        _errorSender = errorSender;
+        
         RegisterRoutes();
     }
 
@@ -49,7 +51,7 @@ public class RouteHandler
         var route = GetRoute(context, out var parameters);
         if (route == null)
         {
-            await WebHelper.ShowError(404, "Page not found", context, ctx.Token);
+            await _errorSender.ShowErrorPageAsync(404, "Page not found", context, ctx.Token);
             return;
         }
 
@@ -57,7 +59,7 @@ public class RouteHandler
         
         if (controller == null)
         {
-            await WebHelper.ShowError(404, "incorrect request ", context, ctx.Token);
+            await _errorSender.ShowErrorPageAsync(404, "Page not found", context, ctx.Token);
             return;
         }
 
@@ -69,7 +71,7 @@ public class RouteHandler
     }
     catch (Exception ex)
     {
-        await WebHelper.ShowError(500, "Internal server error", context, ctx.Token);
+        await _errorSender.ShowErrorPageAsync(500, "Internal server error", context, ctx.Token);
     }
 }
 
@@ -107,13 +109,13 @@ private async Task<bool> AuthorizeRequest(HttpListenerContext context, Route rou
 
     if (user == null)
     {
-        await WebHelper.ShowError(401, "Not authorized", context, cancellationToken);
+        await _errorSender.ShowErrorJsonAsync(401, "Not authorized", context, cancellationToken);
         return false;
     }
 
     if (!authorizeAttribute.Roles.Contains(user.Role!))
     {
-        await WebHelper.ShowError(403, "Forbidden: Insufficient permissions", context, cancellationToken);
+        await  _errorSender.ShowErrorJsonAsync(403, "Forbidden: Insufficient permissions", context, cancellationToken);
         return false;
     }
 
@@ -148,7 +150,7 @@ private async Task<object?[]> GetActionArguments(HttpListenerContext context, Ro
         }
         else if (parameter.GetCustomAttribute<FromBodyAttribute>() != null)
         {
-            args[i] = await WebHelper.ReadBodyAsync(context, cancellationToken, parameter.ParameterType);
+            args[i] = await RequestBodyReader.ReadBodyAsync(context, cancellationToken, parameter.ParameterType);
         }
     }
 
@@ -171,7 +173,7 @@ private async Task ExecuteAction(Route route, object controller, object?[] args,
             break;
 
         default:
-            await WebHelper.ShowError(500, "Invalid action result", context, cancellationToken);
+            await _errorSender.ShowErrorPageAsync(500, "Internal server error", context, cancellationToken);
             break;
     }
 }

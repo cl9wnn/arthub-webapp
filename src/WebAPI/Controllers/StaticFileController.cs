@@ -2,6 +2,7 @@
 using MyFramework;
 using MyFramework.Attributes;
 using MyFramework.Contracts;
+using MyFramework.Views;
 
 namespace WebAPI.Controllers;
 

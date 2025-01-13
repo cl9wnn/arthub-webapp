@@ -3,6 +3,7 @@ using BusinessLogic.Interfaces;
 using BusinessLogic.Services;
 using Infrastructure;
 using MyFramework;
+using MyFramework.TemplateGenerator;
 using MyORM;
 using Persistence.Repositories;
 
@@ -28,9 +29,12 @@ serviceProvider.AddSingleton<SavingFavouriteService>();
 serviceProvider.AddSingleton<IS3Storage<string>,MinioService>();
 serviceProvider.AddSingleton<IPasswordHasher, PasswordHasher>();
 
+var authService = new AuthorizationService();
 
-var authService = new AuthorizationService(); 
-var routeHandler = new RouteHandler(serviceProvider, authService);
+var templateGenerator = new TemplateGenerator();
+var errorSender = new ErrorSender(templateGenerator);
+
+var routeHandler = new RouteHandler(serviceProvider, errorSender, authService);
 
 while (httpListener.IsListening)
 {

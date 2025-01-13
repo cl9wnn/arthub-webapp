@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using MyFramework.Contracts;
 
-namespace MyFramework;
+namespace MyFramework.Views;
 
 public class ResourceResult(string path): IMyActionResult
 {
@@ -15,6 +15,10 @@ public class ResourceResult(string path): IMyActionResult
             "js" => "text/javascript",
             "svg" => "image/svg+xml",
             "ico" => "image/x-icon",
+            "png" => "image/png",
+            "jpg" => "image/jpeg",
+            "jpeg" => "image/jpeg",
+            "gif" => "image/gif",
             _ => "application/octet-stream"
         };
         var file = await File.ReadAllBytesAsync(path, cancellationToken);
