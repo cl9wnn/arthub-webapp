@@ -13,31 +13,31 @@ document.addEventListener('DOMContentLoaded', async() => {
     avatarImg = document.getElementById('avatarImg');
     profileName = document.getElementById('profileName');
     country = document.getElementById('country');
-    
+
     const pathname = window.location.pathname;
     const pathSegments = pathname.split("/");
     userId = pathSegments[pathSegments.length - 1];
-    
+
     const userTokenId = parseJwtToSub(tokenStorage.get());
 
     if (userId === userTokenId) {
         await createMyAccount();
     }
-    
+
     if (userId){
         await loadAccountData(userId);
         await loadAccountDecoration(userId);
     }
 });
 
-let addArtworkBtn;  
+let addArtworkBtn;
 let portfolioText;
 
 async function createMyAccount() {
     const portfolioHeader = document.querySelector('.portfolio-header');
     const portfolioTextContainer = document.querySelector('.portfolio-text-container');
 
-    addArtworkBtn = document.createElement('button');  
+    addArtworkBtn = document.createElement('button');
     addArtworkBtn.classList.add('profile-button');
     addArtworkBtn.id = 'addArtBtn';
 
@@ -124,7 +124,7 @@ async function generateArtsContainer(profileArts) {
 
     let currentIndex = 0;
     const itemsToShow = 3;
-    const itemWidth = 275;
+    const itemWidth = 250;
     const maxIndex = Math.max(0, profileArts.length - itemsToShow);
 
     function updateSliderPosition() {
@@ -152,8 +152,8 @@ async function generateArtsContainer(profileArts) {
 
 async function renderAccountData(data) {
     if (addArtworkBtn){
-        addArtworkBtn.textContent = 'Upgrade';
-        portfolioText.innerText = 'Improve your account by filling additional information to add own artworks';
+        addArtworkBtn.textContent = 'Upgrade account';
+        portfolioText.innerText = 'Upgrade your account by filling additional information to add own artworks';
     }
     profileName.innerText = data.profileName;
     avatarImg.src = `${avatarFolderPath}${data.avatarPath}`;
@@ -162,36 +162,56 @@ async function renderAccountData(data) {
 
 async function createArtistSummary(data) {
     const summaryDiv = document.createElement('div');
-    summaryDiv.className = 'Summary';
+    summaryDiv.className = 'summary';
 
     const summaryContainer = document.createElement('div');
     summaryContainer.className = 'summary-container';
 
     const heading = document.createElement('h1');
     heading.id = 'summary';
-    heading.textContent = 'About artist';
+    heading.textContent = 'About Artist';
 
-    const summaryTextContainer = document.createElement('div');
-    summaryTextContainer.className = 'summary-text-container';
+    const summaryContent = document.createElement('div');
+    summaryContent.className = 'summary-content';
 
-    const contactParagraph = document.createElement('p');
-    contactParagraph.id = 'contact';
-    contactParagraph.textContent = `Contact: ${data.contactInfo}`;
+    const createTextWithIcon = (iconSrc, textHtml) => {
+        const itemContainer = document.createElement('div');
+        itemContainer.className = 'item-container';
 
-    const experienceParagraph = document.createElement('p');
-    experienceParagraph.id = 'experience';
-    experienceParagraph.textContent = `Experience: ${data.summary}`;
+        const iconElement = document.createElement('img');
+        iconElement.src = iconSrc;
+        iconElement.alt = 'icon';
+        iconElement.className = 'icon';
 
-    summaryTextContainer.appendChild(contactParagraph);
-    summaryTextContainer.appendChild(experienceParagraph);
+        const textElement = document.createElement('div');
+        textElement.className = 'text-element';
+        textElement.innerHTML = textHtml;
+
+        itemContainer.appendChild(iconElement);
+        itemContainer.appendChild(textElement);
+        return itemContainer;
+    };
+
+    const fullnameElement = createTextWithIcon('/static/resources/profileIcons/name.png', ` ${data.fullname}`);
+    const contactParagraph = createTextWithIcon('/static/resources/profileIcons/contact.png', `${data.contactInfo}`);
+    const experienceParagraph = createTextWithIcon('/static/resources/profileIcons/experience.png', `${data.summary}`);
+
+    const textContainer = document.createElement('div');
+    textContainer.className = 'text-container';
+    textContainer.appendChild(fullnameElement);
+    textContainer.appendChild(contactParagraph);
+    textContainer.appendChild(experienceParagraph);
+
+    summaryContent.appendChild(textContainer);
 
     summaryContainer.appendChild(heading);
-    summaryContainer.appendChild(summaryTextContainer);
+    summaryContainer.appendChild(summaryContent);
 
     summaryDiv.appendChild(summaryContainer);
-    
+
     return summaryDiv;
 }
+
 
 async function addUpgradeAccountData(data) {
     const wrapper = document.querySelector('.wrapper');
@@ -201,16 +221,7 @@ async function addUpgradeAccountData(data) {
         portfolioText.textContent = 'Add your own artworks so that others can rate and promote you';
     }
 
-    const nameInfo = document.querySelector('.name-info');
     const nameContainer = document.querySelector('.name-container');
-
-    let fullnameElement = document.getElementById('fullname');
-    if (!fullnameElement) {
-        fullnameElement = document.createElement('h1');
-        fullnameElement.id = 'fullname';
-        nameInfo.appendChild(fullnameElement);
-    }
-    fullnameElement.innerText = data.fullname;
 
     let badgeArtistElement = document.getElementById('badge');
     if (!badgeArtistElement) {
@@ -218,7 +229,7 @@ async function addUpgradeAccountData(data) {
         badgeArtistElement.id = 'badge';
         nameContainer.appendChild(badgeArtistElement);
     }
-    badgeArtistElement.innerText = 'artist';
+    badgeArtistElement.innerText = 'PRO';
 
     const portfolio = wrapper.querySelector('.Portfolio');
 
@@ -251,24 +262,24 @@ async function loadAccountData(userId) {
 
         const data = await response.json();
         console.log(data);
-        
+
         if (response.ok) {
             await renderAccountData(data);
 
-            if (data.role === 'artist') { 
+            if (data.role === 'artist') {
                 isArtist = true;
                 let portfolioContainer = portfolio.querySelector('.portfolio-container');
                 if (portfolioContainer) {
-                    portfolioContainer.remove(); 
+                    portfolioContainer.remove();
                 }
-                
+
                 if (data.profileArts.length > 0) {
                     const portfolioContainer = await generateArtsContainer(data.profileArts);
                     portfolio.appendChild(portfolioContainer);
                 }
                 await addUpgradeAccountData(data);
             }
-        } 
+        }
         else if (response.status === 401) {
             const loginSuccessful = await showForm(createLoginForm, '/auth/signin', 'Sign In');
 
@@ -277,9 +288,9 @@ async function loadAccountData(userId) {
                 await loadAccountDecoration(userId);
             }
         }
-        else 
+        else
         {
-           alert(data);
+            alert(data);
         }
     } catch (error) {
         alert(error.message);
@@ -416,7 +427,7 @@ function renderRewards(rewardImages, rewards) {
 
     if (rewards.length === 0) {
         const noRewardsMessage = document.createElement('div');
-        noRewardsMessage.textContent = 'Пока наград нет';
+        noRewardsMessage.textContent = 'There are no rewards yet';
         noRewardsMessage.classList.add('no-rewards-message');
         container.appendChild(noRewardsMessage);
     } else {

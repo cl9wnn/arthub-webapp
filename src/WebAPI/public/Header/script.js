@@ -1,15 +1,20 @@
 ﻿import { tokenStorage } from '../Auth/auth.js';
-import { showForm, createLoginForm, parseJwtToSub, parseJwtToRole} from '../Auth/auth.js';
+import { showForm, createLoginForm, parseJwtToSub, parseJwtToRole } from '../Auth/auth.js';
+const homeBtn = document.getElementById('homeBtn');
 
 document.addEventListener('DOMContentLoaded', () => {
     setupHeaderButtons();
+    
+    homeBtn.addEventListener('click', () => {
+        window.location.href = '/';
+    });
 });
 
 function setupHeaderButtons() {
     const headerButtonsContainer = document.querySelector('.header-buttons');
-    
+
     headerButtonsContainer.innerHTML = '';
-    
+
     if (tokenStorage.get()) {
         createLoggedInButtons(headerButtonsContainer);
     } else {
@@ -20,12 +25,12 @@ function setupHeaderButtons() {
 function createLoggedInButtons(container) {
     const accountButton = createButton('btnImg', 'accountBtn');
     const savingsButton = createButton('btnImg', 'savingsBtn');
-
+    
     const token = tokenStorage.get();
     if (token) {
         const userRole = parseJwtToRole(token);
         console.log(userRole);
-        
+
         if (userRole === 'artist') {
             const marketButton = createButton('btnImg', 'marketBtn');
             container.append(marketButton);
@@ -42,7 +47,8 @@ function createLoggedInButtons(container) {
     const logoutLink = document.createElement('a');
     logoutLink.href = '#';
     logoutLink.textContent = 'Log Out';
-    logoutLink.addEventListener('click', () => {
+    logoutLink.addEventListener('click', (event) => {
+        event.stopPropagation();
         tokenStorage.remove();
         setupHeaderButtons();
         window.location.href = '/';
@@ -51,9 +57,17 @@ function createLoggedInButtons(container) {
     const switchAccountLink = document.createElement('a');
     switchAccountLink.href = '#';
     switchAccountLink.textContent = 'Switch Account';
-    switchAccountLink.addEventListener('click', async () => {
+    switchAccountLink.addEventListener('click', async (event) => {
+        event.stopPropagation();
         tokenStorage.remove();
-        await handleSignIn();
+        const success = await handleSignIn();
+        if (success) {
+            const newToken = tokenStorage.get();
+            if (newToken) {
+                const newUserId = parseJwtToSub(newToken);
+                window.location.href = `/account/${newUserId}`;
+            }
+        }
     });
 
     dropdownMenu.append(logoutLink, switchAccountLink);
@@ -61,7 +75,7 @@ function createLoggedInButtons(container) {
 
     accountButton.addEventListener('click', () => {
         if (token) {
-            const userId = parseJwtToSub(token); 
+            const userId = parseJwtToSub(token);
             window.location.href = `/account/${userId}`;
         } else {
             console.error('User is not logged in.');
@@ -100,7 +114,8 @@ function createButton(className, id, text = '') {
 async function handleSignIn() {
     const success = await showForm(createLoginForm, '/auth/signin', 'Sign in');
     if (success) {
-        setupHeaderButtons(); 
+        setupHeaderButtons();
         await loadArtworkList();
     }
+    return success;
 }
