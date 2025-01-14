@@ -24,16 +24,18 @@ body {
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    margin-bottom:20px;
 }
 
 .header-container h1 {
     font-size: 40px;
-    color: #c7d5e0;
+    color: #5598c4;
+    margin-bottom: 10px;
 }
 
 .header-container h3 {
     font-size:20px;
-    color: #959ca6;
+    color: #c8c8c8;
 }
 
 .arts-container {
@@ -84,9 +86,8 @@ body {
     height: 20px;
     cursor: pointer;
     font-size: 24px; 
-    font-weight: bold;
     background-color: transparent;
-    color: #dc0000; 
+    color: #434343;
     padding: 0;
     border: none;
     display: flex;
@@ -96,5 +97,5 @@ body {
 }
 
 .closeBtn:hover {
-    color: #900000; 
+    color: #b60000; 
 }

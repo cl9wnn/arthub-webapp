@@ -16,12 +16,12 @@ body {
 }
 
 .main-container {
-    margin-top: 85px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: stretch;
     width: 100%;
+    margin: 70px 20px 0 20px;
     max-width: 1500px;
     height: 80vh;
     gap: 20px;
@@ -40,6 +40,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative; 
 }
 
 .image-area img {
@@ -77,6 +78,10 @@ body {
 }
 
 .like-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
     margin-top: 15px;
 }
 
@@ -86,6 +91,65 @@ body {
     margin-top: 20px;
 }
 
+#title{
+    color: #7fb1d9;
+    font-size: 32px;
+    margin-top:6px;
+}
+
+#description{
+    font-size: 18px;
+    margin-bottom: 5px;
+    font-style: italic;
+}
+
+#category {
+    color: #ececec;
+    margin-bottom: 30px;
+}
+
+.like-item{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+}
+
+.like-item p{
+    margin:0;
+    font-size: 20px;
+}
+.icon{
+    width: 30px;
+    height: 30px;
+    margin-right: 3px;
+}
+.switchBtn {
+    width: 40px;
+    height: 40px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    position: absolute; 
+    top: 50%; 
+    transform: translateY(-50%); 
+}
+
+#prevImgBtn {
+    left: 1px; 
+    background-image: url("/static/resources/artworkIcons/arrow.png");
+    transform: translateY(-50%) scaleX(-1); 
+}
+
+#nextImgBtn {
+    right: 1px;
+    background-image: url("/static/resources/artworkIcons/arrow.png");
+    transform: translateY(-50%);
+}
 .post-btn {
     background-color: #333333;
     color: #e0e0e0;
@@ -107,7 +171,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-top: auto;
+    margin-top: 60px;
     cursor: pointer;
 }
 
@@ -262,7 +326,7 @@ body {
 }
 
 .rewards-area{
-    margin-top: 20px;    
+    margin-top: 30px;    
 }
 
 .reward img {
@@ -323,10 +387,13 @@ body {
 .reward-item {
     position: relative;
     display: inline-block;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
 }
 
+.rewards-area h2{
+    
+}
 .reward-img {
     width: 100%;
     height: 100%;
@@ -342,4 +409,9 @@ body {
     font-size: 12px;
     padding: 2px 4px;
     border-radius: 4px;
+}
+
+.no-rewards-message{
+    margin-top: 5px;
+    color: #b6b6b6;
 }

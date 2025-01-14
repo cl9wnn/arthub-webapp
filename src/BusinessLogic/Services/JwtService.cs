@@ -24,7 +24,7 @@ public static class JwtService
         var token = new JwtSecurityToken(
             issuer: "http://localhost:5050",
             audience: "http://localhost:5050",
-            expires: DateTime.Now.AddMinutes(1),
+            expires: DateTime.Now.AddMinutes(5),
             claims: claims,
             signingCredentials: credentials
         );

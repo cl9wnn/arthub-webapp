@@ -17,9 +17,9 @@
 </header>
 <div class="main-container">
     <div class="image-area">
-        <button id="prevImgBtn">prev</button>
+        <button class="switchBtn" id="prevImgBtn"></button>
         <img id="artImg" src="" alt="Art Image">
-        <button id="nextImgBtn">next</button>
+        <button class="switchBtn" id="nextImgBtn"></button>
     </div>
     <div class="info-area">
         <div class="artwork-details">
@@ -27,12 +27,14 @@
             <p id="description"></p>
             <p id="category"></p>
             <div class="like-container">
-                <p id="like-text">Likes: </p>
-                <p id="view-text">Views: </p>
-            </div>
-            <div class="tags-container">
-                <p id="tag-text">Tags:</p>
-                <div class="tags"></div>
+                <div class="like-item">
+                    <img src="/static/resources/artworkIcons/like.png" alt="Likes" class="icon">
+                    <p id="like-text"> </p>
+                </div>
+                <div class="like-item">
+                    <img src="/static/resources/artworkIcons/view.png" alt="Likes" class="icon">
+                    <p id="view-text"> </p>
+                </div>
             </div>
         </div>
         <div class="button-area">
@@ -41,7 +43,7 @@
             <button class="post-btn" id="reward-btn">Reward</button>
         </div>
         <div class="rewards-area">
-            <h3>Награды</h3>
+            <h2>Награды</h2>
             <div class="rewards-container">
                 
             </div>
