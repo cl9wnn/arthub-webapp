@@ -14,7 +14,7 @@ body {
 /*  --------------------------------  MAIN -------------------------------- */
 
 .main-container {
-    margin-top: 80px;
+    margin-top: 100px;
     display: flex;
     background-color: #121212;
     justify-content: center;
@@ -26,7 +26,7 @@ body {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 6px;
-    padding: 100px 20px 20px;
+    padding: 40px 20px 20px;
 }
 
 .artwork {
@@ -127,68 +127,115 @@ body {
     padding: 10px;
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+    gap: 10px;
 }
 
+/* Поисковая строка */
 .search-bar {
     width: 500px;
-    padding: 10px;
+    padding: 12px;
     font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    color: #ffffff;
+    background-color: #2b2b2b;
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
     outline: none;
-    transition: box-shadow 0.2s ease;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-/*  --------------------------------  SORT -------------------------------- */
-
-
-.search-bar:focus {
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-    border-color: rgba(0, 123, 255, 0.5);
+.search-bar::placeholder {
+    color: #a0a0a0;
 }
 
-.sort-dropdown {
-    margin-left: 10px;
-    padding: 10px;
+/* Стили для выпадающих списков (селектов) */
+.sort-dropdown, #category {
+    padding: 12px;
     font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    color: #ffffff;
+    background-color: #2b2b2b;
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
     outline: none;
     cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
-/*  --------------------------------  TAGS -------------------------------- */
+.sort-dropdown:hover, #category:hover {
+    border-color: #555;
+    background-color: #292929;
+}
 
+.sort-dropdown option, #category option {
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
 
+/* Теги */
 .tag-container {
     display: flex;
-    flex-direction: row;
     flex-wrap: wrap;
     gap: 10px;
+    justify-content: center;
     margin-top: 10px;
 }
 
 .tag {
     padding: 8px 16px;
     font-size: 14px;
-    font-family: Arial, sans-serif;
-    color: #333;
-    background-color: #f9f9f9;
-    border: 2px solid #ddd;
+    color: #bcbcbc;
+    background-color: #2a2a2a;
+    border: 1px solid #3a3a3a;
     border-radius: 20px;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
 .tag:hover {
-    background-color: #e0e0e0;
-    border-color: #bbb;
+    background-color: #3e3e3e;
+    border-color: #555;
+    color: #ffffff;
 }
 
 .tag.selected {
     background-color: #007bff;
-    color: white;
+    color: #ffffff;
     border-color: #0056b3;
     font-weight: bold;
+}
+
+/* Адаптивность */
+@media (max-width: 1200px) {
+    .search-bar {
+        width: 400px;
+    }
+}
+
+@media (max-width: 800px) {
+    .parameters-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    .search-bar {
+        width: 300px;
+    }
+    .sort-dropdown, #category {
+        width: 300px;
+    }
+}
+
+@media (max-width: 500px) {
+    .search-bar {
+        width: 100%;
+    }
+    .sort-dropdown, #category {
+        width: 100%;
+    }
+    .tag-container {
+        gap: 5px;
+    }
+    .tag {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
 }

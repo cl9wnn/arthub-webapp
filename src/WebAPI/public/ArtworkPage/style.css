@@ -303,6 +303,12 @@ body {
     color: #666;
 }
 
+.modal-footer{
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+}
+
 /* Секция наград */
 .rewards {
     display: flex;
@@ -363,24 +369,26 @@ body {
 }
 
 /* Кнопка подтверждения */
-.confirm-button {
-    align-self: flex-end;
+#confirmButton {
     padding: 10px 20px;
     font-size: 16px;
+    margin-top:20px;
     background-color: #007bff;
     color: #fff;
+    align-items: center;
+    justify-content: center;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
 }
 
-.confirm-button:disabled {
+#confirmButton:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
 }
 
-.confirm-button:hover:not(:disabled) {
+#confirmButton:hover:not(:disabled) {
     background-color: #0056b3;
 }
 

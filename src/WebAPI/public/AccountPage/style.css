@@ -21,7 +21,7 @@ body {
 .wrapper {
     margin-top: 80px;
     width: 800px;
-    background-color: rgb(41, 41, 41);
+    background-color: rgb(32, 32, 32);
     overflow: hidden;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     padding: 20px;

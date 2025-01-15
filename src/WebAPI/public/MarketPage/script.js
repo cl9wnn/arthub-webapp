@@ -97,7 +97,6 @@ async function buyDecoration(decorationId) {
         });
         
         if (response.ok) {
-            await showInfoModal();
             await updateBalance();
             
             await loadDecorationList();
@@ -256,17 +255,12 @@ async function createBuyModal(cardId) {
     const buttonsContainer = document.createElement('div');
     buttonsContainer.className = 'modal-buttons';
 
-    const noButton = document.createElement('button');
-    noButton.textContent = 'Нет';
-    noButton.addEventListener('click', hideModal);
-
     const yesButton = document.createElement('button');
     yesButton.textContent = 'Да';
     yesButton.addEventListener('click', async () => {
         await buyDecoration(cardId);  
         hideModal();  
     });
-    buttonsContainer.appendChild(noButton);
     buttonsContainer.appendChild(yesButton);
 
     modal.appendChild(message);
@@ -275,32 +269,9 @@ async function createBuyModal(cardId) {
     document.body.appendChild(overlay);
     overlay.appendChild(modal);
 }
-function createInfoModal() {
-    const modal = document.createElement('div');
-    modal.className = 'infoModal';
-
-    const message = document.createElement('p');
-    message.className = 'message-text';
-    message.textContent = 'Удачная покупка!';
-
-    const button = document.createElement('button');
-    button.textContent = 'Ок';
-    button.addEventListener('click', async () => {
-        if (modal) modal.remove();
-    });
-
-    modal.appendChild(message);
-    modal.appendChild(button);
-
-    document.body.appendChild(modal);
-}
 
 async function showBuyModal(cardId) {
     await createBuyModal(cardId);
-}
-
-async function showInfoModal() {
-    await createInfoModal();
 }
 
 function hideModal() {

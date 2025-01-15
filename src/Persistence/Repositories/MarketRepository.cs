@@ -153,7 +153,7 @@ public class MarketRepository(QueryMapper queryMapper)
                                                         FROM decorations
                                                         INNER JOIN decorationTypes
                                                         ON decorations.type_id = decorationTypes.type_id
-                                                        
+                                                        ORDER BY decoration_id ASC;
                                                     """;
         return await queryMapper.ExecuteAndReturnListAsync<Decoration?>(selectDecorationsQuery, cancellationToken);
     }

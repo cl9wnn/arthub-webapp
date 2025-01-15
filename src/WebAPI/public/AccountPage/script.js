@@ -238,13 +238,17 @@ async function addUpgradeAccountData(data) {
         existingSummary.remove();
     }
 
+    const existingRewardContainer = wrapper.querySelector('.rewards'); 
+    if (existingRewardContainer) {
+        existingRewardContainer.remove();
+    }
+
     const summaryContainer = await createArtistSummary(data);
     summaryContainer.classList.add('artist-summary');
     wrapper.insertBefore(summaryContainer, portfolio);
 
     const rewardContainer = await renderRewards(rewardImages, data.rewards);
     wrapper.appendChild(rewardContainer);
-
 }
 
 // загружаем данные аккаунта
