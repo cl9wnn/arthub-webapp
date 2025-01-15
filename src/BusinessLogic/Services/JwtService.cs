@@ -7,7 +7,7 @@ namespace BusinessLogic.Services;
 
 public static class JwtService
 {
-      private const string? SecretKey = "15tkwagt2h6k8m3vs9z9qf21qkgbheho155mbs";
+    private static readonly string? SecretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
 
     public static string GenerateJwtToken(User? user)
     {

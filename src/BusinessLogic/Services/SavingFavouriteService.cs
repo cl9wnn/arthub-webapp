@@ -1,10 +1,11 @@
 ﻿using BusinessLogic.Models;
 using Persistence.Entities;
+using Persistence.interfaces;
 using Persistence.Repositories;
 
 namespace BusinessLogic.Services;
 
-public class SavingFavouriteService(SavingFavouriteRepository savingFavouriteRepository)
+public class SavingFavouriteService(ISavingFavouriteRepository savingFavouriteRepository)
 {
     public async Task<Result<List<SavingArtModel>>> GetSavingFavouritesAsync(int userId, CancellationToken cancellationToken)
     {

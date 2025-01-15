@@ -2,11 +2,12 @@
 using BusinessLogic.Models;
 using BusinessLogic.Validators;
 using Persistence.Entities;
+using Persistence.interfaces;
 using Persistence.Repositories;
 
 namespace BusinessLogic.Services;
 
-public class UserService(UserRepository userRepository, FileService fileService, IPasswordHasher passwordHasher)
+public class UserService(IUserRepository userRepository, FileService fileService, IPasswordHasher passwordHasher)
 {
     public async Task<Result<JwtTokenModel>> RegisterUserAsync(UserModel userModel, string fileData, string contentType,
         CancellationToken cancellationToken)

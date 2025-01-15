@@ -1,11 +1,12 @@
 ﻿using BusinessLogic.Interfaces;
 using BusinessLogic.Models;
 using Persistence.Entities;
+using Persistence.interfaces;
 using Persistence.Repositories;
 
 namespace BusinessLogic.Services;
 
-public class AccountService(UserRepository userRepository, ArtworkRepository artworkRepository, MarketRepository marketRepository)
+public class AccountService(IUserRepository userRepository, IArtworkRepository artworkRepository, IMarketRepository marketRepository)
 {
     
     public async Task<Result<UserProfileModel>> GetUserDataAsync(int id, CancellationToken cancellationToken)

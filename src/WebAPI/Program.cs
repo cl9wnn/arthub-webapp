@@ -5,6 +5,7 @@ using Infrastructure;
 using MyFramework;
 using MyFramework.TemplateGenerator;
 using MyORM;
+using Persistence.interfaces;
 using Persistence.Repositories;
 
 var httpListener = new HttpListener();
@@ -13,27 +14,38 @@ httpListener.Start();
 
 var serviceProvider = new MyServiceCollection();
 
-serviceProvider.AddSingleton<QueryMapper>();
-serviceProvider.AddSingleton<UserRepository>();
-serviceProvider.AddSingleton<ArtistRepository>();
-serviceProvider.AddSingleton<ArtworkRepository>();
-serviceProvider.AddSingleton<MarketRepository>();
-serviceProvider.AddSingleton<SavingFavouriteRepository>();
+serviceProvider.AddSingleton<QueryMapper>(() =>
+    new QueryMapper(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!));
+
+serviceProvider.AddSingleton<IS3Storage<string>, MinioService>(() => 
+                new MinioService("image-bucket", 
+        Environment.GetEnvironmentVariable("MINIO_ACCESS_KEY")!,
+        Environment.GetEnvironmentVariable("MINIO_SECRET_KEY")!));
+
+serviceProvider.AddSingleton<IPasswordHasher, PasswordHasher>();
+
+serviceProvider.AddSingleton<IUserRepository,UserRepository>();
 serviceProvider.AddSingleton<UserService>();
+
+serviceProvider.AddSingleton<IArtistRepository,ArtistRepository>();
+serviceProvider.AddSingleton<ArtistService>();
+
+serviceProvider.AddSingleton<IArtworkRepository,ArtworkRepository>();
+serviceProvider.AddSingleton<ArtworkService>();
+
+serviceProvider.AddSingleton<IMarketRepository,MarketRepository>();
+serviceProvider.AddSingleton<MarketService>();
+
+serviceProvider.AddSingleton<ISavingFavouriteRepository,SavingFavouriteRepository>();
+serviceProvider.AddSingleton<SavingFavouriteService>();
+
 serviceProvider.AddSingleton<AccountService>();
 serviceProvider.AddSingleton<FileService>();
-serviceProvider.AddSingleton<ArtistService>();
-serviceProvider.AddSingleton<ArtworkService>();
-serviceProvider.AddSingleton<MarketService>();
-serviceProvider.AddSingleton<SavingFavouriteService>();
-serviceProvider.AddSingleton<IS3Storage<string>,MinioService>();
-serviceProvider.AddSingleton<IPasswordHasher, PasswordHasher>();
 
 var authService = new AuthorizationService();
 
 var templateGenerator = new TemplateGenerator();
 var errorSender = new ErrorSender(templateGenerator);
-
 var routeHandler = new RouteHandler(serviceProvider, errorSender, authService);
 
 while (httpListener.IsListening)

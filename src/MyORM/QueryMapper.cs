@@ -7,16 +7,14 @@ using System.Transactions;
 using Npgsql;
 namespace MyORM;
 
-public class QueryMapper
+public class QueryMapper(string connectionString)
 {
-    //TODO: перенести в secret
-    private const string ConnectionString = "Host=localhost;Port=5555;Username=postgres;Password=1029384756u;Database=arthub";
-    private readonly NpgsqlConnection _connection = new(ConnectionString);
+    private readonly NpgsqlConnection _connection = new(connectionString);
 
-    private static readonly MethodInfo GetStringMethod = typeof(DataReaderExtensions).GetMethod("GetStringOrDefault")!;
-    private static readonly MethodInfo GetIntMethod = typeof(DataReaderExtensions).GetMethod("GetIntOrDefault")!;
-    private static readonly MethodInfo GetDateMethod = typeof(DataReaderExtensions).GetMethod("GetDateOrDefault")!;
-    private static readonly MethodInfo GetBoolMethod = typeof(DataReaderExtensions).GetMethod("GetBoolOrDefault")!;
+    private static readonly MethodInfo GetStringMethod = typeof(DataReaderExtensions).GetMethod("GetStringOrDefault")!, 
+        GetIntMethod = typeof(DataReaderExtensions).GetMethod("GetIntOrDefault")!,
+        GetDateMethod = typeof(DataReaderExtensions).GetMethod("GetDateOrDefault")!,
+        GetBoolMethod = typeof(DataReaderExtensions).GetMethod("GetBoolOrDefault")!;
     
 
     private static readonly ConcurrentDictionary<Type, Delegate> MapperFuncs = new();
@@ -159,6 +157,7 @@ public class QueryMapper
         
         return Expression.Lambda<Func<IDataReader, T>>(memberInit, readerParam).Compile();
     }
+    
     private static Expression BuildReadColumnExpression(Expression reader, PropertyInfo prop)
     {
         var columnName = prop.GetCustomAttribute<ColumnNameAttribute>()?.Name ?? prop.Name;

@@ -1,10 +1,11 @@
 ﻿using BusinessLogic.Models;
 using Persistence.Entities;
+using Persistence.interfaces;
 using Persistence.Repositories;
 
 namespace BusinessLogic.Services;
 
-public class MarketService(MarketRepository marketRepository, ArtworkRepository artworkRepository)
+public class MarketService(IMarketRepository marketRepository, IArtworkRepository artworkRepository)
 {
     public async Task<Result<List<Reward>>> GetRewardListAsync(CancellationToken cancellationToken)
     {

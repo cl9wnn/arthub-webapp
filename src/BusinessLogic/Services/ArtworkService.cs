@@ -2,12 +2,13 @@
 using BusinessLogic.Validators;
 using Npgsql.Internal.Postgres;
 using Persistence.Entities;
+using Persistence.interfaces;
 using Persistence.Repositories;
 
 namespace BusinessLogic.Services;
 
-public class ArtworkService(FileService fileService, ArtworkRepository artworkRepository, 
-   SavingFavouriteRepository savingFavouriteRepository, UserRepository userRepository, MarketRepository marketRepository)
+public class ArtworkService(FileService fileService, IArtworkRepository artworkRepository, 
+   ISavingFavouriteRepository savingFavouriteRepository, IUserRepository userRepository, IMarketRepository marketRepository)
 {
     public async Task<Result<Artwork>> SaveArtAsync(ArtworkModel artworkModel,  string fileData, string contentType,
         CancellationToken cancellationToken)

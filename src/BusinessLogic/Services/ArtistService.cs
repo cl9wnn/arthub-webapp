@@ -1,10 +1,11 @@
 ﻿using BusinessLogic.Models;
 using BusinessLogic.Validators;
+using Persistence.interfaces;
 using Persistence.Repositories;
 
 namespace BusinessLogic.Services;
 
-public class ArtistService(ArtistRepository repository)
+public class ArtistService(IArtistRepository repository)
 {
     public async Task<Result<JwtTokenModel>> RegisterArtistAsync(ArtistModel artistModel,
         CancellationToken cancellationToken)

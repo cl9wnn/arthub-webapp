@@ -1,10 +1,11 @@
 ﻿using System.Transactions;
 using MyORM;
 using Persistence.Entities;
+using Persistence.interfaces;
 
 namespace Persistence.Repositories;
 
-public class MarketRepository(QueryMapper queryMapper)
+public class MarketRepository(QueryMapper queryMapper): IMarketRepository
 {
     public async Task AddPointsToBalanceAsync(int userId, int pointsCount, CancellationToken cancellationToken = default)
     {

@@ -3,25 +3,21 @@ using Minio.DataModel.Args;
 using BusinessLogic.Interfaces;
 namespace Infrastructure;
 
-public class MinioService: IS3Storage<string>
+public class MinioService(string bucketName, string accessKey, string secretKey): IS3Storage<string>
 {
-    //TODO: сделать конфиг и брать ключи оттуда
-    private const string BucketName = "image-bucket";
     private const string Endpoint = "localhost:9000";
-    private const string AccessKey = "cl9wn";
-    private const string SecretKey = "1029384756u";
 
     private readonly IMinioClient _minioClient = new MinioClient()
         .WithEndpoint(Endpoint)
-        .WithCredentials(AccessKey, SecretKey)
+        .WithCredentials(accessKey, secretKey)
         .Build();
 
     private async Task EnsureBucketExistsAsync()
     {
-        var found = await _minioClient.BucketExistsAsync(new BucketExistsArgs().WithBucket(BucketName));
+        var found = await _minioClient.BucketExistsAsync(new BucketExistsArgs().WithBucket(bucketName));
         if (!found)
         {
-            await _minioClient.MakeBucketAsync(new MakeBucketArgs().WithBucket(BucketName));
+            await _minioClient.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucketName));
         }
     }
 
@@ -33,13 +29,13 @@ public class MinioService: IS3Storage<string>
 
             using var stream = new MemoryStream(fileBytes);
             await _minioClient.PutObjectAsync(new PutObjectArgs()
-                .WithBucket(BucketName)
+                .WithBucket(bucketName)
                 .WithObject(objectName)
                 .WithStreamData(stream)
                 .WithObjectSize(fileBytes.Length)
                 .WithContentType(contentType), cancellationToken);
 
-            var objectUrl = $"{Endpoint}/{BucketName}/{objectName}";
+            var objectUrl = $"{Endpoint}/{bucketName}/{objectName}";
             return objectUrl;
         }
         catch (Exception ex)
@@ -53,7 +49,7 @@ public class MinioService: IS3Storage<string>
         try
         {
             await _minioClient.RemoveObjectAsync(new RemoveObjectArgs()
-                .WithBucket(BucketName)
+                .WithBucket(bucketName)
                 .WithObject(objectName), cancellationToken);
             return true;
         }
@@ -71,7 +67,7 @@ public class MinioService: IS3Storage<string>
             using var memoryStream = new MemoryStream();
         
             await _minioClient.GetObjectAsync(new GetObjectArgs()
-                .WithBucket(BucketName)
+                .WithBucket(bucketName)
                 .WithObject(objectName)
                 .WithCallbackStream(async (stream) =>
                 {

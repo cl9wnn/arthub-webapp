@@ -5,7 +5,7 @@ using Persistence.Entities;
 
 namespace BusinessLogic.Services;
 
-public class AuthorizationService: IAuthService //TODO: переделать!
+public class AuthorizationService: IAuthService
 {
     public Task<IAuthEntity?> AuthorizeUserAsync(HttpListenerContext context, CancellationToken cancellationToken)
     {
