@@ -5,6 +5,7 @@ using Infrastructure;
 using MyFramework;
 using MyFramework.TemplateGenerator;
 using MyORM;
+using MyORM.interfaces;
 using Persistence.interfaces;
 using Persistence.Repositories;
 
@@ -14,7 +15,7 @@ httpListener.Start();
 
 var serviceProvider = new MyServiceCollection();
 
-serviceProvider.AddSingleton<QueryMapper>(() =>
+serviceProvider.AddSingleton<IQueryMapper, QueryMapper>(() =>
     new QueryMapper(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!));
 
 serviceProvider.AddSingleton<IS3Storage<string>, MinioService>(() => 

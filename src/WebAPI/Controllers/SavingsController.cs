@@ -11,13 +11,6 @@ namespace WebAPI.Controllers;
 
 public class SavingsController(SavingFavouriteService savingFavouriteService): MyBaseController
 {
-    [HttpGet("/savings")]
-    public IMyActionResult ShowMarket()
-    {
-        const string path = "public/SavingsPage/index.html";
-        return new ResourceResult(path);
-    }
-
     [Authorize("user","artist")]
     [HttpGet("/api/get-savings")]
     public async Task<IMyActionResult> GetSavings(HttpListenerContext context, CancellationToken cancellationToken)

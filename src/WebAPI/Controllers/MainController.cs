@@ -11,13 +11,6 @@ namespace WebAPI.Controllers;
 
 public class MainController(ArtworkService artworkService): MyBaseController
 {
-    [HttpGet("/")]
-    public IMyActionResult ShowIndexAsync()
-    {
-        const string path = "public/MainPage/index.html";
-        return new ResourceResult(path);
-    }
-
     [HttpGet("/api/get-artworks")]
     public async Task<IMyActionResult> GetArtworksForGalleryAsync(CancellationToken cancellationToken)
     {

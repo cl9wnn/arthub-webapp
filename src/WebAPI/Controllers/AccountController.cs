@@ -11,29 +11,6 @@ namespace WebAPI.Controllers;
 
 public class AccountController(AccountService accountService): MyBaseController
 {
-    
-    [HttpGet("/account/{userId}")]
-    public IMyActionResult ShowAccountPageAsync()
-    {
-        const string path = "public/AccountPage/index.html";
-        return new ResourceResult(path);
-    }
-    
-    [HttpGet("/register-account")]
-    public IMyActionResult ShowRegisterPageAsync()
-    {
-        const string path = "public/RegistrationPage/index.html";
-        return new ResourceResult(path);
-    }
-    
-    [HttpGet("/register-artist")]
-    public IMyActionResult ShowRegistrationArtistPageAsync()
-    {
-        const string path = "public/RegistrationArtistPage/index.html";
-        return new ResourceResult(path);
-    }
-    
-    
     [Authorize("user", "artist")]
     [HttpGet("/api/account/{userId}")]
     public async Task<IMyActionResult> ShowAccountInfoAsync(int userId, CancellationToken cancellationToken)

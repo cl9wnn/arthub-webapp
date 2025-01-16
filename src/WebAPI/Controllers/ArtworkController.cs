@@ -14,21 +14,6 @@ namespace WebAPI.Controllers;
 
 public class ArtworkController(ArtworkService artworkService): MyBaseController
 {
-    [HttpGet("/new/artwork")]
-    public IMyActionResult ShowAddArtworkPage()
-    {
-        const string path = "public/AddArtworkPage/index.html";
-        return new ResourceResult(path);
-    }
-
-    [HttpGet("/artwork/{id}")]
-    public IMyActionResult ShowArtworkPage()
-    {
-        const string path = "public/ArtworkPage/index.html";
-        return new ResourceResult(path);
-    }
-    
-    
     [Authorize("user","artist")]
     [HttpGet("/api/artwork-rewards/{artworkId}")]
     public async Task<IMyActionResult> GetArtworkRewardsAsync(int artworkId, HttpListenerContext context, CancellationToken cancellationToken)
