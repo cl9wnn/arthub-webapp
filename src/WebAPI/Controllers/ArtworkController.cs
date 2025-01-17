@@ -1,8 +1,6 @@
 ﻿using System.Net;
-using System.Runtime.Loader;
-using System.Security.Cryptography;
-using BusinessLogic.Models;
-using BusinessLogic.Services;
+using Application.Models;
+using Application.Services;
 using MyFramework;
 using MyFramework.Attributes;
 using MyFramework.Contracts;

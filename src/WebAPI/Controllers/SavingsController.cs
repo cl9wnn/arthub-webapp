@@ -1,6 +1,6 @@
 ﻿using System.Net;
-using BusinessLogic.Models;
-using BusinessLogic.Services;
+using Application.Models;
+using Application.Services;
 using MyFramework;
 using MyFramework.Attributes;
 using MyFramework.Contracts;

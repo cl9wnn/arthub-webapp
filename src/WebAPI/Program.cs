@@ -1,6 +1,7 @@
 ﻿using System.Net;
-using BusinessLogic.Interfaces;
-using BusinessLogic.Services;
+using Application.Interfaces;
+using Application.Services;
+using Application.Services;
 using Infrastructure;
 using MyFramework;
 using MyFramework.TemplateGenerator;

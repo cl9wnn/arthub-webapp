@@ -1,6 +1,7 @@
-﻿using Minio;
+﻿using Application.Interfaces;
+using Minio;
 using Minio.DataModel.Args;
-using BusinessLogic.Interfaces;
+
 namespace Infrastructure;
 
 public class MinioService(string bucketName, string accessKey, string secretKey): IS3Storage<string>

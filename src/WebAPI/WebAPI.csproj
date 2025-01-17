@@ -27,7 +27,7 @@
 	  <ProjectReference Include="..\MyORM\MyORM.csproj" />
 	  <ProjectReference Include="..\MyFramework\MyFramework.csproj" />
 	  <ProjectReference Include="..\Persistence\Persistence.csproj" />
-		<ProjectReference Include="..\BusinessLogic\BusinessLogic.csproj" />
+		<ProjectReference Include="..\Application\Application.csproj" />
 	</ItemGroup>
 	
 	<ItemGroup>

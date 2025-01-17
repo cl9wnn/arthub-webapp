@@ -1,5 +1,5 @@
 ﻿using System.Security.Cryptography;
-using BusinessLogic.Interfaces;
+using Application.Interfaces;
 
 namespace Infrastructure;
 

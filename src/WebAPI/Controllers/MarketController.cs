@@ -1,9 +1,9 @@
 ﻿using System.Net;
-using BusinessLogic.Models;
+using Application.Models;
 using MyFramework;
 using MyFramework.Attributes;
 using MyFramework.Contracts;
-using BusinessLogic.Services;
+using Application.Services;
 using MyFramework.Views;
 using Persistence.Entities;
 using WebAPI.Models;
