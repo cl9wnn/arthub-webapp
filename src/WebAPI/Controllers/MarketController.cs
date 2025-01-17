@@ -12,13 +12,6 @@ namespace WebAPI.Controllers;
 
 public class MarketController(MarketService marketService): MyBaseController
 {
-    [HttpGet("/market")]
-    public IMyActionResult ShowMarket()
-    {
-        const string path = "public/MarketPage/index.html";
-        return new ResourceResult(path);
-    }
-
     [Authorize("user", "artist")]
     [HttpPost("/api/give-reward")]
     public async Task<IMyActionResult> GiveRewardToArtworkAsync([FromBody]RewardDto? reward, 
