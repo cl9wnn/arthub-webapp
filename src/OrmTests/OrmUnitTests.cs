@@ -1,11 +1,12 @@
 using MyORM;
+using MyORM.interfaces;
 using Persistence.Entities;
 
 namespace OrmTests;
 
 public class OrmUnitTests
 {
-    private readonly QueryMapper _mapper;
+    private readonly IQueryMapper _mapper;
 
     public OrmUnitTests()
     {

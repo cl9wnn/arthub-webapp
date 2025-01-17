@@ -4,10 +4,11 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Transactions;
+using MyORM.interfaces;
 using Npgsql;
 namespace MyORM;
 
-public class QueryMapper(string connectionString)
+public class QueryMapper(string connectionString) : IQueryMapper
 {
     private readonly NpgsqlConnection _connection = new(connectionString);
 

@@ -1,10 +1,11 @@
 ﻿using MyORM;
+using MyORM.interfaces;
 using Persistence.Entities;
 using Persistence.interfaces;
 
 namespace Persistence.Repositories;
 
-public class ArtistRepository(QueryMapper queryMapper): IArtistRepository
+public class ArtistRepository(IQueryMapper queryMapper): IArtistRepository
 {
     public async Task CreateArtistAsync(int userId, string fullname, string summary, string contactInfo,
         CancellationToken cancellationToken)

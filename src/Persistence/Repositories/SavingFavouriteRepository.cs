@@ -1,10 +1,11 @@
 ﻿using MyORM;
+using MyORM.interfaces;
 using Persistence.Entities;
 using Persistence.interfaces;
 
 namespace Persistence.Repositories;
 
-public class SavingFavouriteRepository(QueryMapper queryMapper): ISavingFavouriteRepository
+public class SavingFavouriteRepository(IQueryMapper queryMapper): ISavingFavouriteRepository
 {
     public async Task<Artwork?> DeleteSavingArtworkAsync(int userId, int artworkId, CancellationToken cancellationToken)
     {

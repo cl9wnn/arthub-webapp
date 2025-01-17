@@ -1,10 +1,11 @@
 ﻿using MyORM;
+using MyORM.interfaces;
 using Persistence.Entities;
 using Persistence.interfaces;
 
 namespace Persistence.Repositories;
 
-public class ArtworkRepository(QueryMapper queryMapper): IArtworkRepository
+public class ArtworkRepository(IQueryMapper queryMapper): IArtworkRepository
 {
     public async Task<Artwork?> InsertArtworkAsync(Artwork artwork, List<string> tags, CancellationToken cancellationToken)
     {

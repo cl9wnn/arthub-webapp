@@ -1,10 +1,11 @@
 ﻿using MyORM;
+using MyORM.interfaces;
 using Persistence.Entities;
 using Persistence.interfaces;
 
 namespace Persistence.Repositories;
 
-public class UserRepository(QueryMapper queryMapper):IUserRepository
+public class UserRepository(IQueryMapper queryMapper):IUserRepository
 {
     public async Task<User?> CreateUserAsync(User user, CancellationToken cancellationToken = default)
     {
