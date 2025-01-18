@@ -3,6 +3,7 @@ using MyORM;
 using MyORM.interfaces;
 using Persistence.Entities;
 using Persistence.interfaces;
+using IsolationLevel = System.Data.IsolationLevel;
 
 namespace Persistence.Repositories;
 
@@ -117,7 +118,7 @@ public class MarketRepository(IQueryMapper queryMapper): IMarketRepository
 
                 await queryMapper.ExecuteWithTransactionAsync(addPointsQuery, transaction, cancellationToken);
 
-            }, cancellationToken);
+            }, IsolationLevel.Serializable, cancellationToken);
             return true;
         }
         catch (Exception ex)
@@ -251,7 +252,7 @@ public class MarketRepository(IQueryMapper queryMapper): IMarketRepository
 
                 await queryMapper.ExecuteWithTransactionAsync(setSelectedFlagQuery, transaction, cancellationToken);
 
-            }, cancellationToken);
+            },IsolationLevel.ReadCommitted ,cancellationToken);
             
         }
         catch (Exception ex)

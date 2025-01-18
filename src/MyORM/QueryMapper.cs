@@ -6,6 +6,8 @@ using System.Text.RegularExpressions;
 using System.Transactions;
 using MyORM.interfaces;
 using Npgsql;
+using IsolationLevel = System.Data.IsolationLevel;
+
 namespace MyORM;
 
 public class QueryMapper(string connectionString) : IQueryMapper
@@ -19,6 +21,15 @@ public class QueryMapper(string connectionString) : IQueryMapper
     
 
     private static readonly ConcurrentDictionary<Type, Delegate> MapperFuncs = new();
+    
+    private static readonly Dictionary<Type, MethodInfo> TypeMethodMap = new()
+    {
+        { typeof(string), GetStringMethod },
+        { typeof(int), GetIntMethod },
+        { typeof(long), GetIntMethod },
+        { typeof(DateTime), GetDateMethod },
+        { typeof(bool), GetBoolMethod }
+    };
     
     public  async Task<List<T>> ExecuteAndReturnListAsync<T>(FormattableString sql, CancellationToken token)
     {
@@ -108,11 +119,14 @@ public class QueryMapper(string connectionString) : IQueryMapper
         }
     }
     
-    public async Task ExecuteTransactionAsync(Func<NpgsqlTransaction, Task> transactionalWork, CancellationToken cancellationToken = default)
+    public async Task ExecuteTransactionAsync(
+        Func<NpgsqlTransaction, Task> transactionalWork, 
+        IsolationLevel isolationLevel = IsolationLevel.ReadCommitted, 
+        CancellationToken cancellationToken = default)
     {
         await _connection.OpenAsync(cancellationToken);
-    
-        await using var transaction = await _connection.BeginTransactionAsync(cancellationToken);
+
+        await using var transaction = await _connection.BeginTransactionAsync(isolationLevel, cancellationToken);
 
         try
         {
@@ -129,6 +143,7 @@ public class QueryMapper(string connectionString) : IQueryMapper
             await _connection.CloseAsync();
         }
     }
+    
     public async Task ExecuteWithTransactionAsync(FormattableString sql, NpgsqlTransaction transaction, CancellationToken cancellationToken)
     {
         if (transaction.Connection == null)
@@ -162,16 +177,13 @@ public class QueryMapper(string connectionString) : IQueryMapper
     private static Expression BuildReadColumnExpression(Expression reader, PropertyInfo prop)
     {
         var columnName = prop.GetCustomAttribute<ColumnNameAttribute>()?.Name ?? prop.Name;
-        
-        if (prop.PropertyType == typeof(string))
-            return Expression.Call(null, GetStringMethod, reader, Expression.Constant(columnName));
-        else if (prop.PropertyType == typeof(int) || (prop.PropertyType == typeof(long)))
-            return Expression.Call(null, GetIntMethod, reader, Expression.Constant(columnName));
-        else if (prop.PropertyType == typeof(DateTime))
-            return Expression.Call(null, GetDateMethod, reader, Expression.Constant(columnName));
-        else if (prop.PropertyType == typeof(bool))
-            return Expression.Call(null, GetBoolMethod, reader, Expression.Constant(columnName));
-        throw new InvalidOperationException();
+
+        if (!TypeMethodMap.TryGetValue(prop.PropertyType, out var method))
+        {
+            throw new InvalidOperationException($"Unsupported property type: {prop.PropertyType}");
+        }
+
+        return Expression.Call(null, method, reader, Expression.Constant(columnName));
     }
     private static string ReplaceParameters(string query)
     {
