@@ -1,7 +1,6 @@
 ﻿using Moq;
 using MyORM.interfaces;
 using Persistence.Entities;
-using Xunit;
 
 namespace OrmTests;
 

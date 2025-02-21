@@ -3,6 +3,7 @@ const artFolderPath = 'http://localhost:9000/image-bucket/arts/';
 import {createLoginForm, showForm, tokenStorage} from "../Auth/auth.js";
 import {rewardImages} from "../MarketPage/rewardImages.js";
 
+
 let artworkId;
 let authorId;
 let balance;
@@ -29,7 +30,7 @@ likeBtn.addEventListener('click', async () => {
     if (artworkId) {
         await likeArtwork(artworkId);
     } else {
-        alert("ошибка");
+        console.log("ошибка");
     }
 });
 
@@ -38,7 +39,7 @@ saveBtn.addEventListener('click', async () => {
     if (artworkId) {
         await saveArtwork(artworkId);
     } else {
-        alert("ошибка");
+        console.log("ошибка");
     }
 });
 
@@ -85,7 +86,7 @@ async function loadBalance() {
             throw new Error(data || 'Ошибка на сервере!');
         }
     } catch (error) {
-        alert(error);
+        console.log(error);
     }
 }
 
@@ -122,7 +123,7 @@ async function loadArtworkData(artworkId) {
                 throw new Error(data || 'Ошибка на сервере!');
         }
     } catch (error) {
-        alert(error);
+        console.log(error);
     }
 }
 
@@ -153,7 +154,7 @@ async function loadArtworkRewardsData(artworkId) {
             throw new Error(data || 'Ошибка на сервере!');
         }
     } catch (error) {
-        alert(error);
+        console.log(error);
     }
 }
 
@@ -275,7 +276,7 @@ async function loadNextArtwork() {
         artworkId = nextArt.artworkId; 
          window.location.href = `/artwork/${artworkId}`;
     } else {
-        alert("Это последний арт.");
+        console.log("Это последний арт.");
     }
 }
 
@@ -286,7 +287,7 @@ async function loadPreviousArtwork() {
         artworkId = prevArt.artworkId;
         window.location.href = `/artwork/${artworkId}`;
     } else {
-        alert("Это первый арт.");
+        console.log("Это первый арт.");
     }
 }
 
