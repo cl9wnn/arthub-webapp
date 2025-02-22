@@ -57,7 +57,6 @@ public class ArtworkRepository(IQueryMapper queryMapper): IArtworkRepository
                                                      SELECT artwork_id, title, artwork_path, category, artworks.user_id, users.profile_name 
                                                      FROM artworks
                                                      JOIN users ON artworks.user_id = users.user_id
-                                                     ORDER BY random()
                                                      """;
         var artworks = 
             await queryMapper.ExecuteAndReturnListAsync<Artwork?>(sqlQuery, cancellationToken);

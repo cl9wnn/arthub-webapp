@@ -10,10 +10,6 @@ using MyORM.interfaces;
 using Persistence.interfaces;
 using Persistence.Repositories;
 
-var httpListener = new HttpListener();
-httpListener.Prefixes.Add("http://localhost:5050/");
-httpListener.Start();
-
 var serviceProvider = new MyServiceCollection();
 
 serviceProvider.AddSingleton<IQueryMapper, QueryMapper>(() =>
@@ -50,19 +46,5 @@ var templateGenerator = new TemplateGenerator();
 var errorSender = new ErrorSender(templateGenerator);
 var routeHandler = new RouteHandler(serviceProvider, errorSender, authService);
 
-while (httpListener.IsListening)
-{
-    var context = await httpListener.GetContextAsync();
-
-    _ = Task.Run(async () =>
-    {
-        await routeHandler.HandleRequest(context);
-        context.Response.OutputStream.Close();
-        context.Response.Close();
-    });
-}
-httpListener.Stop();
-httpListener.Close();
-
-
-
+var app = new App(routeHandler);
+await app.StartAsync();
