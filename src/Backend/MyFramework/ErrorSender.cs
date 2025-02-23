@@ -6,13 +6,15 @@ namespace MyFramework;
 
 public class ErrorSender(ITemplateGenerator templateGenerator)
 {
+    private const string FrontendPath = "../../../../../Frontend";
+
     public async Task ShowErrorPageAsync(int code, string message, HttpListenerContext context, CancellationToken token)
     {
         context.Response.StatusCode = code;
         context.Response.ContentType = "text/html";
         context.Response.ContentEncoding = Encoding.UTF8;
 
-        const string templatePath = "public/404Page/404.html";
+        const string templatePath = $"{FrontendPath}/404Page/404.html";
         var notFoundTemplate = await TemplateLoader.LoadTemplateAsync(templatePath);
             
         var links = new List<Dictionary<string, string>>

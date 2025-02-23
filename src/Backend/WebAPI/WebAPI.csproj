@@ -8,11 +8,6 @@
         <RootNamespace>WebAPI</RootNamespace>
     </PropertyGroup>
 	
-	<ItemGroup>
-		<Content Include="public\**\*">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>
 	
 	<ItemGroup>
 	  <PackageReference Include="FluentValidation" Version="11.11.0" />
@@ -28,12 +23,6 @@
 	  <ProjectReference Include="..\MyFramework\MyFramework.csproj" />
 	  <ProjectReference Include="..\Persistence\Persistence.csproj" />
 		<ProjectReference Include="..\Application\Application.csproj" />
-	</ItemGroup>
-	
-	<ItemGroup>
-	  <Folder Include="public\resources\frames\" />
-	  <Folder Include="public\resources\headerIcons\" />
-	  <Folder Include="public\resources\profileIcons\" />
 	</ItemGroup>
 
 </Project>

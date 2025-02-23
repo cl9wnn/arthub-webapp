@@ -4,6 +4,7 @@ using System.Text;
 using MyFramework.Attributes;
 using MyFramework.Contracts;
 using MyFramework.TemplateGenerator;
+using MyFramework.Views;
 
 namespace MyFramework;
 
@@ -13,6 +14,8 @@ public class RouteHandler
     private readonly IMyServiceProvider _serviceProvider;
     private readonly IAuthService _authService;
     private readonly ErrorSender _errorSender;
+    private const string FrontendPath = "../../../../../Frontend";
+
     public RouteHandler(IMyServiceProvider serviceProvider, ErrorSender errorSender, IAuthService authService)
     {
         _serviceProvider = serviceProvider;
@@ -48,6 +51,11 @@ public class RouteHandler
 
     try
     {
+        if (await TryHandleStaticFileRequest(context, ctx.Token))
+        {
+            return;
+        }
+        
         var route = GetRoute(context, out var parameters);
         if (route == null)
         {
@@ -229,6 +237,29 @@ private async Task ExecuteAction(Route route, object controller, object?[] args,
             }
         }
 
+        return true;
+    }
+    
+    private async Task<bool> TryHandleStaticFileRequest(HttpListenerContext context, CancellationToken cancellationToken)
+    {
+        var path = context.Request.Url?.LocalPath;
+
+        if (path == null || !path.StartsWith("/static/"))
+        {
+            return false;
+        }
+
+        var filePath = path["/static".Length..].TrimStart('/');
+        var fullPath = $"{FrontendPath}/{filePath}";
+
+        if (!File.Exists(fullPath))
+        {
+            await _errorSender.ShowErrorPageAsync(404, "Page not found", context, cancellationToken);
+            return true;
+        }
+
+        var result = new ResourceResult(fullPath);
+        await result.ExecuteAsync(context, cancellationToken);
         return true;
     }
 }
